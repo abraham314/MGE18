@@ -1,0 +1,383 @@
+
+
+#Se cargan los datos de la base de la carpeta Northwind para cada uno de los csv
+```{r}
+create database if not exists prod 
+location "s3://arturotorre-mge/Tarea5/productos/";
+
+DROP TABLE IF EXISTS prod.products;
+create external table if not exists prod.products (productid smallint,
+productname string,
+supplierid smallint,
+categoryid smallint,
+quantityperunit string,
+unitprice float,
+unitsinstock smallint,
+unitsonorder smallint,
+reorderlevel smallint,
+discontinued int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://arturotorre-mge/Tarea5/productos/productos/'
+tblproperties ("skip.header.line.count"="1");
+
+
+DROP TABLE IF EXISTS prod.orders;
+create external table if not exists prod.orders (orderid smallint,
+customerid string,
+employeeid smallint,
+orderdate timestamp,
+requireddate timestamp,
+shippeddate timestamp,
+shipvia smallint,
+freight float,
+shipname string,
+shipaddress string,
+shipcity string,
+shipregion string,
+shippostalcode string,
+shipcountry string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://arturotorre-mge/Tarea5/productos/orders/'
+tblproperties ("skip.header.line.count"="1");
+
+
+
+DROP TABLE IF EXISTS prod.order_details;
+create external table if not exists prod.order_details (orderid smallint,
+productid smallint,
+unitprice float,
+quantity smallint,
+discount float)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://arturotorre-mge/Tarea5/productos/order_details/'
+tblproperties ("skip.header.line.count"="1");
+
+
+
+
+
+DROP TABLE IF EXISTS prod.customers;
+create external table if not exists prod.customers (
+customerid string,
+companyname string,
+contactname string,
+contacttitle string ,
+address string,
+city string,
+region string,
+postalcode string,
+country string,
+phone string,
+fax string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://arturotorre-mge/Tarea5/productos/customers/'
+tblproperties ("skip.header.line.count"="1");
+
+
+
+
+DROP TABLE IF EXISTS prod.employees;
+create external table if not exists prod.employees (
+employeeid smallint,
+lastname string,
+firstname string,
+title string,
+titleofcourtesy string,
+birthdate string,
+hiredate string,
+address string,
+city string,
+region string,
+postalcode string,
+country string,
+homephone string,
+extension string,
+photo string,
+notes string,
+reportsto smallint,
+photopath string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = "\,",
+   "quoteChar"     = "\"")
+#Corremos este código porque de otra manera los campos no se separan de forma adecuada
+LOCATION 's3://arturotorre-mge/Tarea5/productos/employees/'
+tblproperties ("skip.header.line.count"="1");
+```
+
+#Pregunta 1
+```{r}
+SELECT COUNT(DISTINCT reportsto)
+FROM employees
+WHERE reportsto > 0;
+
+#R= Hay dos jefes distintos
+```
+
+#Pregunta 2
+```{r}
+SELECT  chief.employeeid AS id, chief.firstname AS name,chief.lastname AS lastname, chief.title AS title, chief.birthdate AS birthdate, chief.hiredate AS hire, chief.city AS city, chief.country AS country, chief.empleado AS empleado
+FROM (SELECT jefe.employeeid, jefe.firstname, jefe.lastname, jefe.title, 
+            jefe.birthdate, jefe.hiredate, jefe.city, jefe.country, emp.empleado as empleado
+        FROM (SELECT reportsto, COLLECT_SET(lastname) as empleado
+            FROM prod.employees
+            WHERE reportsto > 0
+            GROUP BY reportsto) emp
+            JOIN prod.employees AS jefe
+            ON emp.reportsto = jefe.employeeid) chief
+    LATERAL VIEW EXPLODE(chief.empleado) chief AS empleado
+    ORDER BY id; 
+
+#id	name	lastname	title	birthdate	hire	city	country	empleado
+#2	Andrew	Fuller	Vice President, Sales	19/02/52	14/08/92	Tacoma	USA	Davolio
+#2	Andrew	Fuller	Vice President, Sales	19/02/52	14/08/92	Tacoma	USA	Leverling
+#2	Andrew	Fuller	Vice President, Sales	19/02/52	14/08/92	Tacoma	USA	Peacock
+#2	Andrew	Fuller	Vice President, Sales	19/02/52	14/08/92	Tacoma	USA	Buchanan
+#2	Andrew	Fuller	Vice President, Sales	19/02/52	14/08/92	Tacoma	USA	Callahan
+#5	Steven	Buchanan	Sales Manager	04/03/55	17/10/93	London	UK	Suyama
+#5	Steven	Buchanan	Sales Manager	04/03/55	17/10/93	London	UK	King
+#5	Steven	Buchanan	Sales Manager	04/03/55	17/10/93	London	UK	Dodsworth
+```
+
+#Pregunta 3
+
+```{r}
+SELECT ord.employeeid AS id, emp.firstname AS name, emp.lastname AS lastname, emp.title AS title, 
+        emp.hiredate AS hire, ord.cant AS ord_cant, ord.top AS ord_top
+    FROM (SELECT *, LAG(oc.cant) OVER (partition by NULL) as top
+        FROM (SELECT orders.employeeid, orders.cant
+            	FROM (SELECT DISTINCT employeeid, 
+            	        COUNT(*) OVER (partition by employeeid) as cant
+                    	FROM prod.orders
+                    	ORDER BY cant ASC) orders
+                ORDER BY cant DESC
+            	LIMIT 2) as oc
+            	ORDER BY cant ASC) ord
+            JOIN (SELECT employeeid, firstname, lastname, title, hiredate
+    	        FROM prod.employees) emp
+				ON ord.employeeid = emp.employeeid
+    LIMIT 1;
+    
+#R=
+#id	name	lastname	title	hire	ord_cant	ord_top
+#3	Janet	Leverling	Sales Representative	01/04/92	127	156
+```
+
+#Pregunta 4
+
+```{r}
+
+SELECT delta.orderid as orderid, datediff(delta.orderdate, delta.dif) as delta
+FROM(
+SELECT orderid, orderdate, (LAG(orderdate) OVER(ORDER BY orderid)) as dif
+FROM orders) delta
+ORDER BY delta DESC
+LIMIT 1;
+
+#R=
+#orderid	delta
+#10250	3
+```
+
+#Cargamos los datos de los flights
+
+```{r}
+
+create database if not exists airp 
+location "s3://arturotorre-mge/Tarea5/aviones/";
+
+DROP TABLE IF EXISTS airp.airports;
+create external table if not exists airp.airports (iata_code string,
+airport string,
+city string,
+state string,
+country string,
+latitude double,
+longitude double)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://arturotorre-mge/Tarea5/aviones/airports/'
+tblproperties ("skip.header.line.count"="1");
+
+DROP TABLE IF EXISTS airp.flights;
+create external table if not exists airp.flights (year smallint,
+month smallint,
+day smallint,
+day_of_week smallint,
+airline string,
+flight_number smallint,
+tail_number string,
+origin_airport string,
+destination_airport string,
+scheduled_departure smallint,
+departure_time smallint,
+departure_delay smallint,
+taxi_out smallint,
+wheels_off smallint,
+scheduled_time smallint,
+elapsed_time smallint,
+air_time smallint,
+distance smallint,
+wheels_on smallint,
+taxi_in smallint,
+scheduled_arrival smallint,
+arrival_time smallint,
+arrival_delay smallint,
+diverted smallint,
+cancelled smallint,
+cancellation_reason string,
+air_system_delay string,
+security_delay string,
+airline_delay string,
+late_aircraft_delay string,
+weather_delay string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://arturotorre-mge/Tarea5/aviones/flights/'
+tblproperties ("skip.header.line.count"="1");
+
+DROP TABLE IF EXISTS airp.airlines;
+create external table if not exists airp.airlines (iata_code string,
+airline string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://arturotorre-mge/Tarea5/aviones/airlines/'
+tblproperties ("skip.header.line.count"="1");
+```
+
+
+#Pregunta 1B
+```{r}
+SELECT DISTINCT aerol.airline
+FROM flights f JOIN airports AS hnl
+ON f.destination_airport = hnl.iata_code
+JOIN airlines AS aerol
+ON f.airline=aerol.iata_code
+WHERE hnl.airport="Honolulu International Airport";
+
+#R= aerol.airline
+#Alaska Airlines Inc.
+#Hawaiian Airlines Inc.
+#United Air Lines Inc.
+#Virgin America
+#American Airlines Inc.
+#Delta Air Lines Inc.
+#US Airways Inc.
+
+```
+
+#Pregunta 2B
+
+```{r}
+SELECT DISTINCT 
+    CASE
+        WHEN LENGTH(cast(departure_time as string)) = "3" then cast(substr(departure_time, 1, 1) as int) 
+        WHEN LENGTH(cast(departure_time as string)) = "4" then cast(substr(departure_time, 1, 2) as int)
+    END AS horario
+FROM  flights 
+WHERE origin_airport = "SFO"
+  AND destination_airport = "HNL"
+  AND departure_time > 0
+  ORDER BY horario;
+  
+  #R
+```
+
+#Pregunta 3B
+
+```{r}
+SELECT airl.airline, fli.day_of_week, AVG(fli.departure_delay) AS retraso
+FROM flights AS fli JOIN airports AS aerp
+ON fli.destination_airport = aerp.iata_code
+JOIN airlines AS airl
+ON fli.airline=airl.iata_code
+WHERE aerp.airport="Honolulu International Airport"
+GROUP BY airl.airline, fli.day_of_week
+HAVING retraso > 0
+ORDER BY retraso
+LIMIT 1;
+
+#R
+#airl.airline	fli.day_of_week	retraso
+#Hawaiian Airlines Inc.	6	0.187819732
+
+
+```
+
+#Pregunta 4B
+```{r}
+SELECT vuelo.destination_airport, 
+airp.airport AS aeropuerto,
+count(vuelo.destination_airport) AS vuelos_recibidos
+FROM airp.flights AS vuelo
+JOIN airp.airports airp
+ON vuelo.destination_airport = airp.iata_code
+GROUP BY vuelo.destination_airport, airp.airport
+ORDER BY vuelos_recibidos DESC 
+LIMIT 1;
+
+#R
+#vuelo.destination_airport	aeropuerto	vuelos_recibidos
+#ATL	Hartsfield-Jackson Atlanta International Airport	346904
+```
+
+#Pregunta 5B
+
+```{r}
+SELECT fl_delay.dia AS dia, fl_delay.retraso AS maximo, fl_delay.code AS code, airl.airline AS aerolinea
+FROM (SELECT fl.dia, fl.retraso, fli.airline AS code
+FROM (SELECT day_of_week AS dia, MAX(departure_delay) AS retraso
+FROM flights
+GROUP BY day_of_week
+ORDER BY dia) AS fl
+JOIN flights AS fli
+ON  fl.dia = fli.day_of_week 
+AND fl.retraso  = fli.departure_delay) AS fl_delay
+JOIN airlines AS airl 
+ON fl_delay.code = airl.iata_code;
+
+#R=dia	maximo	code	aerolinea
+#1	1625	AA	American Airlines Inc.
+#3	1589	AA	American Airlines Inc.
+#5	1988	AA	American Airlines Inc.
+#4	1649	AA	American Airlines Inc.
+#2	1609	AA	American Airlines Inc.
+#6	1878	AA	American Airlines Inc.
+#7	1670	AA	American Airlines Inc.
+```
+
+
+#Pregunta 6B
+
+```{r}
+SELECT a.clasifi AS clasifi, air.airline AS airline, a.delay AS delay 
+FROM ( SELECT * 
+FROM (SELECT row_number() OVER (ORDER BY b.delay) AS clasifi, b.airline, b.delay 
+FROM ( SELECT airline, round(avg(departure_delay),2) AS delay 
+FROM flights
+WHERE day_of_week = 2
+GROUP BY airline
+ORDER BY delay ASC) b ) fl
+WHERE fl.clasifi = 3 ) a
+JOIN airlines AS air 
+ON a.airline = air.iata_code
+
+#R=
+#clasifi	airline	delay
+#3	US Airways Inc.	6.48
+```
+
+#Pregunta 7B
+
+```{r}
+SELECT aeropuerto.airport AS aeropuerto, COUNT( DISTINCT vuelo.destination_airport) as destino
+FROM flights AS vuelo JOIN airports AS aeropuerto
+ON vuelo.origin_airport = aeropuerto.iata_code
+GROUP BY aeropuerto.airport
+ORDER BY destino DESC
+LIMIT 1;
+
+#R=
+#aeropuerto	destino
+#Hartsfield-Jackson Atlanta International Airport	169
+```
+

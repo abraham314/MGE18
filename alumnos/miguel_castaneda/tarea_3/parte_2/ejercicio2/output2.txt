@@ -1,0 +1,10 @@
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,2771,N959WN,LAX,1230,1315,45,8,1323,95,93,70,451,1433,15,1405,1448,43,0,0,,0,0,0,43,0	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,2799,N458WN,LAS,0820,0815,-5,9,0824,75,70,56,365,0920,5,0935,0925,-10,0,0,,,,,,	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,2815,N7727A,LAX,1910,1905,-5,12,1917,95,90,70,451,2027,8,2045,2035,-10,0,0,,,,,,	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,2819,N445WN,SAN,1000,0959,-1,7,1006,75,68,56,368,1102,5,1115,1107,-8,0,0,,,,,,	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,2834,N247WN,SAN,0555,0551,-4,8,0559,75,68,56,368,0655,4,0710,0659,-11,0,0,,,,,,	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,300,N568WN,LAS,2010,2004,-6,6,2010,70,69,58,365,2108,5,2120,2113,-7,0,0,,,,,,	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,3196,N731SA,DEN,0605,0603,-2,20,0623,110,132,102,639,0905,10,0855,0915,20,0,0,,20,0,0,0,0	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,488,N405WN,LAX,0645,0639,-6,15,0654,90,96,71,451,0805,10,0815,0815,0,0,0,,,,,,	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,525,N7705A,DEN,1545,1540,-5,8,1548,110,100,85,639,1813,7,1835,1820,-15,0,0,,,,,,	
+WN,Southwest Airlines Co.,TUS,Tucson International Airport,Tucson,AZ,USA,32.11608,-110.94103,2015,9,9,3,61,N711HK,LAS,1155,1149,-6,8,1157,75,70,55,365,1252,7,1310,1259,-11,0,0,,,,,,	

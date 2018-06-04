@@ -1,0 +1,9 @@
+id,nombre,apellido,titulo,fecha_nac,ingreso,ciudad,pais,empleado
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,Davolio
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,Leverling
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,Peacock
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,Buchanan
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,Callahan
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,Suyama
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,King
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,Dodsworth

@@ -1,0 +1,2 @@
+f.origin_airport	ap.airport	n_destination
+ATL	Hartsfield-Jackson Atlanta International Airport	693672

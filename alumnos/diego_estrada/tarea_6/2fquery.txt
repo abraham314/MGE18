@@ -1,0 +1,13 @@
+%pyspark
+
+# 2f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)? 
+
+vuelosaerolinea = vuelos.join(aerolineas, vuelos.IATA_CODE == aerolineas.IATA_CODE, 'left_outer').select(vuelos.DAY_OF_WEEK, vuelos.DEPARTURE_DELAY, aerolineas.AIRLINE)
+
+retrasosprom = vuelosaerolinea.groupBy("AIRLINE", "DAY_OF_WEEK").avg("DEPARTURE_DELAY")
+
+retrasosprom = retrasosprom.withColumnRenamed('avg(DEPARTURE_DELAY)', 'RETRASO_PROM')
+
+resultado = retrasosprom.where(retrasosprom.DAY_OF_WEEK == 2).orderBy('RETRASO_PROM', ascending = True).limit(3)
+
+resultado.orderBy('RETRASO_PROM', ascending = False).limit(1).show()

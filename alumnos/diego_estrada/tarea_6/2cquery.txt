@@ -1,0 +1,17 @@
+%pyspark
+
+# 2c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible? 
+
+vuelosretraso = vuelos.select('DAY_OF_WEEK', 'AIRLINE', 'DESTINATION_AIRPORT', 'DEPARTURE_DELAY', 'ARRIVAL_DELAY')
+
+vuelosretraso = vuelosretraso.withColumn("RETRASO", (F.col("DEPARTURE_DELAY") + F.col("ARRIVAL_DELAY")))
+
+vuelosretraso = vuelosretraso.join(aeropuertos, vuelosretraso.DESTINATION_AIRPORT == aeropuertos.IATA_CODE, 'left_outer').select(vuelosretraso.DESTINATION_AIRPORT, vuelosretraso.AIRLINE, vuelosretraso.DAY_OF_WEEK, vuelosretraso.RETRASO, aeropuertos.AIRPORT)
+
+vuelosretraso = vuelosretraso.withColumnRenamed('AIRLINE', 'IATA_CODE')
+
+vuelosretraso = vuelosretraso.join(aerolineas, vuelosretraso.IATA_CODE == aerolineas.IATA_CODE, "left_outer").select(vuelosretraso.DAY_OF_WEEK, vuelosretraso.RETRASO, vuelosretraso.AIRPORT, aerolineas.AIRLINE)
+
+vuelosretraso = vuelosretraso.where(vuelosretraso.AIRPORT == "Honolulu International Airport")
+
+vuelosretraso.groupBy("DAY_OF_WEEK", "AIRLINE").avg("RETRASO").orderBy('avg(RETRASO)', ascending = True).limit(1).show()

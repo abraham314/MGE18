@@ -1,0 +1,2 @@
+n_incom_traffic	ap.airport
+693808	Hartsfield-Jackson Atlanta International Airport

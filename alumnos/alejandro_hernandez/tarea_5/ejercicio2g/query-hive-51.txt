@@ -1,0 +1,323 @@
+f.origin_airport,ae.airport,cuenta
+ATL,Hartsfield-Jackson Atlanta International Airport,169
+ORD,Chicago O'Hare International Airport,162
+DFW,Dallas/Fort Worth International Airport,148
+DEN,Denver International Airport,139
+MSP,Minneapolis-Saint Paul International Airport,120
+IAH,George Bush Intercontinental Airport,119
+DTW,Detroit Metropolitan Airport,112
+SLC,Salt Lake City International Airport,89
+EWR,Newark Liberty International Airport,88
+LAX,Los Angeles International Airport,80
+SFO,San Francisco International Airport,80
+PHX,Phoenix Sky Harbor International Airport,79
+LAS,McCarran International Airport,78
+MCO,Orlando International Airport,74
+SEA,Seattle-Tacoma International Airport,73
+IAD,Washington Dulles International Airport,71
+MDW,Chicago Midway International Airport,69
+CLT,Charlotte Douglas International Airport,69
+LGA,LaGuardia Airport (Marine Air Terminal),69
+BWI,Baltimore-Washington International Airport,67
+JFK,John F. Kennedy International Airport (New York International Airport),64
+BOS,Gen. Edward Lawrence Logan International Airport,62
+TPA,Tampa International Airport,61
+FLL,Fort Lauderdale-Hollywood International Airport,59
+DCA,Ronald Reagan Washington National Airport,57
+MIA,Miami International Airport,55
+DAL,Dallas Love Field,52
+HOU,William P. Hobby Airport,51
+STL,St. Louis International Airport at Lambert Field,49
+BNA,Nashville International Airport,47
+PDX,Portland International Airport,47
+SAN,San Diego International Airport (Lindbergh Field),46
+PHL,Philadelphia International Airport,46
+MCI,Kansas City International Airport,42
+AUS,Austin-Bergstrom International Airport,41
+CVG,Cincinnati/Northern Kentucky International Airport,40
+RSW,Southwest Florida International Airport,39
+MSY,Louis Armstrong New Orleans International Airport,38
+CLE,Cleveland Hopkins International Airport,36
+RDU,Raleigh-Durham International Airport,36
+OAK,Oakland International Airport,35
+PIT,Pittsburgh International Airport,30
+SAT,San Antonio International Airport,30
+IND,Indianapolis International Airport,30
+ANC,Ted Stevens Anchorage International Airport,30
+MKE,General Mitchell International Airport,29
+HNL,Honolulu International Airport,28
+CMH,Port Columbus International Airport,28
+SMF,Sacramento International Airport,27
+SJC,Norman Y. Mineta San José International Airport,25
+BDL,Bradley International Airport,25
+CHS,Charleston International Airport/Charleston AFB,24
+PBI,Palm Beach International Airport,24
+MEM,Memphis International Airport,23
+SJU,Luis Muñoz Marín International Airport,23
+ABQ,Albuquerque International Sunport,23
+JAX,Jacksonville International Airport,22
+SNA,John Wayne Airport (Orange County Airport),22
+OKC,Will Rogers World Airport,22
+OMA,Eppley Airfield,21
+OGG,Kahului Airport,18
+TTN,Trenton Mercer Airport,18
+TUL,Tulsa International Airport,18
+SDF,Louisville International Airport (Standiford Field),18
+MSN,Dane County Regional Airport,18
+BUF,Buffalo Niagara International Airport,18
+RIC,Richmond International Airport,17
+MYR,Myrtle Beach International Airport,17
+ORF,Norfolk International Airport,17
+BOI,Boise Airport (Boise Air Terminal),16
+TUS,Tucson International Airport,16
+BHM,Birmingham-Shuttlesworth International Airport,15
+ALB,Albany International Airport,15
+PVD,Theodore Francis Green State Airport,15
+GRR,Gerald R. Ford International Airport,15
+GSP,Greenville-Spartanburg International Airport,14
+ONT,Ontario International Airport,14
+DSM,Des Moines International Airport,13
+RNO,Reno/Tahoe International Airport,13
+ROC,Greater Rochester International Airport,13
+JAC,Jackson Hole Airport,13
+KOA,Kona International Airport at Keahole,12
+BZN,Bozeman Yellowstone International Airport (Gallatin Field Airport),12
+GSO,Piedmont Triad International Airport,12
+CAK,Akron-Canton Regional Airport,12
+PSP,Palm Springs International Airport,12
+LGB,Long Beach Airport (Daugherty Field),12
+DAY,James M. Cox Dayton International Airport,12
+MHT,Manchester-Boston Regional Airport,12
+LIT,Bill and Hillary Clinton National Airport (Adams Field),12
+ELP,El Paso International Airport,12
+STT,Cyril E. King Airport,12
+XNA,Northwest Arkansas Regional Airport,11
+EGE,Eagle County Regional Airport,11
+SYR,Syracuse Hancock International Airport,11
+TYS,McGhee Tyson Airport,11
+PWM,Portland International Jetport,11
+SAV,Savannah/Hilton Head International Airport,11
+BUR,Bob Hope Airport (Hollywood Burbank Airport),11
+LIH,Lihue Airport,11
+ICT,Wichita Dwight D. Eisenhower National Airport (Wichita Mid-Continent Airport),10
+MTJ,Montrose Regional Airport,10
+HDN,Yampa Valley Airport (Yampa Valley Regional),10
+GEG,Spokane International Airport,10
+ACY,Atlantic City International Airport,10
+FAT,Fresno Yosemite International Airport,9
+COS,City of Colorado Springs Municipal Airport,9
+PNS,Pensacola International Airport (Pensacola Gulf Coast Regional Airport),9
+HPN,Westchester County Airport,9
+RAP,Rapid City Regional Airport,8
+MSO,Missoula International Airport,8
+FNT,Bishop International Airport,8
+LEX,Blue Grass Airport,8
+HSV,Huntsville International Airport,8
+ASE,Aspen-Pitkin County Airport,8
+SBN,South Bend International Airport (South Bend Regional),8
+LBB,Lubbock Preston Smith International Airport,8
+SWF,Stewart International Airport,7
+LBE,Arnold Palmer Regional Airport,7
+BMI,Central Illinois Regional Airport at Bloomington-Normal,7
+BTV,Burlington International Airport,7
+FAR,Hector International Airport,7
+FSD,Sioux Falls Regional Airport,7
+CID,The Eastern Iowa Airport,7
+PIA,General Wayne A. Downing Peoria International Airport,7
+SRQ,Sarasota-Bradenton International Airport,7
+ECP,Northwest Florida Beaches International Airport,7
+JNU,Juneau International Airport,7
+MDT,Harrisburg International Airport,6
+SGF,Springfield-Branson National Airport,6
+GJT,Grand Junction Regional Airport (Walker Field),6
+TVC,Cherry Capital Airport,6
+MLI,Quad City International Airport,6
+SBA,Santa Barbara Municipal Airport (Santa Barbara Airport),6
+BIL,Billings Logan International Airport,6
+FCA,Glacier Park International Airport,6
+MAF,Midland International Airport,6
+CAE,Columbia Metropolitan Airport,6
+CRW,Yeager Airport,6
+ISP,Long Island MacArthur Airport,6
+JAN,Jackson-Evers International Airport,5
+CRP,Corpus Christi International Airport,5
+PSC,Tri-Cities Airport,5
+AMA,Rick Husband Amarillo International Airport,5
+RST,Rochester International Airport,5
+EUG,Eugene Airport (Mahlon Sweet Field),5
+FWA,Fort Wayne International Airport,5
+LFT,Lafayette Regional Airport,5
+BFL,Meadows Field,4
+GCC,Gillette-Campbell County Airport,4
+RDM,Redmond Municipal Airport (Roberts Field),4
+LNK,Lincoln Airport (Lincoln Municipal),4
+GUC,Gunnison-Crested Butte Regional Airport,4
+LAN,Capital Region International Airport ( Lansing Capital City),4
+BTR,Baton Rouge Metropolitan Airport,4
+STX,Henry E. Rohlsen Airport,4
+MBS,MBS International Airport,4
+ATW,Appleton International Airport,4
+BIS,Bismarck Municipal Airport,4
+GRB,Green Bay-Austin Straubel International Airport,4
+AZO,Kalamazoo/Battle Creek International Airport,4
+FAI,Fairbanks International Airport,4
+GRK,Killeen-Fort Hood Regional Airport,4
+EVV,Evansville Regional Airport,4
+BLI,Bellingham International Airport,4
+AVP,Wilkes-Barre/Scranton International Airport,4
+SHV,Shreveport Regional Airport,4
+KTN,Ketchikan International Airport,4
+CHA,Chattanooga Metropolitan Airport (Lovell Field),4
+MOB,Mobile Regional Airport,4
+BQN,Rafael Hernández Airport,4
+CWA,Central Wisconsin Airport,3
+SIT,Sitka Rocky Gutierrez Airport,3
+HRL,Valley International Airport,3
+AEX,Alexandria International Airport,3
+GTF,Great Falls International Airport,3
+SCE,University Park Airport,3
+ILM,Wilmington International Airport,3
+INL,Falls International Airport,3
+ISN,Sloulin Field International Airport,3
+TLH,Tallahassee International Airport,3
+LRD,Laredo International Airport,3
+DRO,Durango-La Plata County Airport,3
+MFR,Rogue Valley International Airport,3
+ROA,Roanoke Regional Airport (Woodrum Field),3
+BRW,Wiley Post-Will Rogers Memorial Airport,3
+VPS,Destin-Fort Walton Beach Airport/Eglin AFB,3
+GPT,Gulfport-Biloxi International Airport,3
+MRY,Monterey Regional Airport (Monterey Peninsula Airport),3
+ABE,Lehigh Valley International Airport,3
+HLN,Helena Regional Airport,3
+IDA,Idaho Falls Regional Airport,3
+SUN,Friedman Memorial Airport,3
+COD,Yellowstone Regional Airport,3
+ACK,Nantucket Memorial Airport,3
+SBP,San Luis Obispo County Regional Airport (McChesney Field),3
+ITO,Hilo International Airport,3
+ELM,Elmira/Corning Regional Airport,3
+SAF,Santa Fe Municipal Airport,3
+RKS,Rock Springs-Sweetwater County Airport,3
+AVL,Asheville Regional Airport,3
+MLU,Monroe Regional Airport,3
+CHO,Charlottesville-Albemarle Airport,3
+EYW,Key West International Airport,3
+WRG,Wrangell Airport,2
+CDV,Merle K. (Mudhole) Smith Airport,2
+BGR,Bangor International Airport,2
+GNV,Gainesville Regional Airport,2
+SGU,St. George Regional Airport,2
+ILG,Wilmington Airport,2
+JMS,Jamestown Regional Airport,2
+LSE,La Crosse Regional Airport,2
+MEI,Meridian Regional Airport,2
+MFE,McAllen-Miller International Airport (McAllen Miller International),2
+PSE,Mercedita Airport,2
+PLN,Pellston Regional Airport of Emmet County,2
+OME,Nome Airport,2
+PHF,Newport News/Williamsburg International Airport,2
+OTH,Southwest Oregon Regional Airport (North Bend Municipal),2
+OTZ,Ralph Wien Memorial Airport,2
+YAK,Yakutat Airport,2
+BRO,Brownsville/South Padre Island International Airport,2
+COU,Columbia Regional Airport,2
+DAB,Daytona Beach International Airport,2
+DLH,Duluth International Airport,2
+DVL,Devils Lake Regional Airport,2
+ERI,Erie International Airport,2
+HIB,Range Regional Airport (Chisholm-Hibbing Airport),2
+LCH,Lake Charles Regional Airport,2
+MGM,Montgomery Regional Airport,2
+MMH,Mammoth Yosemite Airport,2
+MOT,Minot International Airport,2
+MQT,Sawyer International Airport,2
+MVY,Martha's Vineyard Airport,2
+PBG,Plattsburgh International Airport,2
+PIB,Hattiesburg-Laurel Regional Airport,2
+SMX,Santa Maria Public Airport (Capt G. Allan Hancock Field),2
+SPI,Abraham Lincoln Capital Airport,2
+TYR,Tyler Pounds Regional Airport,2
+ORH,Worcester Regional Airport,2
+FSM,Fort Smith Regional Airport,2
+IAG,Niagara Falls International Airport,2
+IMT,Ford Airport,2
+MHK,Manhattan Regional Airport,2
+DIK,Dickinson Theodore Roosevelt Regional Airport,2
+CPR,Natrona County International Airport,2
+CMI,University of Illinois - Willard Airport,2
+CLL,Easterwood Airport,2
+PSG,Petersburg James A. Johnson Airport,2
+RHI,Rhinelander-Oneida County Airport,2
+BRD,Brainerd Lakes Regional Airport,2
+SCC,Deadhorse Airport (Prudhoe Bay Airport),2
+AGS,Augusta Regional Airport (Bush Field),2
+UST,Northeast Florida Regional Airport (St. Augustine Airport),2
+GCK,Garden City Regional Airport,1
+VLD,Valdosta Regional Airport,1
+BQK,Brunswick Golden Isles Airport,1
+PIH,Pocatello Regional Airport,1
+OAJ,Albert J. Ellis Airport,1
+GTR,Golden Triangle Regional Airport,1
+ACT,Waco Regional Airport,1
+DLG,Dillingham Airport,1
+EAU,Chippewa Valley Regional Airport,1
+TOL,Toledo Express Airport,1
+ABR,Aberdeen Regional Airport,1
+JLN,Joplin Regional Airport,1
+CDC,Cedar City Regional Airport,1
+BTM,Bert Mooney Airport,1
+CLD,McClellan-Palomar Airport,1
+PUB,Pueblo Memorial Airport,1
+MKG,Muskegon County Airport,1
+LWS,Lewiston-Nez Perce County Airport,1
+HYS,Hays Regional Airport,1
+HOB,Lea County Regional Airport,1
+GUM,Guam International Airport,1
+GFK,Grand Forks International Airport,1
+DBQ,Dubuque Regional Airport,1
+CSG,Columbus Metropolitan Airport,1
+ITH,Ithaca Tompkins Regional Airport,1
+ADK,Adak Airport,1
+CMX,Houghton County Memorial Airport,1
+STC,St. Cloud Regional Airport,1
+CEC,Del Norte County Airport (Jack McNamara Field),1
+BPT,Jack Brooks Regional Airport (Southeast Texas Regional),1
+AKN,King Salmon Airport,1
+PPG,Pago Pago International Airport (Tafuna Airport),1
+RDD,Redding Municipal Airport,1
+ROW,Roswell International Air Center,1
+ABI,Abilene Regional Airport,1
+ABY,Southwest Georgia Regional Airport,1
+ACV,Arcata Airport,1
+ADQ,Kodiak Airport,1
+ALO,Waterloo Regional Airport,1
+APN,Alpena County Regional Airport,1
+BET,Bethel Airport,1
+BGM,Greater Binghamton Airport,1
+BJI,Bemidji Regional Airport,1
+CIU,Chippewa County International Airport,1
+CNY,Canyonlands Field,1
+DHN,Dothan Regional Airport,1
+EKO,Elko Regional Airport,1
+ESC,Delta County Airport,1
+EWN,Coastal Carolina Regional Airport (Craven County Regional),1
+FAY,Fayetteville Regional Airport,1
+FLG,Flagstaff Pulliam Airport,1
+GGG,East Texas Regional Airport,1
+GRI,Central Nebraska Regional Airport,1
+GST,Gustavus Airport,1
+HYA,Barnstable Municipal Airport,1
+LAR,Laramie Regional Airport,1
+LAW,Lawton-Fort Sill Regional Airport,1
+MLB,Melbourne International Airport,1
+PAH,Barkley Regional Airport,1
+SJT,San Angelo Regional Airport (Mathis Field),1
+SPS,Wichita Falls Municipal Airport/Sheppard AFB,1
+SUX,Sioux Gateway Airport,1
+TRI,Tri-Cities Regional Airport,1
+TWF,Magic Valley Regional Airport (Joslin Field),1
+TXK,Texarkana Regional Airport (Webb Field),1
+VEL,Valdez Airport,1
+WYS,Westerly State Airport,1
+YUM,Yuma International Airport,1

@@ -1,0 +1,682 @@
+﻿{
+   "paragraphs": [
+      {
+         "text": "%pyspark\n\nfrom pyspark.sql import SparkSession\nfrom pyspark.sql.functions import *\n\nspark = SparkSession.builder.master(\"local[*]\").getOrCreate()\n\n\nemployees = spark.read.csv('s3://metodosgranescala/hive_db/northwind/employees/employees.csv', header =True)\nemployees.createOrReplaceTempView(\"employees\");\n\norders    = spark.read.csv('s3://metodosgranescala/hive_db/northwind/orders/orders.csv', header =True)   \norders.createOrReplaceTempView(\"orders\");\n\nflights  = spark.read.csv('s3://metodosgranescala/hive_db/flights/flights/flights.csv', header =True)   \nflights.createOrReplaceTempView(\"flights\");\n\nairlines  = spark.read.csv('s3://metodosgranescala/hive_db/flights/airlines/airlines.csv', header =True)   \nairlines.createOrReplaceTempView(\"airlines\");\n\nairports  = spark.read.csv('s3://metodosgranescala/hive_db/flights/airports/airports.csv', header =True)   \nairports.createOrReplaceTempView(\"airports\");\n\n",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "text",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/text"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521221573950_1416827250",
+         "id": "20180316-173253_984800904",
+         "dateCreated": "2018-03-16T17:32:53+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:1884",
+         "dateFinished": "2018-03-16T18:37:13+0000",
+         "dateStarted": "2018-03-16T18:36:59+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": []
+         }
+      },
+      {
+         "text": "%pyspark\nflights.printSchema()",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521224884696_1445880096",
+         "id": "20180316-182804_1454933984",
+         "dateCreated": "2018-03-16T18:28:04+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:6196",
+         "dateFinished": "2018-03-16T18:37:13+0000",
+         "dateStarted": "2018-03-16T18:36:59+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TEXT",
+                  "data": "root\n |-- YEAR: string (nullable = true)\n |-- MONTH: string (nullable = true)\n |-- DAY: string (nullable = true)\n |-- DAY_OF_WEEK: string (nullable = true)\n |-- AIRLINE: string (nullable = true)\n |-- FLIGHT_NUMBER: string (nullable = true)\n |-- TAIL_NUMBER: string (nullable = true)\n |-- ORIGIN_AIRPORT: string (nullable = true)\n |-- DESTINATION_AIRPORT: string (nullable = true)\n |-- SCHEDULED_DEPARTURE: string (nullable = true)\n |-- DEPARTURE_TIME: string (nullable = true)\n |-- DEPARTURE_DELAY: string (nullable = true)\n |-- TAXI_OUT: string (nullable = true)\n |-- WHEELS_OFF: string (nullable = true)\n |-- SCHEDULED_TIME: string (nullable = true)\n |-- ELAPSED_TIME: string (nullable = true)\n |-- AIR_TIME: string (nullable = true)\n |-- DISTANCE: string (nullable = true)\n |-- WHEELS_ON: string (nullable = true)\n |-- TAXI_IN: string (nullable = true)\n |-- SCHEDULED_ARRIVAL: string (nullable = true)\n |-- ARRIVAL_TIME: string (nullable = true)\n |-- ARRIVAL_DELAY: string (nullable = true)\n |-- DIVERTED: string (nullable = true)\n |-- CANCELLED: string (nullable = true)\n |-- CANCELLATION_REASON: string (nullable = true)\n |-- AIR_SYSTEM_DELAY: string (nullable = true)\n |-- SECURITY_DELAY: string (nullable = true)\n |-- AIRLINE_DELAY: string (nullable = true)\n |-- LATE_AIRCRAFT_DELAY: string (nullable = true)\n |-- WEATHER_DELAY: string (nullable = true)\n\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\nshow tables\n",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "sql",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/sql"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521221878410_273585550",
+         "id": "20180316-173758_338859466",
+         "dateCreated": "2018-03-16T17:37:58+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:1983",
+         "dateFinished": "2018-03-16T18:37:13+0000",
+         "dateStarted": "2018-03-16T18:37:13+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "database\ttableName\tisTemporary\n\tairlines\ttrue\n\tairports\ttrue\n\temployees\ttrue\n\tflights\ttrue\n\torders\ttrue\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect count(*) as total_jefes\n  from employees e \n  join (select distinct reportsto from employees) jefes \n  on jefes.reportsto = e.employeeid",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521222214659_-1312892341",
+         "id": "20180316-174334_1099469679",
+         "dateCreated": "2018-03-16T17:43:34+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:2283",
+         "dateFinished": "2018-03-16T18:37:15+0000",
+         "dateStarted": "2018-03-16T18:37:13+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "total_jefes\n2\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect e.employeeid, e.lastname, e.firstname, e.title, e.birthdate, e.hiredate, e.city, e.country, e.reportsto    \n  from employees e \n  join (select distinct reportsto from employees) jefes \n  on jefes.reportsto = e.employeeid",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521222523644_-503150792",
+         "id": "20180316-174843_652865066",
+         "dateCreated": "2018-03-16T17:48:43+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:2667",
+         "dateFinished": "2018-03-16T18:37:16+0000",
+         "dateStarted": "2018-03-16T18:37:13+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "employeeid\tlastname\tfirstname\ttitle\tbirthdate\thiredate\tcity\tcountry\treportsto\n2\tFuller\tAndrew\tVice President, Sales\t1952-02-19\t1992-08-14\tTacoma\tUSA\tnull\n5\tBuchanan\tSteven\tSales Manager\t1955-03-04\t1993-10-17\tLondon\tUK\t2\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect a.employeeid, concat(e.lastname ,\" \",  e.firstname) as nombre, e.title, e.hiredate, a.total, lead(a.total,1) over (order by a.total) as primero \nfrom ( \n  select o.employeeid, count(*) as total \n  from orders o \n  group by o.employeeid\n) a \njoin employees e\non e.employeeid = a.employeeid\norder by primero desc limit 1",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223142155_477892149",
+         "id": "20180316-175902_838446196",
+         "dateCreated": "2018-03-16T17:59:02+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:3021",
+         "dateFinished": "2018-03-16T18:37:19+0000",
+         "dateStarted": "2018-03-16T18:37:15+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "employeeid\tnombre\ttitle\thiredate\ttotal\tprimero\n3\tLeverling Janet\tSales Representative\t1992-04-01\t127\t156\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect orderid, from_utc_timestamp(date_format(orderdate,'yyyy-MM-dd HH:mm:ss.SSS'),'UTC') as orderdate , \ndatediff(orderdate, lag(orderdate) over (order by orderid)) as diferencia\nfrom orders \norder by diferencia desc\nlimit 1",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223399170_-1233334685",
+         "id": "20180316-180319_2002134416",
+         "dateCreated": "2018-03-16T18:03:19+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:3319",
+         "dateFinished": "2018-03-16T18:37:20+0000",
+         "dateStarted": "2018-03-16T18:37:17+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "orderid\torderdate\tdiferencia\n10250\t1996-07-08 00:00:00.0\t3\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect distinct(f.airline) as airline, a.airline from flights f \njoin airlines a \non a.iata_code = f.airline\nwhere destination_airport = 'HNL'",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:42:12+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {
+               "0": {
+                  "graph": {
+                     "mode": "table",
+                     "height": 300,
+                     "optionOpen": false
+                  },
+                  "helium": {}
+               }
+            },
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223446765_719543462",
+         "id": "20180316-180406_558836739",
+         "dateCreated": "2018-03-16T18:04:06+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:3491",
+         "dateFinished": "2018-03-16T18:37:36+0000",
+         "dateStarted": "2018-03-16T18:37:19+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "airline\tairline\nAS\tAlaska Airlines Inc.\nDL\tDelta Air Lines Inc.\nVX\tVirgin America\nUS\tUS Airways Inc.\nHA\tHawaiian Airlines Inc.\nAA\tAmerican Airlines Inc.\nUA\tUnited Air Lines Inc.\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect distinct substring(lpad(scheduled_departure,4,\"0\"),1,2) as hora \nfrom flights f where f.destination_airport ='HNL' and f.origin_airport ='SFO'",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:36:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223782599_610583656",
+         "id": "20180316-180942_2046524662",
+         "dateCreated": "2018-03-16T18:09:42+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:3751",
+         "dateFinished": "2018-03-16T18:37:45+0000",
+         "dateStarted": "2018-03-16T18:37:20+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "hora\n07\n15\n11\n16\n18\n17\n09\n19\n08\n06\n10\n12\n13\n14\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect f.day_of_week, f.airline, a.airline, min(cast (f.departure_delay as int))  as minimo\n from flights f \n join airlines a \n on a.iata_code = f.airline \nwhere f.destination_airport ='HNL' \ngroup by f.day_of_week, f.airline, a.airline\norder by minimo asc limit 1",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:37:00+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223846619_-924656401",
+         "id": "20180316-181046_301618549",
+         "dateCreated": "2018-03-16T18:10:46+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:3897",
+         "dateFinished": "2018-03-16T18:37:54+0000",
+         "dateStarted": "2018-03-16T18:37:36+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "day_of_week\tairline\tairline\tminimo\n5\tHA\tHawaiian Airlines Inc.\t-27\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect  f.destination_airport, a.airport, count(f.destination_airport) as total_llegadas\n from flights f \n join airports a \n on a.iata_code = f.destination_airport \n group by f.destination_airport, a.airport\n order by total_llegadas desc limit 1",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:37:00+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223872403_1127071566",
+         "id": "20180316-181112_942192735",
+         "dateCreated": "2018-03-16T18:11:12+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:4042",
+         "dateFinished": "2018-03-16T18:38:03+0000",
+         "dateStarted": "2018-03-16T18:37:46+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "destination_airport\tairport\ttotal_llegadas\nATL\tHartsfield-Jackson Atlanta International Airport\t346904\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect f.airline, a.airline, f.day_of_week , cast(f.departure_delay as int) as departure_delay from flights f \n    join (\n    select day_of_week, max(cast(departure_delay as int) ) as maximo from flights group by day_of_week\n    ) ff \n    on  f.departure_delay = ff.maximo\n    join airlines a \n    on f.airline = a.iata_code\n    order by f.day_of_week\n    \n    ",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:42:30+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {
+               "0": {
+                  "graph": {
+                     "mode": "table",
+                     "height": 300,
+                     "optionOpen": false,
+                     "setting": {
+                        "stackedAreaChart": {
+                           "style": "expand"
+                        }
+                     },
+                     "commonSetting": {},
+                     "keys": [
+                        {
+                           "name": "airline",
+                           "index": 0,
+                           "aggr": "sum"
+                        }
+                     ],
+                     "groups": [],
+                     "values": [
+                        {
+                           "name": "airline",
+                           "index": 1,
+                           "aggr": "sum"
+                        }
+                     ]
+                  },
+                  "helium": {}
+               }
+            },
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223919958_-88288913",
+         "id": "20180316-181159_1226580422",
+         "dateCreated": "2018-03-16T18:11:59+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:4184",
+         "dateFinished": "2018-03-16T18:38:21+0000",
+         "dateStarted": "2018-03-16T18:37:54+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "airline\tairline\tday_of_week\tdeparture_delay\nAA\tAmerican Airlines Inc.\t1\t1625\nAA\tAmerican Airlines Inc.\t2\t1609\nAA\tAmerican Airlines Inc.\t3\t1589\nAA\tAmerican Airlines Inc.\t4\t1649\nAA\tAmerican Airlines Inc.\t5\t1988\nAA\tAmerican Airlines Inc.\t6\t1878\nAA\tAmerican Airlines Inc.\t7\t1670\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect * from (\nselect  f.airline, a.airline, min(cast(f.departure_delay as int)) as menor\n from flights f \n join airlines a \n on a.iata_code = f.airline \n where day_of_week = 2\n group by f.airline, a.airline\n order by menor asc limit 3) aerolineas \n order by aerolineas.menor desc\n limit 1",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:37:00+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223946893_-1507780847",
+         "id": "20180316-181226_198888189",
+         "dateCreated": "2018-03-16T18:12:26+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:4326",
+         "dateFinished": "2018-03-16T18:38:29+0000",
+         "dateStarted": "2018-03-16T18:38:03+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "airline\tairline\tmenor\nEV\tAtlantic Southeast Airlines\t-41\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect a.airport, count(distinct f.destination_airport) as total_destinos\n from flights f \n join airports a \n on a.iata_code = f.origin_airport \n group by a.airport\n order by total_destinos desc limit 1",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:37:00+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "sql",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/sql"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521223993769_-412942008",
+         "id": "20180316-181313_1310189766",
+         "dateCreated": "2018-03-16T18:13:13+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:4470",
+         "dateFinished": "2018-03-16T18:38:41+0000",
+         "dateStarted": "2018-03-16T18:38:22+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "airport\ttotal_destinos\nHartsfield-Jackson Atlanta International Airport\t169\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%spark.sql\n\nselect day_of_week, max(departure_delay) as maximo from flights group by day_of_week",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T18:37:00+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521224229743_-1716685820",
+         "id": "20180316-181709_1104456856",
+         "dateCreated": "2018-03-16T18:17:09+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:5095",
+         "dateFinished": "2018-03-16T18:38:49+0000",
+         "dateStarted": "2018-03-16T18:38:30+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": [
+               {
+                  "type": "TABLE",
+                  "data": "day_of_week\tmaximo\n7\t994\n3\t994\n5\t99\n6\t997\n1\t999\n4\t99\n2\t99\n"
+               }
+            ]
+         }
+      },
+      {
+         "text": "%pyspark \nspark.catalog.dropTempView(\"employees\")\nspark.catalog.dropTempView(\"orders\")\nspark.catalog.dropTempView(\"flights\")\nspark.catalog.dropTempView(\"airlines\")\nspark.catalog.dropTempView(\"airports\")\n",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T19:09:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "python",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/python"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521224843396_-53162916",
+         "id": "20180316-182723_1758819005",
+         "dateCreated": "2018-03-16T18:27:23+0000",
+         "status": "FINISHED",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:6010",
+         "dateFinished": "2018-03-16T19:09:59+0000",
+         "dateStarted": "2018-03-16T19:09:59+0000",
+         "results": {
+            "code": "SUCCESS",
+            "msg": []
+         }
+      },
+      {
+         "text": "%pyspark\n",
+         "user": "anonymous",
+         "dateUpdated": "2018-03-16T19:09:59+0000",
+         "config": {
+            "colWidth": 12,
+            "enabled": true,
+            "results": {},
+            "editorSetting": {
+               "language": "scala",
+               "editOnDblClick": false
+            },
+            "editorMode": "ace/mode/scala"
+         },
+         "settings": {
+            "params": {},
+            "forms": {}
+         },
+         "apps": [],
+         "jobName": "paragraph_1521227399481_1264062955",
+         "id": "20180316-190959_1571937707",
+         "dateCreated": "2018-03-16T19:09:59+0000",
+         "status": "READY",
+         "progressUpdateIntervalMs": 500,
+         "focus": true,
+         "$$hashKey": "object:8467"
+      }
+   ],
+   "name": "Tarea 6",
+   "id": "2D7VE6BZ8",
+   "angularObjects": {
+      "2BRWU4WXC:shared_process": [],
+      "2AM1YV5CU:shared_process": [],
+      "2AJXGMUUJ:shared_process": [],
+      "2ANGGHHMQ:shared_process": [],
+      "2AKK3QQXU:shared_process": []
+   },
+   "config": {
+      "looknfeel": "default",
+      "personalizedMode": "false"
+   },
+   "info": {}
+}

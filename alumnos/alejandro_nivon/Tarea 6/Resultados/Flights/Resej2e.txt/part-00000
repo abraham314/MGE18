@@ -1,0 +1,8 @@
+Row(AIRLINE=u'HA', DAY_OF_WEEK=u'1', DELAY=2934.0, IATA_CODE=u'HA', AIRLINE=u'Hawaiian Airlines Inc.')
+Row(AIRLINE=u'HA', DAY_OF_WEEK=u'6', DELAY=2146.0, IATA_CODE=u'HA', AIRLINE=u'Hawaiian Airlines Inc.')
+Row(AIRLINE=u'HA', DAY_OF_WEEK=u'4', DELAY=2102.0, IATA_CODE=u'HA', AIRLINE=u'Hawaiian Airlines Inc.')
+Row(AIRLINE=u'UA', DAY_OF_WEEK=u'2', DELAY=2060.0, IATA_CODE=u'UA', AIRLINE=u'United Air Lines Inc.')
+Row(AIRLINE=u'HA', DAY_OF_WEEK=u'6', DELAY=2026.0, IATA_CODE=u'HA', AIRLINE=u'Hawaiian Airlines Inc.')
+Row(AIRLINE=u'HA', DAY_OF_WEEK=u'4', DELAY=1964.0, IATA_CODE=u'HA', AIRLINE=u'Hawaiian Airlines Inc.')
+Row(AIRLINE=u'UA', DAY_OF_WEEK=u'3', DELAY=1958.0, IATA_CODE=u'UA', AIRLINE=u'United Air Lines Inc.')
+Row(AIRLINE=u'HA', DAY_OF_WEEK=u'5', DELAY=1914.0, IATA_CODE=u'HA', AIRLINE=u'Hawaiian Airlines Inc.')

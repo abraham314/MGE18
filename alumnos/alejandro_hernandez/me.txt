@@ -1,0 +1,13 @@
+Nombre: Alejandro Hernández Farías.
+
+Clave Única: 87806.
+
+Carrera: Matemáticas Aplicadas.
+
+Universidad: ITAM
+
+Fecha de titulación: No me he titulado.
+
+Tiempo: Parcial.
+
+Trabajo y descripción del día a día: Trabajo en una empresa que se llama SESPEC es un broker de seguros y consultora en riesgos. Mi día a día es variado pues realizo gestión de proyectos por lo que hay días que tengo que explotar base de datos, o hacer trabajo administrativo, o revisar contratos, etc.

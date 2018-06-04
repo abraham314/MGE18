@@ -1,0 +1,50 @@
+f.day_of_week,f.airline,a.airline,avg_delay
+3,AS,Alaska Airlines Inc.,-1.8235294117647058
+2,HA,Hawaiian Airlines Inc.,-1.6864203454894433
+3,HA,Hawaiian Airlines Inc.,-0.3109969647443381
+6,HA,Hawaiian Airlines Inc.,0.18781973203410476
+2,AS,Alaska Airlines Inc.,0.23741007194244604
+7,HA,Hawaiian Airlines Inc.,0.6056957629080806
+1,HA,Hawaiian Airlines Inc.,0.8798889146031011
+6,VX,Virgin America,1.0
+4,HA,Hawaiian Airlines Inc.,1.0372685185185184
+7,AS,Alaska Airlines Inc.,1.2083333333333333
+7,VX,Virgin America,1.25
+4,AS,Alaska Airlines Inc.,1.3870967741935485
+3,VX,Virgin America,1.6666666666666667
+5,AS,Alaska Airlines Inc.,2.0598290598290596
+6,AS,Alaska Airlines Inc.,2.161849710982659
+1,AS,Alaska Airlines Inc.,2.1700879765395893
+5,HA,Hawaiian Airlines Inc.,3.060217391304348
+5,VX,Virgin America,3.375
+1,VX,Virgin America,3.4444444444444446
+3,US,US Airways Inc.,4.470588235294118
+1,US,US Airways Inc.,6.203389830508475
+2,VX,Virgin America,6.222222222222222
+6,DL,Delta Air Lines Inc.,8.26265060240964
+4,DL,Delta Air Lines Inc.,8.806372549019608
+5,US,US Airways Inc.,9.984615384615385
+2,DL,Delta Air Lines Inc.,10.188010899182562
+1,DL,Delta Air Lines Inc.,10.256857855361597
+5,DL,Delta Air Lines Inc.,10.366412213740459
+3,DL,Delta Air Lines Inc.,11.24074074074074
+4,US,US Airways Inc.,12.609375
+7,DL,Delta Air Lines Inc.,13.604591836734693
+7,US,US Airways Inc.,14.203125
+2,US,US Airways Inc.,15.807692307692308
+3,AA,American Airlines Inc.,17.045180722891565
+2,AA,American Airlines Inc.,17.91849529780564
+4,AA,American Airlines Inc.,18.031976744186046
+6,AA,American Airlines Inc.,18.056603773584907
+7,AA,American Airlines Inc.,18.073863636363637
+7,UA,United Air Lines Inc.,19.308539944903583
+6,UA,United Air Lines Inc.,19.396596858638745
+5,UA,United Air Lines Inc.,22.3536231884058
+4,UA,United Air Lines Inc.,22.42394366197183
+6,US,US Airways Inc.,23.303030303030305
+2,UA,United Air Lines Inc.,23.749235474006117
+5,AA,American Airlines Inc.,23.95575221238938
+3,UA,United Air Lines Inc.,25.818873668188736
+1,UA,United Air Lines Inc.,26.01994301994302
+4,VX,Virgin America,26.444444444444443
+1,AA,American Airlines Inc.,26.591836734693878

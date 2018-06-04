@@ -1,0 +1,2 @@
+dia_de_la_semana,delay_promiedo,nom_aerolinea
+3,-1.8235294117647058,Alaska Airlines Inc.

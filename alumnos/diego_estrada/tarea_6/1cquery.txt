@@ -1,0 +1,23 @@
+%pyspark
+
+# 1c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?
+
+from pyspark.sql import functions as F
+
+w = Window().partitionBy().orderBy(col("orderid"))
+
+ordenes_laggeadas = ordenes.select("orderid", "orderdate", lag("orderdate").over(w).alias("lag_orderdate")).na.drop()
+
+timeFmt = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+
+timeDiff = (F.unix_timestamp('orderdate', format=timeFmt) - F.unix_timestamp('lag_orderdate', format=timeFmt))
+
+ordenes_laggeadas = ordenes_laggeadas.withColumn("Tiempo_a_la_siguiente", timeDiff)
+
+ordenes_laggeadas = ordenes_laggeadas.orderBy('Tiempo_a_la_siguiente', ascending = False)
+
+ordenes_laggeadas = ordenes_laggeadas.select('orderid', 'orderdate', 'lag_orderdate', 'Tiempo_a_la_siguiente', lit(86400))
+
+ordenes_laggeadas = ordenes_laggeadas.withColumn("Delta_mas_grande_dias", (F.col("Tiempo_a_la_siguiente") / F.col("86400"))).drop("86400", "Tiempo_a_la_siguiente")
+
+ordenes_laggeadas.select("Delta_mas_grande_dias").limit(1).show()

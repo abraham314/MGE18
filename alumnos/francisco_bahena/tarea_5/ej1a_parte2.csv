@@ -1,0 +1,6 @@
+tabla.employeeid,tabla.firstname,tabla.lastname,tabla.title,tabla.birthdate,tabla.hiredate,tabla.city,tabla.country,tabla.empleados
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,Anne
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Nancy
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Janet
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Margaret
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Laura

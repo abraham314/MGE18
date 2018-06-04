@@ -1,0 +1,2 @@
+select max(delta) as max_delta from (select DATEDIFF(orderdate,lag(orderdate,1) over (order by orderdate)) as delta from orders2) t; 
+

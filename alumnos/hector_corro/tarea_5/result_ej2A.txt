@@ -1,0 +1,10 @@
+OK
+AA	American Airlines Inc.
+US	US Airways Inc.
+VX	Virgin America
+AS	Alaska Airlines Inc.
+DL	Delta Air Lines Inc.
+HA	Hawaiian Airlines Inc.
+UA	United Air Lines Inc.
+Time taken: 33.058 seconds, Fetched: 7 row(s)
+

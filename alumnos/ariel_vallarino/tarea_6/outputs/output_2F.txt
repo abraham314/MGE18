@@ -1,0 +1,2 @@
+day_of_week,airline,airline_name,retrato_salida
+2,US,US Airways Inc.,6.48

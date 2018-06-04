@@ -1,0 +1,59 @@
+drop database if exists flights cascade;
+
+create database if not exists flights location "s3://cristian-challu/tarea5/bases/flights";
+
+create external table if not exists flights.airlines (iata_code string,
+airline string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://cristian-challu/tarea5/bases/flights/airlines'
+tblproperties ("skip.header.line.count"="1");
+LOAD DATA INPATH 's3://cristian-challu/tarea5/flights/airlines.csv' INTO table flights.airlines;
+
+create external table if not exists flights.airports (iata_code string,
+airport string,
+city string,
+state string,
+country string,
+latitude double,
+longitude double)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://cristian-challu/tarea5/bases/flights/airports'
+tblproperties ("skip.header.line.count"="1");
+LOAD DATA INPATH 's3://cristian-challu/tarea5/flights/airports.csv' INTO table flights.airports;
+
+create external table if not exists flights.vuelos (year smallint,
+month smallint,
+day smallint,
+day_of_week smallint,
+airline string,
+flight_number smallint,
+tail_number string,
+origin_airport string,
+destination_airport string,
+scheduled_departure string,
+departure_time string,
+departure_delay smallint,
+taxi_out smallint,
+wheels_off smallint,
+scheduled_time string,
+elapsed_time smallint,
+air_time smallint,
+distance smallint,
+wheels_on smallint,
+taxi_in smallint,
+scheduled_arrival string,
+arrival_time smallint,
+arrival_delay smallint,
+diverted smallint,
+cancelled smallint,
+cancellation_reason string,
+air_system_delay smallint,
+security_delay smallint,
+airline_delay smallint,
+late_aircraft_delay smallint,
+weather_delay smallint
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+location 's3://cristian-challu/tarea5/bases/flights/vuelos'
+tblproperties ("skip.header.line.count"="1");
+LOAD DATA INPATH 's3://cristian-challu/tarea5/flights/flights.csv' INTO table flights.vuelos;

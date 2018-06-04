@@ -1,0 +1,78 @@
+---
+title: "Tarea_3_parte_2"
+output: html_document
+---
+
+### Parte 2
+
+
+#### Ejercicio 1
+
+
+Subimos imágen del mapper y reducer:
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej1/mapper_ej1.png)
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej1/reducer_ej1.png)
+
+Subimos imágen del jps del clúster 
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej1/jps_1.png)
+
+
+Imagén localhost:8088 seleccionando la opción Nodes:
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej1/nodes_1.png)
+
+
+Imagén llocalhost:8088 seleccionando la opción FINISHED:
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej1/finished_1.png)
+
+Imágen del output:
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej1/output_ej1.png)
+
+
+
+#### Ejercicio 2
+
+
+Subimos imagenes de mapper con join y reducer:
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/mapper_join.png)
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/reducer.png)
+
+
+Subimos imágen del jps del clúster 
+
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/jps_2.png)
+
+Por cuestiones de memoria en nuestros equipos no logramos correrlo en el clúster (de un datanode y un namenode). Por lo que lo corrimos de manera local con una parte del archivo flights para comprobar que sirvieran los archivos mapper y reducer. El output resultante es:
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/output2_1.png)
+
+
+
+#### Ejercicio 3
+
+
+Subimos imagenes de mapper y reducer con join:
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/mapper.png)
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/reducer_join.png)
+
+
+Subimos imágen del jps del clúster 
+
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/jps_2.png)
+
+Por cuestiones de memoria en nuestros equipos no logramos correrlo en el clúster (de un datanode y un namenode). Por lo que lo corrimos de manera local con una parte del archivo flights para comprobar que sirvieran los archivos mapper y reducer. El output resultante es:
+
+![](/home/victor/Documents/Maestria_DS/Metodos_gran_escala/tarea3/parte_2/ej2/output2_2.png)
+
+
+

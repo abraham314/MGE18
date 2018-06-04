@@ -1,0 +1,164 @@
+%pyspark
+
+from pyspark.ml import Pipeline
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
+from pyspark.ml.feature import HashingTF, Tokenizer
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+from pyspark.ml.linalg import Vectors
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.feature import OneHotEncoder, StringIndexer
+from pyspark.ml.regression import LinearRegression, RandomForestRegressor
+from pyspark.sql.types import DoubleType
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+from pyspark.ml.base import Estimator, Model, Transformer
+from pyspark.ml.evaluation import RegressionEvaluator
+import numpy as np
+import time
+
+# Descarga de base de datos
+flights_orig = spark.read.csv("s3://cristian-challu/tarea5/bases/flights/vuelos/flights.csv", header =True)
+
+
+# Nuevos transformers
+
+# Transformer para seleccionar columnas
+class SelectCols(Transformer):  
+
+    def __init__(self, columns=[None]):
+        self.columns = columns
+
+    def _transform(self, df):
+        df = df.select(self.columns)
+        self = df
+        return self
+
+# Transformer para renombrar columna
+class RenameCol(Transformer):  
+
+    def __init__(self, old=None, new=None):
+        self.old = old
+        self.new = new
+
+    def _transform(self, df):
+        df = df.withColumnRenamed(self.old,self.new)
+        self = df
+        return self
+
+# Transformer para convertir a double
+class StringToDouble(Transformer):  
+
+    def __init__(self, columns=[None]):
+        self.columns = columns
+
+    def _transform(self, df):
+        for col in self.columns:
+            df = df.withColumn(col, df[col].cast(DoubleType()))
+        self = df
+        return self
+
+# Transformer para eliminar nulls
+class DropNulls(Transformer):  
+    def _transform(self, df):
+        self = df.na.drop(subset=df.columns)
+        return self
+
+
+# Pipeline de limpieza 
+
+# Seleccion de variables a utilizar en modelo y dependiente
+select_cols_1 = SelectCols(["MONTH","DAY","DAY_OF_WEEK","AIRLINE","DEPARTURE_DELAY", "ORIGIN_AIRPORT", "DISTANCE"])
+# Eliminar nulls
+drop_nulls = DropNulls()
+# Indexers para variables string
+indexers = [StringIndexer(inputCol=column, outputCol=column+"_index") for column in ["MONTH","DAY","DAY_OF_WEEK","AIRLINE", "ORIGIN_AIRPORT"]]
+# Encoders para variables indexadas
+encoders = [OneHotEncoder(inputCol=column, outputCol=column+"_vec") for column in ["MONTH_index","DAY_index","DAY_OF_WEEK_index","AIRLINE_index", "ORIGIN_AIRPORT_index"]]
+# Renombrar variable dependiente a label
+rename_label = RenameCol("DEPARTURE_DELAY","label")
+# Convertir label de string a double
+cast_label = StringToDouble(["label", "DISTANCE"])
+# Assembler para features
+assembler = VectorAssembler(
+    inputCols=["MONTH_index_vec", "DAY_index_vec", "DAY_OF_WEEK_index_vec", "AIRLINE_index_vec", "ORIGIN_AIRPORT_index_vec", "DISTANCE"],
+    outputCol="features")
+# Seleccion de variables para quedarse solo con features y label
+select_cols_2 = SelectCols(["features","label"])
+
+# Creacion de pipeline
+pipeline = Pipeline(stages=[select_cols_1, drop_nulls] + indexers + encoders + [rename_label, cast_label, assembler, select_cols_2])
+# Transformacion de datos originales a limpios con pipeline
+flights = pipeline.fit(flights_orig).transform(flights_orig)
+
+# Train y Test split
+(train_data, test_data) = flights.randomSplit([0.7, 0.3])
+
+
+# Magic Loop (tomado de examen final de Mineria de datos)
+# Esta funcion aplica la funcion CrossValidator para cada modelo especificado en models_to_run y guarda el output en un diccionario
+def magic_loop(models_to_run, clfs, grids, X):
+    models = {}
+    for n in range(1, 2):
+        # For para iterar a lo largo de los pipes que haya recibido
+        for clf in models_to_run:
+            print(clf)
+            # Grid search para encontrar los parámetros óptimos para cada modelo
+            pipe = Pipeline(stages=[clfs[clf]])
+            crossval = CrossValidator(estimator=pipe,
+                          estimatorParamMaps=grids[clf],
+                          evaluator=RegressionEvaluator(metricName='rmse'),
+                          numFolds=10)
+            models[clf] = crossval.fit(X)
+    return models
+
+
+# Ejecucion de Magic Loop
+
+# Modelos a utilizar
+models_to_run = ['RF','LR']
+
+# Diccionario de los modelos
+classifiers = {'LR':LinearRegression(maxIter = 10),
+              'RF': RandomForestRegressor(featureSubsetStrategy='onethird')}
+
+# Grids de parametros
+paramGrid_lr = ParamGridBuilder() \
+    .addGrid(classifiers['LR'].maxIter, [5, 7, 10]) \
+    .addGrid(classifiers['LR'].regParam, [0.1, 0.05, 0.01]) \
+    .build()
+    
+paramGrid_rf = ParamGridBuilder() \
+    .addGrid(classifiers['RF'].numTrees, [1, 5, 10]) \
+    .addGrid(classifiers['RF'].subsamplingRate,[0.1, 0.15, 0.20])\
+    .build()
+    
+grids = {'LR':paramGrid_lr,
+        'RF': paramGrid_rf}
+
+# Inicio de magic loop. Se utiliza la funcion time.time() porque con timeit no se guardaba el output del magic loop.
+start = time.time()
+m_loop = magic_loop(models_to_run, classifiers, grids, train_data)
+end = time.time()
+
+# Tiempo de ejecucion en segundos
+print("Tiempo de ejecucucion:", end-start)
+
+
+# Mejores modelos
+# Para cada algoritmo se obtienen los parametros del que tuvo el menor error de validacion
+parameters_rf = m_loop['RF'].getEstimatorParamMaps()
+parameters_rf[np.argmin(m_loop['RF'].avgMetrics)]
+
+parameters_lr = m_loop['LR'].getEstimatorParamMaps()
+parameters_lr[np.argmin(m_loop['LR'].avgMetrics)]
+
+# Se imprime el error de validacion para el mejor modelo de cada algoritmo
+print("RF:", np.min(m_loop['RF'].avgMetrics), "LR:", np.min(m_loop['LR'].avgMetrics))
+
+
+# Prueba en test
+# Perdida rmse
+evaluator = RegressionEvaluator(metricName='rmse')
+# Impresion de perdida en test para el mejor Random Forest y Regresion Lineal
+print("RF:", evaluator.evaluate(m_loop['RF'].transform(test_data)), "LR:", evaluator.evaluate(m_loop['LR'].transform(test_data)))
+

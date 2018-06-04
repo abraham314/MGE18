@@ -1,0 +1,88 @@
+---
+title: "Tarea7_CCC_103531"
+output: html_document
+---
+## Spark
+
+###**Notas aclaratorias**
+
+Para resolver mi tarea primero intenté hacerlo con pyspark desde un *notebook* de **Jupyter** en mi **docker**, todo corrió bien y revisé que todos mis ejercicios corrieran considerando una pequeña fracción de los datos. Utilicé la siguiente referencia para configurar mi imagen y el *notebook*:
+https://medium.com/@suci/running-pyspark-on-jupyter-notebook-with-docker-602b18ac4494
+
+La imagen que utilicé se puede encontrar en el siguiente enlace: https://github.com/jupyter/docker-stacks/tree/master/pyspark-notebook
+
+Para poder correrlos con toda la base había que conectarlo a AWS (en otro caso, habría tomado demasiado tiempo) pero tuve un problema pues, al parecer, para correr un *notebook* de **Jupyter** es necesario instalar algunas detalles extra en el clúster, lo intenté varias veces pero por alguna razón no podía abrir mi ssh, muestro imagen de evidencia:
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/Archivos/error_ssh.png)
+
+
+Consulté a algunos compañeros y me recomendaron utilizar Zepellin pues ya está configurado dentro de los clúster de AWS, tomé gran parte del código que había hecho en Jupuyter y pude realizar mi tarea sin problemas. **Para mayor claridad, subo mis scripts de pyspark en Jupyter y Zepellin, podrás encontrarlos en la carpeta Archivos.**
+
+```{r, include=TRUE}
+#Diagrama de elementos
+```
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/diagrama.png)
+
+
+**Summary de mi clúster**
+```{r, include=TRUE}
+#Summary de mi clúster
+```
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/mi_cluster.png)
+
+
+```{r, include=TRUE}
+#step en verde de mi script
+```
+
+En esta ocasión no utilicé la consola de AWS para agregar mis steps, abrí un *notebook* en un puerto de mi computadora y desde ahí fui corriendo mi código. Agrego una imagen del estatus *finished* de mi *notebook* así como las salidas finales de la corrida (como prueba de que terminaron mis *"steps"*):
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/step_verde.png)
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/resultados_finales.png)
+
+###¿Qué algoritmo resultó el mejor, con qué parámetros?
+
+Para mi tarea utilicé 2 algoritmos: regresión lineal simople y modelos lineales generalizados. 
+
+Como sabemos, los MLG son una familia de distribuciones que recaen en la media mediante distintas ligas; antes de intentar la familia *Normal*, probé con las demás, por ejemplo *Gamma* y *Poisson*, sin embargo, la primea tiene un dominio positivo y la segunda es más natural para conteos, pude pensar en un reescalmiento de los datos (por ejemplo, sumarle a todos el valor absoluto del valor más chico, es decir el más negativo) pero a final de cuentas, decidí utilizar el MLG con liga *Gaussiana* optimizando parámetros distintos respecto a la regresión lineal. Para determinar el modelo ganador utilicé el **error cuadrático medio**; los resultados fueron los siguientes:
+
+```{r, include=TRUE}
+#MLG - liga: Guassiana
+```
+
+**Predicciones y el error cuadrático medio correspondiente - MLG**
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/model_GLM.jpeg)
+
+```{r, include=TRUE}
+#Regresión Lineal Simple
+```
+
+**Predicciones y el error cuadrático medio correspondiente - Regresión Lineal**
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/model_LR.jpeg)
+
+
+```{r, include=TRUE}
+#Parámetros del mejor modelo: Regresión Lineal Simple
+```
+
+**Mejor modelo**
+
+Dado el error cuadrático medio de ambos, el mejor modelo fue la **regresión lineal simple, agrego la salida de sus parámetros**:
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/param_LR.jpeg)
+
+```{r, include=TRUE}
+#Tiempo de ejecución
+```
+
+### Indicar el tiempo de ejecución de la función de magic
+
+**Agregando la salida directa de mi código:**
+
+![](/Users/carloscastrocorrea/Desktop/Carlos/MsC/SegundoSemestre/Gran_Escala/Tarea7/tarea_7/Fotos/tiempo_total.jpeg)
+

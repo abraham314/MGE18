@@ -1,0 +1,9 @@
+employeeid,firstname,lastname,title,hiredate,city,country,empleado
+2,Andrew,Fuller,"Vice President, Sales",8/14/1992,Tacoma,USA,Nancy
+2,Andrew,Fuller,"Vice President, Sales",8/14/1992,Tacoma,USA,Janet
+2,Andrew,Fuller,"Vice President, Sales",8/14/1992,Tacoma,USA,Margaret
+2,Andrew,Fuller,"Vice President, Sales",8/14/1992,Tacoma,USA,Steven
+2,Andrew,Fuller,"Vice President, Sales",8/14/1992,Tacoma,USA,Laura
+5,Steven,Buchanan,Sales Manager,10/17/1993,London,UK,Michael
+5,Steven,Buchanan,Sales Manager,10/17/1993,London,UK,Robert
+5,Steven,Buchanan,Sales Manager,10/17/1993,London,UK,Anne

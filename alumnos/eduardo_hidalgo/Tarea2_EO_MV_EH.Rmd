@@ -1,0 +1,76 @@
+---
+title: "Tarea 2"
+author: "Estefany Ortiz; Monica Vargas; Eduardo Hidalgo"
+date: "February 4, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/Documents/MetodosDeGranEscalaTareas")
+```
+
+A continuación se presentan los pasos seguidos para la creación del contenedero con la imagen de docker con Ubuntu y Hadoop, así como la primera vez que se carga un archivo al contenedor
+
+## Paso 1
+
+### Se crea el contenedero con la liga de la clase 
+<p>`sudo docker run -i -t  -v /Users/eduardo/metodos_gran_escala/alumnos/eduardo_hidalgo:/Docker_Metodos sequenceiq/hadoop-ubuntu:2.6.0 /etc/bootstrap.sh -bash` </p>
+
+![Paso 1.](ContenedorMGEDocker.png)
+
+
+
+
+
+
+## Paso 2
+
+
+### Se crea el directorio que recibirá los datos  
+<p>`hdfs dfs -mkdir -p`</p>
+
+### Se verifica que la carpeta recien creada esta vacia
+
+<p>`ls`</p>
+
+![Carpeta Vacia.](vacio.png)
+
+### Se carga el archivo con la informacion de ecobici
+
+<p>`hdfs dfs -copyFromLocal`
+
+
+### Se verifica que se copio correctamente a la carpeta
+
+<p>`ls`</p>
+
+![Paso Dos.](mkdir.png)
+
+
+
+
+## Paso 3
+
+
+### MUestra que el *NameNode*, *DataNode*, *ResourceManager* y el *NodeManager* estan activos en el cluster de Hadoop
+
+<p>`jps`</p>
+
+
+
+![Paso Tres.](jps.png)
+
+
+## Paso 3
+
+
+### MUestra la salida del reporte generado con 
+
+<p>`dfsadmin report`</p>
+
+
+![Paso Cuatro.](dfsadmin.png)
+
+<p>**Nota.-** Como se observaa en la imagen del paso cuatro, el **porcentaje de DFS utilizado es del 0.91%** </p>
+

@@ -1,0 +1,15 @@
+hora_sal,x.origin_airport,orig_airport,x.destination_airport,x.lleg_airport
+10,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+12,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+09,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+13,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+15,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+16,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+19,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+11,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+14,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+06,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+17,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+07,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+08,SFO,San Francisco International Airport,HNL,Honolulu International Airport
+18,SFO,San Francisco International Airport,HNL,Honolulu International Airport

@@ -1,0 +1,122 @@
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados2a.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+DISTINCT 
+airlines.airline as AERO,
+airports.airport as AIRP
+FROM flights LEFT JOIN airlines ON flights.airline=airlines.iata_code
+LEFT JOIN airports ON flights.destination_airport=airports.iata_code
+WHERE airports.airport = "Honolulu International Airport";
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados2b.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+DISTINCT CAST(HORAS as INT) as HORAS
+FROM(
+SELECT
+ROUND(flights.scheduled_departure/100, 0) as HORAS
+FROM flights LEFT JOIN airports AS AIR1 ON flights.origin_airport=AIR1.iata_code
+LEFT JOIN airports AS AIR2 ON flights.destination_airport=AIR2.iata_code
+WHERE flights.origin_airport = "SFO"
+AND AIR2.airport="Honolulu International Airport") as sub
+SORT BY HORAS ASC;
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados3b.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+flights.day_of_week AS DAY,
+airlines.airline AS AIR,
+SUM(
+COALESCE(flights.air_system_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.security_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.airline_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.late_aircraft_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.weather_delay, CAST(0 AS BIGINT))) as DELAY
+FROM flights LEFT JOIN airlines ON flights.airline=airlines.iata_code
+LEFT JOIN airports AS AIR2 ON flights.destination_airport=AIR2.iata_code
+WHERE AIR2.airport="Honolulu International Airport"
+GROUP BY flights.day_of_week, airlines.airline
+SORT BY DELAY ASC
+LIMIT 1;
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados4b.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+AIR2.airport,
+COUNT(AIR2.airport) AS CONTEO
+FROM flights
+LEFT JOIN airports AS AIR2 ON flights.destination_airport=AIR2.iata_code
+GROUP BY AIR2.airport
+SORT BY CONTEO DESC
+LIMIT 1;
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados5b.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+DISTINCT DAY, AIR,
+DELAY
+FROM
+(SELECT
+flights.day_of_week AS DAY,
+airlines.airline AS AIR,
+SUM(
+COALESCE(flights.air_system_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.security_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.airline_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.late_aircraft_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.weather_delay, CAST(0 AS BIGINT))) as DELAY
+FROM flights LEFT JOIN airlines ON flights.airline=airlines.iata_code
+LEFT JOIN airports AS AIR2 ON flights.destination_airport=AIR2.iata_code
+GROUP BY flights.day_of_week, airlines.airline
+SORT BY DELAY DESC, DAY ASC) as sub
+SORT BY DELAY DESC, DAY ASC
+LIMIT 7;
+
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados6b.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+AIR,
+DELAY
+FROM(
+SELECT
+flights.day_of_week AS DAY,
+airlines.airline AS AIR,
+SUM(
+COALESCE(flights.air_system_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.security_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.airline_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.late_aircraft_delay, CAST(0 AS BIGINT))+
+COALESCE(flights.weather_delay, CAST(0 AS BIGINT))) as DELAY
+FROM flights LEFT JOIN airlines ON flights.airline=airlines.iata_code
+LEFT JOIN airports AS AIR2 ON flights.destination_airport=AIR2.iata_code
+WHERE flights.day_of_week = 2
+GROUP BY flights.day_of_week, airlines.airline
+SORT BY DELAY DESC
+LIMIT 3) as sub
+SORT BY DELAY ASC
+LIMIT 1;
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados7b.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+flights.origin_airport,
+AIR2.airport,
+COUNT(DISTINCT(flights.destination_airport)) as conteo
+FROM flights LEFT JOIN airports AS AIR2 ON flights.origin_airport=AIR2.iata_code
+GROUP BY flights.origin_airport, AIR2.airport
+SORT BY conteo DESC
+LIMIT 1;

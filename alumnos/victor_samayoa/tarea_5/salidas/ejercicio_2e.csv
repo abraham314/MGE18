@@ -1,0 +1,8 @@
+tbl.day_of_week,tbl.airline,tbl.max_delayed_departure
+1,American Airlines Inc.,1625.0
+2,American Airlines Inc.,1609.0
+3,American Airlines Inc.,1589.0
+4,American Airlines Inc.,1649.0
+5,American Airlines Inc.,1988.0
+6,American Airlines Inc.,1878.0
+7,American Airlines Inc.,1670.0

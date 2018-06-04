@@ -1,0 +1,14 @@
+CODE    AEROLINEA       CANT.CANCELACIONES
+AA      American Airlines Inc.  10919
+AS      Alaska Airlines Inc.    669
+B6      JetBlue Airways 4276
+DL      Delta Air Lines Inc.    3824
+EV      Atlantic Southeast Airlines     15231
+F9      Frontier Airlines Inc.  588
+HA      Hawaiian Airlines Inc.  171
+MQ      American Eagle Airlines Inc.    15025
+NK      Spirit Air Lines        2004
+OO      Skywest Airlines Inc.   9960
+UA      United Air Lines Inc.   6573
+US      US Airways Inc. 4067
+VX      Virgin America  534

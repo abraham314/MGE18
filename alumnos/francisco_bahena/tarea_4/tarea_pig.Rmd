@@ -1,0 +1,133 @@
+---
+title: "tarea_pig"
+author: "Francisco_Bahena_Galeana123084"
+date: "March 8, 2018"
+output: html_document
+---
+
+
+
+## Tarea de Pig
+
+
+### Pregunta 1.1
+
+
+```{r eval=FALSE}
+
+order_details = load 's3://tristanvhbucket/data/order_details.csv' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+
+products = load 's3://tristanvhbucket/data/products.csv' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+
+orders_products = join order_details by productid, products by productid;
+group_orders = group orders_products by productname;
+count_products = FOREACH group_orders GENERATE group as productname,COUNT($1) as cuenta;
+ranked = rank count_products by cuenta DESC;
+limited_rank = limit ranked 1;
+store limited_rank into 's3://tristanvhbucket/data/output1/' using PigStorage(',');
+
+
+
+
+
+```
+
+
+#### Pregunta 2.1
+
+
+```{r eval=FALSE}
+
+flights = load 's3://tristanvhbucket/data/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:int, departure_time:int, departure_delay:int, taxi_out:int, wheels_off:int, scheduled_time:int, elapsed_time:int, air_time:int, distance:int, wheels_on:int, taxi_in:int, scheduled_arrival:int, arrival_time:int, arrival_delay:int, diverted:int, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray,	security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+airports = load 's3://tristanvhbucket/data/airports.csv' using PigStorage(',') as (iata_code:chararray,	airport:chararray,	city:chararray,	state:chararray,country:chararray,	latitude:float,	longitude:float);
+
+airlines = load 's3://tristanvhbucket/data/airlines.csv'  using PigStorage(',') as (iata_code:chararray,airline:chararray);
+
+join_flights = join flights by destination_airport, airports by iata_code;
+joinp = filter join_flights by airport=='Honolulu International Airport';
+fly_count = FOREACH (GROUP joinp ALL) GENERATE COUNT(joinp);
+
+store fly_count into 's3://tristanvhbucket/data/output2_1/' using PigStorage(',');
+
+```
+
+#### Pregunta 2.2
+
+
+```{r eval=FALSE}
+
+flights = load 's3://tristanvhbucket/data/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:int, departure_time:int, departure_delay:int, taxi_out:int, wheels_off:int, scheduled_time:int, elapsed_time:int, air_time:int, distance:int, wheels_on:int, taxi_in:int, scheduled_arrival:int, arrival_time:int, arrival_delay:int, diverted:int, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray,	security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+rank = order flights by departure_delay DESC;
+rank_lim = limit rank 1;
+join_rank = join rank_lim by airline, airlines by iata_code;
+store join_rank into 's3://tristanvhbucket/data/output2_2/' using PigStorage(',');
+
+```
+
+#### Pregunta 2.3
+
+
+```{r eval=FALSE}
+
+flights = load 's3://tristanvhbucket/data/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:int, departure_time:int, departure_delay:int, taxi_out:int, wheels_off:int, scheduled_time:int, elapsed_time:int, air_time:int, distance:int, wheels_on:int, taxi_in:int, scheduled_arrival:int, arrival_time:int, arrival_delay:int, diverted:int, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray,	security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+group_fly = group flights by day_of_week;
+count_cancel = FOREACH group_fly GENERATE group as dweek ,SUM(flights.cancelled) as cancellations;
+count_final = order count_cancel by cancellations DESC;
+store count_final into 's3://tristanvhbucket/data/output2_3/' using PigStorage(',');
+
+
+```
+
+#### Pregunta 2.4
+
+
+```{r eval=FALSE}
+
+flights = load 's3://tristanvhbucket/data/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:int, departure_time:int, departure_delay:int, taxi_out:int, wheels_off:int, scheduled_time:int, elapsed_time:int, air_time:int, distance:int, wheels_on:int, taxi_in:int, scheduled_arrival:int, arrival_time:int, arrival_delay:int, diverted:int, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray,	security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+fly_cancel = FOREACH flights GENERATE origin_airport, cancelled;
+gairport = group fly_cancel by origin_airport;
+count_cancel = FOREACH gairport GENERATE group as origin ,SUM(fly_cancel.cancelled) as cancellations;
+origin17 = filter count_cancel by cancellations == 17;
+orig_air = join origin17 by origin, airports by iata_code;
+store orig_air into 's3://tristanvhbucket/data/output2_4/' using PigStorage(',');
+
+```
+
+
+#### Pregunta 2.5
+
+
+```{r eval=FALSE}
+
+flights = load 's3://tristanvhbucket/data/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:int, departure_time:int, departure_delay:int, taxi_out:int, wheels_off:int, scheduled_time:int, elapsed_time:int, air_time:int, distance:int, wheels_on:int, taxi_in:int, scheduled_arrival:int, arrival_time:int, arrival_delay:int, diverted:int, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray,	security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+fly_cancel = FOREACH flights GENERATE origin_airport, cancelled;
+gairport = group fly_cancel by origin_airport;
+count_cancel = FOREACH gairport GENERATE group as origin ,SUM(fly_cancel.cancelled) as cancellations;
+rank_cancel = order count_cancel by cancellations DESC;
+rank_cancel2 = limit rank_cancel 1;
+orig_air = join rank_cancel2 by origin, airports by iata_code;
+store orig_air into 's3://tristanvhbucket/data/output2_5/' using PigStorage(',');
+
+```
+
+
+
+
+#### Pregunta 2.6
+
+
+
+```{r eval=FALSE}
+
+airflights_join = join flights by destination_airport, airports by iata_code;
+airflights_g = GROUP airflights_join BY flight_number;
+finalorder = FOREACH airflights_g { unique_airports = DISTINCT airflights_join.airport; GENERATE group AS flight_number, COUNT(unique_airports) as amount, unique_airports;};
+final_order = ORDER finalorder BY unique_airports DESC;
+
+store final_order into 's3://tristanvhbucket/data/output2_6/' using PigStorage(',');
+```

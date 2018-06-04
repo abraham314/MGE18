@@ -1,0 +1,2 @@
+codigo,airline,retraso,retraso_lunes
+US,US Airways Inc.,6.48,3

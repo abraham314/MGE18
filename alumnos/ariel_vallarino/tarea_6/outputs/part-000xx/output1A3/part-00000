@@ -1,0 +1,8 @@
+Row(employeeid='2', firstname='Andrew', lastname='Fuller', title='Vice President, Sales', birthdate='1952-02-19', hiredate='1992-08-14', city='Tacoma', country='USA', empleado='Janet')
+Row(employeeid='2', firstname='Andrew', lastname='Fuller', title='Vice President, Sales', birthdate='1952-02-19', hiredate='1992-08-14', city='Tacoma', country='USA', empleado='Laura')
+Row(employeeid='2', firstname='Andrew', lastname='Fuller', title='Vice President, Sales', birthdate='1952-02-19', hiredate='1992-08-14', city='Tacoma', country='USA', empleado='Nancy')
+Row(employeeid='2', firstname='Andrew', lastname='Fuller', title='Vice President, Sales', birthdate='1952-02-19', hiredate='1992-08-14', city='Tacoma', country='USA', empleado='Margaret')
+Row(employeeid='2', firstname='Andrew', lastname='Fuller', title='Vice President, Sales', birthdate='1952-02-19', hiredate='1992-08-14', city='Tacoma', country='USA', empleado='Steven')
+Row(employeeid='5', firstname='Steven', lastname='Buchanan', title='Sales Manager', birthdate='1955-03-04', hiredate='1993-10-17', city='London', country='UK', empleado='Robert')
+Row(employeeid='5', firstname='Steven', lastname='Buchanan', title='Sales Manager', birthdate='1955-03-04', hiredate='1993-10-17', city='London', country='UK', empleado='Anne')
+Row(employeeid='5', firstname='Steven', lastname='Buchanan', title='Sales Manager', birthdate='1955-03-04', hiredate='1993-10-17', city='London', country='UK', empleado='Michael')

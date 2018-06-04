@@ -1,0 +1,33 @@
+---
+title: "Tarea 3 Parte 1"
+author: "Daniel Sharp, Cristian Challu y Francisco Bahena"
+date: "February 12, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Levantamiento del clúster con HDFS y YARN  
+  
+  Para crear la imagen de Docker con base en el Dockerfile que produjimos es necesario que los archivos binarios de Hadoop 2.7.4 se encuentren en el mismo directorio que el Dockerfile. Además, es importante cambiar el nombre de la primera carpeta de los binarios de hadoop-2.7.4 a hadoop para la correcta ejecución del Dockerfile.  El Dockerfile se encuentra en la misma carpeta que este archivo.  
+  
+
+### Imágenes de jps  
+
+#### Master Node  
+
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/tarea_3/parte_1/jps_ds138176.png)  
+
+#### Slave Nodes  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/tarea_3/parte_1/jps_cc120652.png)  
+  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/tarea_3/parte_1/jps_123084.png)  
+
+
+### Imagenes  
+#### HDFS - localhost:50070
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/tarea_3/parte_1/localhost_50070.png)  
+
+#### YARN - localhost:8088
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/tarea_3/parte_1/localhost_8088.png)  

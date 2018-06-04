@@ -1,0 +1,2 @@
+flights_limit::origin_airport,flights_limit::n_cancelled,airports::iata_code,airports::airport,airports::city,airports::state,airports::country,airports::latitude,airports::longitude
+ORD,8548,ORD,Chicago O'Hare International Airport,Chicago,IL,USA,41.9796,-87.90446

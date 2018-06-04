@@ -1,0 +1,2 @@
+dia_semana,retrato_arribo,codigo,aerolinea
+7,-72,DL,Delta Air Lines Inc.

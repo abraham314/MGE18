@@ -1,0 +1,10 @@
+Total MapReduce CPU Time Spent: 0 msec
+OK
+AA      American Airlines Inc.
+AS      Alaska Airlines Inc.
+DL      Delta Air Lines Inc.
+HA      Hawaiian Airlines Inc.
+US      US Airways Inc.
+VX      Virgin America
+UA      United Air Lines Inc.
+Time taken: 33.19 seconds, Fetched: 7 row(s)

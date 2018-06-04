@@ -1,0 +1,7 @@
+%pyspark
+
+# 2d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? 
+
+destinovuelos = vuelos.groupBy('DESTINATION_AIRPORT').count().orderBy('count', ascending = False).limit(1)
+
+destinovuelos.join(aeropuertos, destinovuelos.DESTINATION_AIRPORT == aeropuertos.IATA_CODE, "left_outer").select(aeropuertos.AIRPORT).show()

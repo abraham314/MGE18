@@ -1,0 +1,27 @@
+%pyspark
+
+# 2b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"? 
+
+from pyspark.sql import functions as F
+
+from pyspark.sql.functions import floor, lit
+
+vuelosaeropuertosD = vuelos.join(aeropuertos, vuelos.DESTINATION_AIRPORT == aeropuertos.IATA_CODE, "left_outer").select(vuelos.ORIGIN_AIRPORT, vuelos.DESTINATION_AIRPORT, vuelos.SCHEDULED_DEPARTURE, aeropuertos.AIRPORT)
+
+vuelosaeropuertosD = vuelosaeropuertosD.withColumnRenamed('AIRPORT', 'NOMBREDESTINO')
+
+vuelosaeropuertosDO = vuelosaeropuertosD.join(aeropuertos, vuelosaeropuertosD.ORIGIN_AIRPORT == aeropuertos.IATA_CODE).select(vuelosaeropuertosD.ORIGIN_AIRPORT, vuelosaeropuertosD.DESTINATION_AIRPORT, vuelosaeropuertosD.SCHEDULED_DEPARTURE, vuelosaeropuertosD.NOMBREDESTINO, aeropuertos.AIRPORT)
+
+vuelosaeropuertosDO = vuelosaeropuertosDO.withColumnRenamed('AIRPORT', 'NOMBREORIGEN')
+
+vuelosaeropuertosDO = vuelosaeropuertosDO.where(vuelosaeropuertosDO.NOMBREDESTINO == "Honolulu International Airport")
+
+vuelosaeropuertosDO = vuelosaeropuertosDO.where(vuelosaeropuertosDO.NOMBREORIGEN == "San Francisco International Airport")
+
+vuelosaeropuertosDO = vuelosaeropuertosDO.select('ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE', 'NOMBREDESTINO', 'NOMBREORIGEN', lit(100))
+
+vuelosaeropuertosDO = vuelosaeropuertosDO.withColumn("HORAS", (F.col("SCHEDULED_DEPARTURE") / F.col("100"))).drop("SCHEDULED_DEPARTURE", "100")
+
+horarios = vuelosaeropuertosDO.select(floor("HORAS").alias("HORARIOS")).distinct().orderBy('HORARIOS', ascending = False)
+
+horarios.show()

@@ -1,0 +1,2 @@
+products::productid,products::productname,products::supplierid,products::categoryid,products::quantityperunit,products::unitprice,products::unitsinstock,products::unitsonorder,products::reorderlevel,products::discontinued,limited_rank::rank_count_products,limited_rank::productid,limited_rank::n
+59,Raclette Courdavault,28,4,5 kg pkg.,55.0,79,0,0,,1,59,54

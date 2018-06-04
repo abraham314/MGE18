@@ -1,0 +1,4 @@
+Jorge III Altamirano Astorga
+Ingeniero en Sistemas, Universidad del Valle de México, 2007
+Estudiante de Tiempo Parcial de M Ciencia de Datos
+Trabajo para la minera Peñoles en Operaciones de TI en el Centro de Datos de la Ciudad de México realizando funciones de arquitectura y gestión del centro de datos, virtualización, almacenamiento, correo electrónico y seguridad informática.

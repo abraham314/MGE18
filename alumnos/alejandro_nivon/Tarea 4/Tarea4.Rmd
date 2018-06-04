@@ -1,0 +1,310 @@
+# Tarea 4: PIG
+
+La totalidad de la tarea se hizo pensando en un esquema de almacenamiento y entrega de resultados en S3.
+
+## Ejercicio A:
+
+Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank.
+
+```
+products = LOAD 's3://granescala-t4/products.csv' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+
+order_details = LOAD 's3://granescala-t4/order_details.csv' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+
+group_d = GROUP order_details BY productid;
+
+conteo = FOREACH group_d GENERATE group as productid , COUNT($1) as n;
+
+rankeo = rank conteo by n DESC;
+
+limrank = limit rankeo 10;
+
+
+joinprod = JOIN limrank BY productid, products BY productid;
+
+res = FOREACH joinprod GENERATE $1 as productid, productname, n;
+
+STORE res INTO 's3://granescala-t4/resultadoejercicioA.csv' using PigStorage(',');
+
+```
+
+Resultado:
+
+```
+Chicago O'Hare International Airport,8548
+```
+
+## Ejercicio B - 1:
+
+¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el "Honolulu International Airport"?
+
+```
+products = LOAD 's3://granescala-t4/products.csv' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+
+orders = LOAD 's3://granescala-t4/order_details.csv' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+
+groupos = GROUP orders BY productid;
+
+conteo_productos = FOREACH groupos GENERATE group as productid , COUNT($1) as n;
+
+ranked = rank conteo_productos by n DESC;
+
+lim_rank = limit ranked 10;
+
+join_product = JOIN lim_rank BY productid, products BY productid;
+
+result = FOREACH join_product GENERATE $1 as productid, productname, n;
+
+STORE result INTO 's3://granescala-t4/resultadoejercicio1.csv' USING PigStorage(',');
+```
+
+Resultado:
+
+```
+16,Pavlova,43
+2,Chang,44
+24,Guaraná Fantástica,51
+31,Gorgonzola Telino,51
+41,Jack's New England Clam Chowder,47
+56,Gnocchi di nonna Alice,50
+59,Raclette Courdavault,54
+60,Camembert Pierrot,51
+62,Tarte au sucre,48
+75,Rhönbräu Klosterbier,46
+```
+
+## Ejercicio B - 2:
+
+¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es?
+
+```
+flights = LOAD 's3://granescala-t4/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time:chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:chararray, elapsed_time:int, air_time:int, distance:int, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:chararray, cancelled:chararray, cancellation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+airlines =LOAD 's3://granescala-t4/airlines.csv' using PigStorage(',') as (iata_code:chararray,airline_name:chararray);
+
+vuelos = JOIN flights by airline, airlines by iata_code;
+
+aerolinea_ord = ORDER vuelos BY arrival_delay DESC;
+
+demora = LIMIT aerolinea_ord 1;
+
+res = FOREACH demora GENERATE flight_number, airline_name, iata_code;
+
+STORE res INTO 's3://granescala-t4/resultadoejercicio2.csv'  using PigStorage(',');
+```
+
+
+Rsultado:
+
+```
+1322,American Airlines Inc.,AA
+```
+
+## Ejercicio B - 3:
+
+¿Qué día es en el que más vuelos cancelados hay?
+
+```
+flights = LOAD 's3://granescala-t4/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time:chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:chararray, elapsed_time:int, air_time:int, distance:int, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:chararray, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+cancelados = FILTER flights by cancelled == 1;
+
+cancelado_diario = GROUP cancelados by day_of_week;
+
+cuenta = FOREACH cancelado_diario GENERATE group as day_of_week, COUNT($1) as n;
+
+top_cancel = rank cuenta by n DESC;
+
+lim_cancel = limit top_cancel 1;
+
+STORE lim_cancel INTO 's3://granescala-t4/resultadoejercicio3.csv' using PigStorage(',');
+```
+
+Resultado:
+
+```
+1,1,21073
+
+```
+
+## Ejercicio B - 4:
+
+¿Cuáles son los aeropuertos orígen con 17 cancelaciones?
+
+```
+flights = LOAD 's3://granescala-t4/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time:chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:chararray, elapsed_time:int, air_time:int, distance:int, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:chararray, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+airports = LOAD 's3://granescala-t4/airports.csv' using PigStorage(',') as (iata_code:chararray, airport:chararray, city:chararray, state:chararray, country:chararray, latitude:float, longitude:float);
+
+vuelos_airp = JOIN flights by origin_airport, airports by iata_code;
+
+v_cancel = FILTER vuelos_airp by cancelled == 1;
+
+cancelados = GROUP v_cancel by airport;
+
+cuenta = FOREACH cancelados GENERATE group as airport, COUNT($1) as n;
+
+peor = FILTER cuenta by n==17;
+
+res = FOREACH peor GENERATE airport, n;
+
+STORE res INTO 's3://granescala-t4/resultadoejercicio4.csv' using PigStorage(',');
+
+```
+
+Resultado:
+
+```
+Delta County Airport,17
+Dothan Regional Airport,17
+Dickinson Theodore Roosevelt Regional Airport,17
+
+```
+
+
+## Ejercicio B - 5:
+
+¿Cuál es el aeropuerto origen con más vuelos cancelados?
+
+
+```
+flights = LOAD 's3://granescala-t4/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time:chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:chararray, elapsed_time:int, air_time:int, distance:int, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:chararray, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+airports = LOAD 's3://granescala-t4/airports.csv' using PigStorage(',') as (iata_code:chararray, airport:chararray, city:chararray, state:chararray, country:chararray, latitude:float, longitude:float);
+
+vuelos_airport = JOIN flights by origin_airport, airports by iata_code;
+
+vueloscanc = FILTER vuelos_airport by cancelled == 1;
+
+cancelados = GROUP vueloscanc by airport;
+
+conteo = FOREACH cancelados GENERATE group as airport, COUNT($1) as n;
+
+conteo_final = FOREACH conteo GENERATE airport, n;
+
+rank = ORDER conteo_final by n DESC;
+
+res = LIMIT rank 1;
+
+STORE res INTO 's3://granescala-t4/resultadoejercicio5.csv' using PigStorage(',');
+
+```
+
+Resultado:
+
+```
+Chicago O'Hare International Airport,8548
+
+```
+
+## Ejercicio B - 6:
+
+¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? (ocupar bag te ayudará en esta pregunta)
+
+```
+flights = LOAD 's3://granescala-t4/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time:chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:chararray, elapsed_time:int, air_time:int, distance:int, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:chararray, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+airports = LOAD 's3://granescala-t4/airports.csv' using PigStorage(',') as (iata_code:chararray, airport:chararray, city:chararray, state:chararray, country:chararray, latitude:float, longitude:float);
+
+vuelos_aer = JOIN flights BY destination_airport, airports by iata_code;
+
+agrvuelos = GROUP vuelos_aer by flight_number;
+
+uniq = FOREACH agrvuelos { destino = FOREACH vuelos_aer GENERATE destination_airport; destino_unico = DISTINCT destino; GENERATE flatten(group) as flight_number, COUNT(destino_unico)as n;};
+
+dest = ORDER uniq BY n DESC;
+
+sort_standing = LIMIT dest 1;
+
+other = DISTINCT flights;
+
+vuelosfin = JOIN sort_standing by flight_number, other by flight_number;
+
+res = JOIN vuelosfin by destination_airport LEFT OUTER, airports by iata_code;
+
+STORE res INTO 's3://granescala-t4/resultadoejercicio6.csv' using PigStorage(',');
+```
+
+Resultado:
+
+```
+4988,54,2015,10,24,6,WN,4988,N7704B,10423,10821,0650,0648,-2,15,0703,195,183,152,1342,1035,16,1105,1051,-14,0,0,,,,,,,,,,,,,
+4988,54,2015,10,10,6,WN,4988,N647SW,10423,10821,0650,0650,0,14,0704,195,192,173,1342,1057,5,1105,1102,-3,0,0,,,,,,,,,,,,,
+4988,54,2015,10,17,6,WN,4988,N656SW,10423,10821,0650,0652,2,10,0702,195,173,159,1342,1041,4,1105,1045,-20,0,0,,,,,,,,,,,,,
+4988,54,2015,10,31,6,WN,4988,,10423,10821,0650,,,,,195,,,1342,,,1105,,,0,1,C,,,,,,,,,,,,
+4988,54,2015,10,3,6,WN,4988,N609SW,10423,10821,0650,0647,-3,11,0658,195,193,177,1342,1055,5,1105,1100,-5,0,0,,,,,,,,,,,,,
+4988,54,2015,10,4,7,EV,4988,N722EV,12953,11057,0900,0858,-2,21,0919,135,114,87,544,1046,6,1115,1052,-23,0,0,,,,,,,,,,,,,
+4988,54,2015,10,15,4,EV,4988,N709EV,12953,11057,0900,0855,-5,27,0922,135,112,83,544,1045,2,1115,1047,-28,0,0,,,,,,,,,,,,,
+4988,54,2015,10,18,7,EV,4988,N605QX,12953,11057,0900,0855,-5,32,0927,135,129,92,544,1059,5,1115,1104,-11,0,0,,,,,,,,,,,,,
+4988,54,2015,10,20,2,EV,4988,N608QX,12953,11057,0900,0859,-1,39,0938,135,124,80,544,1058,5,1115,1103,-12,0,0,,,,,,,,,,,,,
+4988,54,2015,10,8,4,EV,4988,N718EV,12953,11057,0900,0854,-6,60,0954,135,144,80,544,1114,4,1115,1118,3,0,0,,,,,,,,,,,,,
+4988,54,2015,10,28,3,EV,4988,N709EV,12953,11057,0900,0851,-9,28,0919,135,131,91,544,1050,12,1115,1102,-13,0,0,,,,,,,,,,,,,
+4988,54,2015,10,14,3,EV,4988,N744EV,12953,11057,0900,0855,-5,25,0920,135,113,84,544,1044,4,1115,1048,-27,0,0,,,,,,,,,,,,,
+4988,54,2015,10,1,4,EV,4988,N713EV,12953,11057,0900,0851,-9,48,0939,135,141,89,544,1108,4,1115,1112,-3,0,0,,,,,,,,,,,,,
+4988,54,2015,10,30,5,EV,4988,N724EV,12953,11057,0900,0850,-10,36,0926,135,126,83,544,1049,7,1115,1056,-19,0,0,,,,,,,,,,,,,
+4988,54,2015,10,21,3,EV,4988,N759EV,12953,11057,0900,0900,0,22,0922,135,109,79,544,1041,8,1115,1049,-26,0,0,,,,,,,,,,,,,
+4988,54,2015,10,7,3,EV,4988,N716EV,12953,11057,0900,0941,41,32,1013,135,119,82,544,1135,5,1115,1140,25,0,0,,0,0,0,25,0,,,,,,,
+4988,54,2015,10,11,7,EV,4988,N614QX,12953,11057,0900,1022,82,17,1039,135,104,77,544,1156,10,1115,1206,51,0,0,,0,0,51,0,0,,,,,,,
+4988,54,2015,10,12,1,EV,4988,N760EV,12953,11057,0900,0852,-8,47,0939,135,125,74,544,1053,4,1115,1057,-18,0,0,,,,,,,,,,,,,
+4988,54,2015,10,29,4,EV,4988,N722EV,12953,11057,0900,0906,6,37,0943,135,141,90,544,1113,14,1115,1127,12,0,0,,,,,,,,,,,,,
+4988,54,2015,10,22,4,EV,4988,N709EV,12953,11057,0900,0900,0,29,0929,135,114,81,544,1050,4,1115,1054,-21,0,0,,,,,,,,,,,,,
+4988,54,2015,10,23,5,EV,4988,N754EV,12953,11057,0900,0905,5,47,0952,135,132,77,544,1109,8,1115,1117,2,0,0,,,,,,,,,,,,,
+4988,54,2015,10,19,1,EV,4988,N744EV,12953,11057,0900,0858,-2,33,0931,135,122,84,544,1055,5,1115,1100,-15,0,0,,,,,,,,,,,,,
+4988,54,2015,10,9,5,EV,4988,N754EV,12953,11057,0900,0858,-2,51,0949,135,137,81,544,1110,5,1115,1115,0,0,0,,,,,,,,,,,,,
+4988,54,2015,10,16,5,EV,4988,N755EV,12953,11057,0900,0855,-5,40,0935,135,138,94,544,1109,4,1115,1113,-2,0,0,,,,,,,,,,,,,
+4988,54,2015,10,13,2,EV,4988,N608QX,12953,11057,0900,0900,0,25,0925,135,118,86,544,1051,7,1115,1058,-17,0,0,,,,,,,,,,,,,
+4988,54,2015,10,2,5,EV,4988,N750EV,12953,11057,0900,0858,-2,57,0955,135,152,91,544,1126,4,1115,1130,15,0,0,,15,0,0,0,0,,,,,,,
+4988,54,2015,10,27,2,EV,4988,N723EV,12953,11057,0900,1010,70,34,1044,135,135,96,544,1220,5,1115,1225,70,0,0,,0,0,70,0,0,,,,,,,
+4988,54,2015,10,25,7,EV,4988,N754EV,12953,11057,0900,0855,-5,29,0924,135,118,84,544,1048,5,1115,1053,-22,0,0,,,,,,,,,,,,,
+4988,54,2015,10,6,2,EV,4988,N741EV,12953,11057,0900,0900,0,35,0935,135,124,83,544,1058,6,1115,1104,-11,0,0,,,,,,,,,,,,,
+4988,54,2015,10,26,1,EV,4988,N741EV,12953,11057,0900,0858,-2,53,0951,135,147,88,544,1119,6,1115,1125,10,0,0,,,,,,,,,,,,,
+4988,54,2015,10,5,1,EV,4988,N611QX,12953,11057,0900,0856,-4,56,0952,135,141,82,544,1114,3,1115,1117,2,0,0,,,,,,,,,,,,,
+4988,54,2015,10,28,3,OO,4988,N728SK,11423,11292,1327,1509,102,8,1517,115,112,98,589,1555,6,1422,1601,99,0,0,,0,0,8,91,0,,,,,,,
+4988,54,2015,10,27,2,OO,4988,N925SW,15919,11292,0921,0915,-6,17,0932,130,140,98,616,1010,25,1031,1035,4,0,0,,,,,,,,,,,,,
+4988,54,2015,10,24,6,OO,4988,N743SK,11292,11921,1845,1837,-8,11,1848,60,49,36,212,1924,2,1945,1926,-19,0,0,,,,,,,,,,,,,
+4988,54,2015,10,28,3,OO,4988,N746SK,11292,11921,1510,1516,6,13,1529,64,49,33,212,1602,3,1614,1605,-9,0,0,,,,,,,,,,,,,
+4988,54,2015,10,10,6,OO,4988,N727SK,11292,11921,1845,1838,-7,15,1853,60,56,36,212,1929,5,1945,1934,-11,0,0,,,,,,,,,,,,,
+4988,54,2015,10,17,6,OO,4988,N794SK,11292,11921,1845,1909,24,17,1926,60,56,35,212,2001,4,1945,2005,20,0,0,,0,0,0,20,0,,,,,,,
+4988,54,2015,10,3,6,OO,4988,N794SK,11292,11921,1845,1843,-2,17,1900,60,56,33,212,1933,6,1945,1939,-6,0,0,,,,,,,,,,,,,
+4988,54,2015,10,17,6,WN,4988,N656SW,10821,11996,1155,1149,-6,13,1202,90,91,74,426,1316,4,1325,1320,-5,0,0,,,,,,,,,,,,,
+4988,54,2015,10,24,6,WN,4988,N383SW,10821,11996,1155,1220,25,13,1233,90,88,71,426,1344,4,1325,1348,23,0,0,,0,0,23,0,0,,,,,,,
+4988,54,2015,10,31,6,WN,4988,N455WN,10821,11996,1155,1151,-4,11,1202,90,83,68,426,1310,4,1325,1314,-11,0,0,,,,,,,,,,,,,
+4988,54,2015,10,3,6,WN,4988,N609SW,10821,11996,1155,1155,0,13,1208,90,88,71,426,1319,4,1325,1323,-2,0,0,,,,,,,,,,,,,
+4988,54,2015,10,10,6,WN,4988,N647SW,10821,11996,1155,1149,-6,17,1206,90,91,70,426,1316,4,1325,1320,-5,0,0,,,,,,,,,,,,,
+4988,54,2015,10,31,6,OO,4988,N753SK,11298,12892,2025,2023,-2,14,2037,206,182,163,1235,2120,5,2151,2125,-26,0,0,,,,,,,,,,,,,
+4988,54,2015,10,27,2,OO,4988,N744SK,11292,13851,1409,1404,-5,16,1420,98,88,66,495,1626,6,1647,1632,-15,0,0,,,,,,,,,,,,,
+4988,54,2015,10,13,2,OO,4988,N707SK,13930,13871,1040,1048,8,20,1108,91,89,66,416,1214,3,1211,1217,6,0,0,,,,,,,,,,,,,
+4988,54,2015,10,4,7,OO,4988,N961SW,13930,13871,0911,0904,-7,32,0936,92,104,69,416,1045,3,1043,1048,5,0,0,,,,,,,,,,,,,
+4988,54,2015,10,6,2,OO,4988,N782SK,13930,13871,1040,1037,-3,31,1108,91,100,65,416,1213,4,1211,1217,6,0,0,,,,,,,,,,,,,
+4988,54,2015,10,11,7,OO,4988,N963SW,13930,13871,0911,0908,-3,24,0932,92,96,67,416,1039,5,1043,1044,1,0,0,,,,,,,,,,,,,
+4988,54,2015,10,20,2,OO,4988,N712SK,13930,13871,1040,1039,-1,14,1053,91,81,63,416,1156,4,1211,1200,-11,0,0,,,,,,,,,,,,,
+4988,54,2015,10,18,7,OO,4988,N937SW,13930,13871,0911,0904,-7,26,0930,92,99,67,416,1037,6,1043,1043,0,0,0,,,,,,,,,,,,,
+4988,54,2015,10,25,7,OO,4988,N975SW,11292,14457,1511,1508,-3,17,1525,72,67,46,300,1611,4,1623,1615,-8,0,0,,,,,,,,,,,,,
+4988,54,2015,10,16,5,OO,4988,N498CA,11292,14457,1727,1720,-7,11,1731,72,59,43,300,1814,5,1839,1819,-20,0,0,,,,,,,,,,,,,
+4988,54,2015,10,12,1,OO,4988,N958SW,11292,14457,1727,1718,-9,20,1738,72,74,49,300,1827,5,1839,1832,-7,0,0,,,,,,,,,,,,,
+4988,54,2015,10,29,4,OO,4988,N746SK,11292,14457,1511,1506,-5,11,1517,70,60,46,300,1603,3,1621,1606,-15,0,0,,,,,,,,,,,,,
+4988,54,2015,10,30,5,OO,4988,N786SK,11292,14457,1511,1518,7,11,1529,70,59,44,300,1613,4,1621,1617,-4,0,0,,,,,,,,,,,,,
+4988,54,2015,10,1,4,OO,4988,N945SW,11292,14457,1727,1717,-10,16,1733,72,68,48,300,1821,4,1839,1825,-14,0,0,,,,,,,,,,,,,
+4988,54,2015,10,5,1,OO,4988,N986SW,11292,14457,1727,1738,11,14,1752,72,63,44,300,1836,5,1839,1841,2,0,0,,,,,,,,,,,,,
+4988,54,2015,10,8,4,OO,4988,N918SW,11292,14457,1727,1723,-4,16,1739,72,65,45,300,1824,4,1839,1828,-11,0,0,,,,,,,,,,,,,
+4988,54,2015,10,15,4,OO,4988,N925SW,11292,14457,1727,1718,-9,18,1736,72,69,47,300,1823,4,1839,1827,-12,0,0,,,,,,,,,,,,,
+4988,54,2015,10,22,4,OO,4988,N941SW,11292,14457,1727,1727,0,25,1752,72,95,65,300,1857,5,1839,1902,23,0,0,,23,0,0,0,0,,,,,,,
+4988,54,2015,10,23,5,OO,4988,N983SW,11292,14457,1727,1725,-2,14,1739,72,61,44,300,1823,3,1839,1826,-13,0,0,,,,,,,,,,,,,
+4988,54,2015,10,26,1,OO,4988,N774SK,11292,14457,1511,1524,13,11,1535,70,59,44,300,1619,4,1621,1623,2,0,0,,,,,,,,,,,,,
+4988,54,2015,10,2,5,OO,4988,N917SW,11292,14457,1727,1720,-7,24,1744,72,,,300,,,1839,,,1,0,,,,,,,,,,,,,
+4988,54,2015,10,9,5,OO,4988,N952SW,11292,14457,1727,1726,-1,18,1744,72,70,48,300,1832,4,1839,1836,-3,0,0,,,,,,,,,,,,,
+4988,54,2015,10,19,1,OO,4988,N941SW,11292,14457,1727,1721,-6,14,1735,72,66,48,300,1823,4,1839,1827,-12,0,0,,,,,,,,,,,,,
+4988,54,2015,10,21,3,OO,4988,N727SK,11292,14908,1543,1614,31,17,1631,139,136,113,846,1724,6,1702,1730,28,0,0,,0,28,0,0,0,,,,,,,
+4988,54,2015,10,7,3,OO,4988,N703SK,11292,14908,1543,1541,-2,16,1557,139,129,106,846,1643,7,1702,1650,-12,0,0,,,,,,,,,,,,,
+4988,54,2015,10,14,3,OO,4988,N771SK,11292,14908,1543,1541,-2,14,1555,139,136,116,846,1651,6,1702,1657,-5,0,0,,,,,,,,,,,,,
+4988,54,2015,8,6,4,OO,4988,N743SK,SFO,ACV,2000,2009,9,17,2026,68,66,45,250,2111,4,2108,2115,7,0,0,,,,,,,ACV,Arcata Airport,Arcata/Eureka,CA,USA,40.97812,-124.10862
+4988,54,2015,8,10,1,OO,4988,N790SK,SFO,ACV,2000,1957,-3,15,2012,68,59,39,250,2051,5,2108,2056,-12,0,0,,,,,,,ACV,Arcata Airport,Arcata/Eureka,CA,USA,40.97812,-124.10862
+4988,54,2015,7,6,1,OO,4988,N755SK,SFO,ACV,2000,2022,22,16,2038,68,57,38,250,2116,3,2108,2119,11,0,0,,,,,,,ACV,Arcata Airport,Arcata/Eureka,CA,USA,40.97812,-124.10862
+4988,54,2015,7,27,1,OO,4988,N758SK,SFO,ACV,2000,2027,27,16,2043,68,63,42,250,2125,5,2108,2130,22,0,0,,0,0,22,0,0,ACV,Arcata Airport,Arcata/Eureka,CA,USA,40.97812,-124.10862
+4988,54,2015,7,11,6,OO,4988,N978SW,SFO,ACV,2000,2045,45,15,2100,68,59,40,250,2140,4,2108,2144,36,0,0,,0,0,36,0,0,ACV,Arcata Airport,Arcata/Eureka,CA,USA,40.97812,-124.10862
+4988,54,2015,8,7,5,OO,4988,N796SK,SFO,ACV,2000,1954,-6,22,2016,68,70,42,250,2058,6,2108,2104,-4,0,0,,,,,,,ACV,Arcata Airport,Arcata/Eureka,CA,USA,40.97812,-124.10862
+4988,54,2015,7,25,6,OO,4988,N730SK,SFO,ACV,2000,2202,122,15,2217,68,62,41,250,2258,6,2108,2304,116,0,0,,0,0,63,53,0,ACV,Arcata Airport,Arcata/Eureka,CA,USA,40.97812,-124.10862
+
+...
+
+``

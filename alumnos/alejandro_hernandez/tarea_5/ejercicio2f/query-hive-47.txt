@@ -1,0 +1,15 @@
+f.day_of_week,a.airline,minimo
+2,Alaska Airlines Inc.,0
+2,American Airlines Inc.,0
+2,American Eagle Airlines Inc.,0
+2,Atlantic Southeast Airlines,0
+2,Delta Air Lines Inc.,0
+2,Frontier Airlines Inc.,0
+2,Hawaiian Airlines Inc.,0
+2,JetBlue Airways,0
+2,Skywest Airlines Inc.,0
+2,Southwest Airlines Co.,0
+2,Spirit Air Lines,0
+2,US Airways Inc.,0
+2,United Air Lines Inc.,0
+2,Virgin America,0

@@ -1,0 +1,55 @@
+---
+title: "Tarea3"
+author: "ArturoGonzalez:172906-DavidRivera:160668-ArturoTorre:90226"
+date: "February 19, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Parte 1
+
+En un Rmd poner la imagen que obtengan de jps una vez que todos los miembros del equipo se han podido conectar al clúster de hadoop
+![optional caption text](parte1-jps.png)
+
+
+En el mismo Rmd poner la imagen de localhost:8088 seleccionando la opción Nodes
+
+![optional caption text](parte1-nodos.png)
+
+
+
+### Parte 2
+
+ejericio 1: El mapper.py, reducer.py y output.txt del conteo del # de registros por cicloestación
+
+    Imágen del jps del clúster
+    Imágen de localhost:8088 seleccionando la opción Nodes
+    Imágen de localhost:8088 seleccionando la opción FINISHED para ver que los jobs corrieron existosamente
+![mapper.py](ecobici/ecobici-mapper.png)
+
+![reducer.py](ecobici/ecobici-reducer.png)
+
+![output](ecobici/ecobici-output.png)
+
+
+![yarn app finished](parte2-finished1.png)
+
+Ejercicio 2: El mapper.py, reducer.py y output.txt del join del lado del mapper
+
+    Imágen del jps del clúster
+    Imágen de localhost:8088 seleccionando la opción Nodes
+    Imágen de localhost:8088 seleccionando la opción FINISHED para ver que los jobs corrieron existosamente
+
+
+
+![mapper.py](flights/flights-mapper.png)
+
+![reducer.py](flights/flights-reducer.png)
+
+![reducer.py](flights/output.png)
+
+
+![yarn app finished](parte2-finished2.png)

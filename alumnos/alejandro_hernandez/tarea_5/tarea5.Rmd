@@ -1,0 +1,199 @@
+---
+title: "Tarea 5"
+author: "Alejandro Hernández Farías 87806"
+output: html_document
+---
+
+### Detalles del cluster hive
+
+__Fotos del cluster `alejandro_hernandez`:__
+
+Imagen del summary:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/cluster.png)
+
+
+
+### Ejercicio 1
+
+__a. ¿Cuántos "jefes" hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? (atributo reportsto, ocupa explode en tu respuesta)__
+
+Se utilizó el siguiente script:
+
+```{r,eval=FALSE}
+SELECT a.employeeid,a.firstname,a.lastname,a.title,a.birthdate,a.hiredate,a.address,a.city,a.country
+FROM (SELECT e.reportsto
+FROM employees e
+WHERE e.reportsto IS NOT NULL
+GROUP BY e.reportsto) aux INNER JOIN employees a ON (a.employeeid=aux.reportsto);
+
+
+```
+
+Hay 2 jefes y los datos especificos de cada uno de ellos se pueden ver en la siguiente imagen:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio1a/ejercicio1a.png)
+
+
+
+
+__b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1)) __
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT *
+FROM (SELECT a.firstname,a.lastname,a.title,a.birthdate,a.hiredate,aux.cuenta,lag(cuenta,1,0) OVER (ORDER BY cuenta DESC) num1
+FROM (SELECT e.employeeid,count(*) cuenta
+FROM employees e JOIN orders o ON (e.employeeid=o.employeeid)
+GROUP BY e.employeeid) aux INNER JOIN employees a ON (a.employeeid=aux.employeeid)
+ORDER BY aux.cuenta DESC
+LIMIT 2) aux2
+ORDER BY aux2.cuenta ASC
+LIMIT 1;
+```
+
+
+La segunda mejor empleada es Janet Leverling y el detalle de los datos solicitados se pueden ver en la siguiente imagen:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio1b/ejercicio1b.png)
+
+__c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?__
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT datediff(to_date(o.orderdate),lag(to_date(o.orderdate),1) OVER (ORDER BY o.orderdate)) diff_t1_t0
+FROM orders o
+ORDER BY diff_t1_t0 DESC
+LIMIT 1;
+```
+
+
+La diferencia maxima es de 3 como se puede constatar en la siguiente imagen:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio1c/ejercicio1c.png)
+
+### Ejercicio 2
+
+__a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"?__
+
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT DISTINCT a.airline
+FROM airlines a JOIN flights f ON (a.iata_code=f.airline) JOIN airports ae ON (f.destination_airport=ae.iata_code)
+WHERE ae.airport='Honolulu International Airport';
+```
+
+
+Se incluye imagen con el nombre de las aerolineas que llegan a Honolulu:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio2a/ejercicio2a.png)
+
+__b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"? __
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT DISTINCT substr(f.scheduled_departure,1,2),f.origin_airport,f.destination_airport
+FROM airlines a JOIN flights f ON (a.iata_code=f.airline) JOIN airports ae ON (f.destination_airport=ae.iata_code) JOIN airports ae2 ON (f.origin_airport=ae2.iata_code) 
+WHERE ae.airport='Honolulu International Airport' AND ae2.airport='San Francisco International Airport';
+```
+
+
+Se incluye imagen del horario:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio2b/ejercicio2b.png)
+
+
+__c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible?__
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT f.day_of_week,a.airline,min(f.departure_delay)
+FROM airlines a JOIN flights f ON (a.iata_code=f.airline) JOIN airports ae ON (f.destination_airport=ae.iata_code) 
+WHERE ae.airport='Honolulu International Airport' AND f.departure_delay=0
+GROUP BY f.day_of_week,a.airline;
+
+```
+
+
+Se incluye imagen de la aerolinea y día de la semana en que conviene viajar a Honolulu para tener el menor retraso posible:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio2c/ejercicio2c.png)
+
+
+__d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? __
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT f.destination_airport,ae.airport,count(*) cuenta
+FROM flights f JOIN airports ae ON (f.destination_airport=ae.iata_code) 
+GROUP BY f.destination_airport,ae.airport
+ORDER BY cuenta DESC;
+```
+
+
+El aeropuerto con mayor trafico de entrada es Hartsfield-Jackson Atlanta International Airport, como se muestra a continuación:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio2d/ejercicio2d.png)
+
+
+__e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana?__
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT f.day_of_week,a.airline,max(f.departure_delay) maximo
+FROM airlines a JOIN flights f ON (a.iata_code=f.airline) 
+GROUP BY f.day_of_week,a.airline
+ORDER BY maximo DESC
+LIMIT 7;
+```
+
+
+La aerolinea con mayor retraso por día de la semana es American Airlines Inc. como se aprecia en la siguiente imagen:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio2e/ejercicio2e.png)
+
+
+__f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)?__
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT f.day_of_week,a.airline,min(f.departure_delay) minimo
+FROM airlines a JOIN flights f ON (a.iata_code=f.airline) 
+WHERE f.day_of_week=2 AND f.departure_delay=0
+GROUP BY f.day_of_week,a.airline
+ORDER BY minimo DESC;
+
+```
+
+Hay 14 aerolineas que cumplen con estos criterios por lo que no se puede establecer cual es la tercer aerolinea específicamente.
+
+Se incluye imagen del resultado:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio2f/ejercicio2f.png)
+
+
+__g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?__
+
+Se utilizó el siguiente script de hive:
+
+```{R,eval=FALSE}
+SELECT f.origin_airport,ae.airport,count(DISTINCT f.destination_airport) cuenta
+FROM flights f JOIN airports ae ON (f.origin_airport=ae.iata_code) 
+GROUP BY f.origin_airport,ae.airport
+ORDER BY cuenta DESC;
+```
+
+
+El aeropuerto origen que llega a la mayor cantidad de aeropuertos destino es Hartsfield-Jackson Atlanta International Airport.
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_5/ejercicio2g/ejercicio2g.png)
+

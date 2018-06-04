@@ -1,0 +1,44 @@
+---
+title: "Tarea 7: Spark ML"
+output: html_notebook
+---
+
+Para realizar la Tarea 7, y revisar los temas de los módulos de Machine Learning que están integrados en Spark se realizaron varios pasos:
+
+- Se hizo un prototipo el local en una jupyter notebook (archivo en la carpeta)
+- El código probado se corrió en un cluster de AWS  a través de Zepellin
+
+Incluyo un archivo llamado "código_zepellin.txt" con el código final que se corrió así cono un archivo json que fue el que se descargó a través de Zepellin. una vez que terminó el proceso en el cluster
+
+El proceso que se siguó para la limpieza de datos y la prueba de modelos fue:
+![Cluster](/Users/usuario/Documents/MaestriaCD/MetodosGE/metodos_gran_escala/alumnos/oliab_herrera/Tarea7/Flowchart.png)
+
+El cluster que se usó fue:
+
+![Cluster](/Users/usuario/Documents/MaestriaCD/MetodosGE/metodos_gran_escala/alumnos/oliab_herrera/Tarea7/imagen_cluster.png)
+
+Una vez que se corrió el archivo a través de Zepellin pudimos ver que el proceso termino ya que en Zepellin apareció como finished además de que se visualizaron los resultados en la parte inferior:
+
+
+![Cluster](/Users/usuario/Documents/MaestriaCD/MetodosGE/metodos_gran_escala/alumnos/oliab_herrera/Tarea7/imagen_cluster_terminado.png)
+
+
+![Cluster](/Users/usuario/Documents/MaestriaCD/MetodosGE/metodos_gran_escala/alumnos/oliab_herrera/Tarea7/imagen_cluster_resultados.png)
+
+
+
+Los mejores parámetros fueron:
+Random Forest:
+{Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='subsamplingRate', doc='Fraction of the training data used for learning each decision tree, in range (0, 1].'): 1.0, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='maxMemoryInMB', doc='Maximum memory in MB allocated to histogram aggregation.'): 256, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='numTrees', doc='Number of trees to train (>= 1)'): 20, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='labelCol', doc='label column name'): 'DEPARTURE_DELAY', Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='predictionCol', doc='prediction column name'): 'prediction', Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='minInfoGain', doc='Minimum information gain for a split to be considered at a tree node.'): 0.0, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='maxDepth', doc='Maximum depth of the tree. (>= 0) E.g., depth 0 means 1 leaf node; depth 1 means 1 internal node + 2 leaf nodes.'): 5, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='maxBins', doc='Max number of bins for discretizing continuous features.  Must be >=2 and >= number of categories for any categorical feature.'): 32, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='impurity', doc='Criterion used for information gain calculation (case-insensitive). Supported options: variance'): 'variance', Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='minInstancesPerNode', doc='Minimum number of instances each child must have after split.  If a split causes the left or right child to have fewer than minInstancesPerNode, the split will be discarded as invalid. Should be >= 1.'): 1, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='cacheNodeIds', doc='If false, the algorithm will pass trees to executors to match instances with nodes. If true, the algorithm will cache node IDs for each instance. Caching can speed up training of deeper trees.'): False, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='featureSubsetStrategy', doc='The number of features to consider for splits at each tree node. Supported options: auto, all, onethird, sqrt, log2, (0.0-1.0], [1-n].'): 'auto', Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='checkpointInterval', doc='set checkpoint interval (>= 1) or disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10 iterations. Note: this setting will be ignored if the checkpoint directory is not set in the SparkContext'): 10, Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='featuresCol', doc='features column name'): 'features', Param(parent=u'RandomForestRegressor_4cb5b7e671e510884147', name='seed', doc='random seed')
+
+GLR:
+Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='featuresCol', doc='features column name'): 'features', Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='maxIter', doc='maximum number of iterations (>= 0)'): 25, Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='labelCol', doc='label column name'): 'DEPARTURE_DELAY', Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='fitIntercept', doc='whether to fit an intercept term'): True, Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='predictionCol', doc='prediction column name'): 'prediction', Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='variancePower', doc='The power in the variance function of the Tweedie distribution which characterizes the relationship between the variance and mean of the distribution. Only applicable to the Tweedie family. Supported values: 0 and [1, Inf).'): 0.0, Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='family', doc='The name of family which is a description of the error distribution to be used in the model. Supported options: binomial, gamma, poisson, gaussian, tweedie.'): 'gaussian', Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='tol', doc='the convergence tolerance for iterative algorithms (>= 0)'): 1e-06, Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='solver', doc='The solver algorithm for optimization. Supported options: irls. (Default irls)'): 'irls', Param(parent=u'GeneralizedLinearRegression_4940a5eeb13213a574c8', name='regParam', doc='regularization parameter (>= 0)'): 0.0}
+
+El mejor módelo fue el GLR con un error de .0088 vs. un error de 18.09 (una locura)
+
+El Magic loop tomó  18059639.619827 ms. que son aproximadamente 300 minutos.
+
+
+
+
+

@@ -1,0 +1,144 @@
+---
+title: "Tarea 3"
+author: "Abraham Nieto 51556, Federico Riveroll 105898 y Alejandro Hernández 87806"
+output: html_document
+---
+__Ejercicio 1:__ 
+
+Utilizando los datos de ecobici_2010_2017 y MapReduce averigua ¿Cuántos registros hay por cicloestación?
+
+__Imágen del jps del clúster y map reduce exitoso__
+
+Jps:
+
+![](ejer1/imagenes/nodos.png)
+
+Map reduce:
+
+![](ejer1/imagenes/mapred.png)
+
+__Imágen de localhost:8088 seleccionando la opción Nodes:__
+
+![](ejer1/imagenes/nodecluster.png)
+
+__Imágen de localhost:8088 seleccionando la opción FINISHED para ver que los jobs corrieron existosamente:__
+
+![](ejer1/imagenes/finished.png)
+
+
+Se muestran resultados:
+
+![](ejer1/imagenes/output1.png)
+
+
+
+__Ejercicio 2:__
+
+Con los datos de vuelos retrasados en USA hacer un join del lado del mapper con flights, airports y airlines. Primero intenta una sola llave o flights o airports.
+
+El join se hizo en 2 partes, la primera se unió flights con airlines utilizando los programas mapper2 y reducer2 que se agregan en la carpeta del ejercicio 2 y la segunda parte usó airports con el resultado del join anterior a través de mapper2_1 y reducer2_1.
+
+__Maper2 y Reducer2:__
+
+Mapper2:
+
+
+![](ejer2/imagenes/mapper2.png) 
+
+Reducer2:
+
+![](ejer2/imagenes/reducer2.png)
+
+__Mapper2_1 y Reducer2_1:__
+
+
+Mapper2_1:
+
+![](ejer2/imagenes/mapper2_1.png)
+
+
+Reducer2_1:
+
+
+![](ejer2/imagenes/reducer2_1.png)
+
+Con ambos obtenemos lo siguiente:
+
+__Jps y Map Reduce exitoso:__
+
+Jps:
+
+![](ejer2/imagenes/jps.png)
+
+Map reduce:
+
+![](ejer2/imagenes/mapred2.png)
+
+__Localhost con nodes:__
+
+![](ejer2/imagenes/node2.png)
+
+__Localhost con finished:__
+
+![](ejer2/imagenes/finish2.png)
+
+__Se muestran los resultados:__
+
+![](ejer2/imagenes/output2.png)
+
+Adicionalmente, se anexa una muestra de la salida en el archivo output2.txt en la carpeta del ejercicio 2.
+
+__Ejercicio 3:__ 
+
+Con los datos de vuelos retrasados en USA hacer un join del lado del reducer con flights, airports y airlines. Primero intenta una sola llave o flights o airports.
+
+Al igual que en el ejemplo anterior se hace el join en 2 pasos primero airlines con flights usando los programas mapper3.py y reducer3.py y luego con ese resulado unido a airports y se usan los programas mapper3_1 y reducer3_1. 
+
+__Mapper3 y Reducer3__
+
+Mapper3:
+
+![](ejer3/imagenes/mapper3.png)
+
+Reducer3:
+
+![](ejer3/imagenes/reducer3.png)
+
+__Mapper3_1 y Reducer3_1:__
+
+
+Mapper3_1:
+
+![](ejer3/imagenes/mapper3_1.png)
+
+Reducer3_1:
+
+![](ejer3/imagenes/reducer3_1.png)
+
+__Jps y Map Reduce exitoso:__
+
+Jps:
+
+![](ejer3/imagenes/jps.png)
+
+Map reduce:
+
+![](ejer3/imagenes/mapred.png)
+
+
+__Localhost con nodes:__
+
+![](ejer3/imagenes/nodes3.png)
+
+
+__Locahost con finished:__
+
+![](ejer3/imagenes/finished3.png)
+
+Se muestran resultados:
+
+![](ejer3/imagenes/output3.png)
+
+Finalmente, se anexa una muestra de la salida en el archivo output3.txt en la carpeta del ejercicio 3.
+
+

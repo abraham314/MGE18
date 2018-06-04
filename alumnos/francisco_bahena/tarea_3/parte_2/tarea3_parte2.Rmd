@@ -1,0 +1,299 @@
+---
+title: "Tarea 3 parte 2"
+author: "Daniel Sharp, Cristian Challu y Francisco Bahena"
+date: "February 12, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+  
+  El Dockerfile utilizado para esta segunda parte de la tarea es el mismo que se utilizó en la primera. El Dockerfile se encuentra tanto en la carpeta de la primera parte como en la de la segunda parte.  
+
+### Ejercicio 1: Con los datos de ECOBICI 2010 a 2017, ¿cuántos registros hay por cicloestación?  
+El output del mapreduce se muestra en el archivo 'output1.txt' en la carpeta ejercicio_1. En la misma se encuentran los archivos mapper1.py y reducer1.py.
+  
+### Códigos  
+#### Mapper.py  
+```{python eval=FALSE}
+#!/usr/bin/env python
+
+import sys
+import re
+ 
+for line in sys.stdin:
+	linea = re.split(',',line)
+	print(linea[13] + "\t1")
+```   
+     
+#### Reducer.py  
+```{python eval=FALSE}
+#!/usr/bin/env python
+
+import sys
+
+previous = None
+sum = 0
+
+for line in sys.stdin:
+  key, value = line.split('\t')
+  if key != previous:
+      if previous is not None:
+        print(previous + '\t' + str(sum))
+      previous = key
+      sum = 0
+
+  sum += int(value)
+
+print(previous + '\t' + str(sum))
+```
+  
+### Head del output.txt  
+```{bash}
+head -10 /home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_1/output1.txt  
+```
+
+## Imagen del jps del clúster  
+  
+  **Nota: dadas las capacidades técnicas del tercer equipo que quisimos unir al clúster lo tuvimos que eliminar en el proceso de Map-Reduce pues generaba errores de memoria. Sin embargo, como se puede observar en la primera parte de tarea, si logramos levantar el YARN con tres equipos.**  
+  
+#### Master  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_1/jps_ds138176.png)  
+
+#### Slave
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_1/jps_cc120652.png)  
+
+#### Imagen del localhost:8088 seleccionando la opción de nodos:  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_1/nodes_succeded.png)  
+
+#### Imagen del localhost:8088 seleccionando la opción FINISHED para ver que los jobs corrieron correctamente  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_1/succededmapreduce.png)  
+
+#### Producto de la línea de comando mostrando el mapreduce exitoso:  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_1/Succesful_mapreduce.png)  
+
+      
+### Ejercicio 2: Con los datos de vuelos retrasados en USA hacer un join del lado del mapper con flights, airports y airlines. Primero intenta una sola llave o flights o airports  
+Una muestra del output del mapreduce se muestra en el archivo 'output_sample.txt' carpeta ejercicio_2 pues el archivo completo rondaba los 800 MB. En la misma se encuentran los archivos mapper-airline-flights.py y mapper-joined-airports.py. Estos archivo lleva a cabo el join de las tablas de airlines y flights y el producto de este primer join con la tabla de airports, respectivamente. No es necesario crear un reducer para este tipo de join pues toda la ejecución se lleva a cabo en el Mapper.
+
+### Códigos  
+  
+  **El primer mapper desarrollaa el join entre la tabla de flights.csv y airlines.csv y el segundo desarrolla el join entre el producto del mapper anterior y la tabla de airports**  
+    
+#### Mapper-airline-flights.py  
+
+```{r eval=FALSE}
+#!/usr/bin/env python
+
+import sys
+
+airline_dict = {}
+# Lee la tabla de airlines a memoria, pues es pequeña
+airlines = open('airlines.csv','r')
+# Llena un diccionario con los valores posibles de la tabla
+for line in airlines:
+   line = line.strip()
+   splits = line.split(",")
+   airline_dict[splits[0]] = splits[1]
+# Cierra el archivo
+airlines.close()
+# Itera línea por línea agregando el valor del nombre de la aerolínea de acuerdo con el código. Si no encuentra el código de la aerolínea en la tabla de airlines agrega un valor 'NA'.
+for line in sys.stdin:
+    line = line.strip()
+    splits = line.split(",")
+    if (splits[4] in airline_dict):
+        splits.insert(5,airline_dict[splits[4]])
+    else:
+        splits.insert(5,'NA')
+    print(','.join(splits))
+```   
+
+#### Mapper-airline-flights.py  
+
+```{r eval=FALSE}
+#!/usr/bin/env python
+
+import sys
+
+airports_dict = {}
+# Lee la tabla de airports
+airports = open('airports.csv','r')
+# Llena un diccionario con los valores posibles de la tabla
+for line in airports:
+   line = line.strip()
+   splits = line.split(",")
+   airports_dict[splits[0]] = splits[1]
+
+airports.close()
+# Itera línea por línea agregando el valor del nombre del aeropuerto de acuerdo con el código. Si no encuentra el código del aeropuerto en la tabla de airports agrega un valor 'NA'.
+for line in sys.stdin:
+    line = line.strip()
+    splits = line.split(",")
+    if (splits[8] in airports_dict):
+        splits.insert(9,airports_dict[splits[8]])
+    else:
+        splits.insert(9,'NA')
+    print(','.join(splits))
+```   
+
+#### Head del output.csv  
+Únicamente se subió una muestra de la tabla resultante del join porque la tabla completa pesa alrededor de 1 GB, que supera la cantidad que se debería de subir a github. En la carpeta se adjunta una muestra de 500 líneas de la tabla final.  
+```{bash}
+head -10 /home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_2/output_sample.txt  
+```    
+## Imagen del jps del clúster  
+**Nota: dadas las capacidades técnicas del tercer equipo que quisimos unir al clúster lo tuvimos que eliminar en el proceso de Map-Reduce pues generaba errores de memoria. Sin embargo, como se puede observar en la primera parte de la tarea, si logramos levantar el YARN con tres equipos.**  
+  
+#### Master  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_2/jps_master.png)  
+
+#### Slave  
+En este se muestran los procesos que corren durante la ejecución del Map-Reduce en el esclavo.  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_2/jps_mapper_join_cristian.png)  
+
+#### Imagen del localhost:8088 seleccionando la opción de nodos:  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_2/yarn_nodos.png)  
+
+#### Imagen del localhost:8088 seleccionando la opción FINISHED para ver que los jobs corrieron correctamente  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_2/job_success_yarn.png)  
+
+#### Producto de la línea de comando mostrando el mapreduce exitoso:  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_2/Job_succesful_terminal.png)  
+
+  
+  
+### Ejercicio 3: Con los datos de vuelos retrasados en USA hacer un join del lado del reducer con flights, airports y airlines. Primero intenta una sola llave o flights o airports  
+Una muestra del output del mapreduce se muestra en el archivo 'output3_sample.txt' en la misma carpeta ejercicio_3. En la misma se encuentran los archivos mapper3.py, mapper3_2.py, reducer3.py y reducer3_2.py. Estos archivos ejecutan el join de las tres tablas en dos fases. El mapper3.py y reducer3.py se encargan de hacer el join entre flights.csv y airlines.csv. Los archivos mapper3_2.py y reducer3_2.py se encargan de hacer el join de la tabla producto de la operación anterior la tabla de airports.csv.  
+
+### Códigos  
+  
+  **Estos mapper y reducer desarrollan el join entre la tabla de flights.csv y airlines.csv**  
+    
+#### Mapper.py  
+
+```{r eval=FALSE}
+#!/usr/bin/env python
+
+import sys
+
+for line in sys.stdin:
+	line = line.strip()
+	splits = line.split(',')
+	if len(splits) == 2:
+		print(splits[0],',','0',',',splits[1],sep='')
+	else:
+		print(splits[4],',','NA',end='',sep='')
+		for i in range(31):
+			if i == 4:
+				continue
+			print(',',splits[i],sep='',end='')
+		print('')
+```   
+#### Reducer.py
+```{r eval=FALSE}
+#!/usr/bin/env python
+import sys
+import string
+
+last_airline_id = None
+cur_airline_name = "-"
+
+for line in sys.stdin:
+	line = line.strip()
+	linea = line.split(',')
+	if not last_airline_id or last_airline_id != linea[0]:
+		last_airline_id = linea[0]
+		cur_airline_name = linea[2]
+	elif linea[0] == last_airline_id:
+		linea[1] = cur_airline_name
+		print(linea[1],sep='',end='')
+		for i in range(2,len(linea)):
+			print(',',linea[i],sep='',end='')
+		print('')
+```   
+
+### **Los siguientes mapper y reducer realizan el join entre la tabla producto del join anterior y la tabla de airports**  
+  
+#### Mapper.py  
+
+```{r eval=FALSE}
+#!/usr/bin/env python
+
+import sys
+
+for line in sys.stdin:
+	line = line.strip()
+	splits = line.split(',')
+	if len(splits) == 7:
+		print(splits[0],',','0',',',splits[1],',',splits[2],',',splits[3],',',splits[4],',',splits[5],',',splits[6],sep='')
+	else:
+		print(splits[7],',','NA,','NA,','NA,','NA,','NA,','NA',end='',sep='')
+		for i in range(31):
+			if i == 7:
+				continue
+			print(',',splits[i],sep='',end='')
+		print('')
+```   
+#### Reducer.py
+```{r eval=FALSE}
+#!/usr/bin/env python
+import sys
+import string
+
+last_airport_id = None
+cur_1 = "-"
+cur_2 = "-"
+cur_3 = "-"
+cur_4 = "-"
+cur_5 = "-"
+cur_6 = "-"
+
+for line in sys.stdin:
+	line = line.strip()
+	linea = line.split(',')
+	if not last_airport_id or last_airport_id != linea[0]:
+		last_airport_id = linea[0]
+		cur_1 = linea[2]
+		cur_2 = linea[3]
+		cur_3 = linea[4]
+		cur_4 = linea[5]
+		cur_5 = linea[6]
+		cur_6 = linea[7]
+	elif linea[0] == last_airport_id:
+		linea[1] = cur_1
+		linea[2] = cur_2
+		linea[3] = cur_3
+		linea[4] = cur_4
+		linea[5] = cur_5
+		linea[6] = cur_6
+		print(linea[1],sep='',end='')
+		for i in range(2,len(linea)):
+			print(',',linea[i],sep='',end='')
+		print('')
+```   
+
+#### Head del output.csv  
+Únicamente se subió una muestra de la tabla resultante del join porque la tabla completa pesa alrededor de 1 GB, que supera la cantidad que se debería de subir a github. En la carpeta se adjunta una muestra de 500 líneas de la tabla final.  
+```{bash}
+head -10 /home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_3/output3_sample.csv  
+```  
+## Imagen del jps del clúster  
+**Nota: dadas las capacidades técnicas del tercer equipo que quisimos unir al clúster lo tuvimos que eliminar en el proceso de Map-Reduce pues generaba errores de memoria. Sin embargo, como se puede observar en la primera parte de la tarea, si logramos levantar el YARN con tres equipos.**  
+  
+#### Master  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_3/jps_ds138176.png)  
+
+#### Slave  
+En este se muestran los procesos que corren durante la ejecución del Map-Reduce en el esclavo.  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_3/jps_cc120652.png)  
+
+#### Imagen del localhost:8088 seleccionando la opción de nodos:  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_3/ejercicio3_yarnnodes.png)  
+
+#### Imagen del localhost:8088 seleccionando la opción FINISHED para ver que los jobs corrieron correctamente  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_3/ejercicio3_finished.png)  
+
+#### Producto de la línea de comando mostrando el mapreduce exitoso:  
+![](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/francisco_bahena/tarea_3/parte_2/ejercicio_3/ejercicio3_succesful.png)  
+

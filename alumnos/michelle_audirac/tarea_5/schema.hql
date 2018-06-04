@@ -1,0 +1,5 @@
+SHOW DATABASES;
+
+USE northwind;
+
+SHOW TABLES;

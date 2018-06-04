@@ -1,0 +1,3 @@
+﻿employeeid,lastname,firstname,title,birthdate,hiredate,city,country,reportsto
+2,Fuller,Andrew,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,null
+5,Buchanan,Steven,Sales Manager,1955-03-04,1993-10-17,London,UK,2

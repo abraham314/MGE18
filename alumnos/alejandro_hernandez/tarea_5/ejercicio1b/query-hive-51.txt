@@ -1,0 +1,2 @@
+aux2.firstname,aux2.lastname,aux2.title,aux2.birthdate,aux2.hiredate,aux2.cuenta,aux2.num1
+Janet,Leverling,Sales Representative,1963-08-30,1992-04-01,127,156

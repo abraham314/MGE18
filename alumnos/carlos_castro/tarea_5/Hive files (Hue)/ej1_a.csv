@@ -1,0 +1,3 @@
+employeeid,firstname,lastname,titleofcourtesy,birthdate,hiredate,city,country
+5,Steven,Buchanan,Mr.,NULL,NULL,London,UK
+2,Andrew,Fuller," Sales""",NULL,NULL,908 W. Capital Way,98401

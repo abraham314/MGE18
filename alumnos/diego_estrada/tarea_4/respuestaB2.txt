@@ -1,0 +1,2 @@
+airlines::iata_code,airlines::airline,flights::flight_number,flights::arrival_delay
+AA,American Airlines Inc.,1322,1971

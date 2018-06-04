@@ -1,0 +1,280 @@
+%pyspark
+
+#Importamos librerias que necesitaremos
+
+from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+from pyspark.ml.regression import RandomForestRegressor
+from pyspark.ml.regression import LinearRegression
+from pyspark.ml.regression import DecisionTreeRegressor
+from pyspark.ml.evaluation import RegressionEvaluator
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.feature import StringIndexer
+from pyspark.ml.feature import OneHotEncoder
+from pyspark.ml.feature import PCA
+from pyspark.ml import Pipeline
+from pyspark.sql.functions import col, sum
+
+%pyspark
+
+#Importamos los datos
+
+flights = spark.read.csv("s3://mat34710/tareas/datos/flights.csv", header = True, inferSchema = True, nullValue = 'null')
+
+%pyspark
+
+#Vemos con cuantas observaciones contamos
+
+flights.count()
+
+5819079
+
+%pyspark
+
+#Primero debemos considerar todas las variables con las que disponemos, como deseamos predecir 'DEPARTURE_DELAY', no queremos utilizar ninguna variable con la que no contemos antes del despegue, como lo son 'DEPARTURE_TIME','TAXI_OUT','WHEELS_OFF','ELAPSED_TIME','AIR_TIME','WHEELS_ON','TAXI_IN','ARRIVAL_TIME','ARRIVAL_DELAY','DIVERTED','CANCELLED','CANCELLATION_REASON','AIR_SYSTEM_DELAY','SECUTIRY_DELAY','AIRLINE_DELAY','LATE_AIRCRAFT_DELAY','WEATHER_DELAY'. De esta forma, nos quedamos unicamente con la información que realmente tendremos disponible cuando deseemos hacer predicciones 
+
+flights.columns
+
+['YEAR', 'MONTH', 'DAY', 'DAY_OF_WEEK', 'AIRLINE', 'FLIGHT_NUMBER', 'TAIL_NUMBER', 'ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE', 'DEPARTURE_TIME', 'DEPARTURE_DELAY', 'TAXI_OUT', 'WHEELS_OFF', 'SCHEDULED_TIME', 'ELAPSED_TIME', 'AIR_TIME', 'DISTANCE', 'WHEELS_ON', 'TAXI_IN', 'SCHEDULED_ARRIVAL', 'ARRIVAL_TIME', 'ARRIVAL_DELAY', 'DIVERTED', 'CANCELLED', 'CANCELLATION_REASON', 'AIR_SYSTEM_DELAY', 'SECURITY_DELAY', 'AIRLINE_DELAY', 'LATE_AIRCRAFT_DELAY', 'WEATHER_DELAY']
+
+%pyspark
+
+#También podemos ver que hay varias variables, especialmente las últimas 6 que son en su mayoría valores nulos 
+
+flights.select(*(sum(col(c).isNull().cast("int")).alias(c) for c in flights.columns)).show()
+
++----+-----+---+-----------+-------+-------------+-----------+--------------+-------------------+-------------------+--------------+---------------+--------+----------+--------------+------------+--------+--------+---------+-------+-----------------+------------+-------------+--------+---------+-------------------+----------------+--------------+-------------+-------------------+-------------+
+|YEAR|MONTH|DAY|DAY_OF_WEEK|AIRLINE|FLIGHT_NUMBER|TAIL_NUMBER|ORIGIN_AIRPORT|DESTINATION_AIRPORT|SCHEDULED_DEPARTURE|DEPARTURE_TIME|DEPARTURE_DELAY|TAXI_OUT|WHEELS_OFF|SCHEDULED_TIME|ELAPSED_TIME|AIR_TIME|DISTANCE|WHEELS_ON|TAXI_IN|SCHEDULED_ARRIVAL|ARRIVAL_TIME|ARRIVAL_DELAY|DIVERTED|CANCELLED|CANCELLATION_REASON|AIR_SYSTEM_DELAY|SECURITY_DELAY|AIRLINE_DELAY|LATE_AIRCRAFT_DELAY|WEATHER_DELAY|
++----+-----+---+-----------+-------+-------------+-----------+--------------+-------------------+-------------------+--------------+---------------+--------+----------+--------------+------------+--------+--------+---------+-------+-----------------+------------+-------------+--------+---------+-------------------+----------------+--------------+-------------+-------------------+-------------+
+|   0|    0|  0|          0|      0|            0|      14721|             0|                  0|                  0|         86153|          86153|   89047|     89047|             6|      105071|  105071|       0|    92513|  92513|                0|       92513|       105071|       0|        0|            5729195|         4755640|       4755640|      4755640|            4755640|      4755640|
++----+-----+---+-----------+-------+-------------+-----------+--------------+-------------------+-------------------+--------------+---------------+--------+----------+--------------+------------+--------+--------+---------+-------+-----------------+------------+-------------+--------+---------+-------------------+----------------+--------------+-------------+-------------------+-------------+
+
+%pyspark
+
+#Por lo tanto, únicamente nos quedaremos con las siguientes variables
+
+data = flights.select(['YEAR', 'MONTH', 'DAY', 'DAY_OF_WEEK', 'AIRLINE', 'FLIGHT_NUMBER','TAIL_NUMBER', 'ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE','DEPARTURE_DELAY', 'SCHEDULED_TIME','DISTANCE','SCHEDULED_ARRIVAL'])
+
+%pyspark
+
+#De las variables restantes, quitaremos las filas que contienen nulos en la variable objetivo 'DEPARTURE DELAY', debido a que esta variable si contiene ceros, previamente observamos que los nulos aquí correponden a los vuelos cancelados, así que no nos interesan. La única otra variable con valores nulos es 'TAIL_NUMBER'
+
+data = data.na.drop(subset=['YEAR', 'MONTH', 'DAY', 'DAY_OF_WEEK', 'AIRLINE', 'FLIGHT_NUMBER','TAIL_NUMBER', 'ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE','DEPARTURE_DELAY', 'SCHEDULED_TIME','DISTANCE','SCHEDULED_ARRIVAL'])
+
+%pyspark
+
+#Al final nos quedamos con 98% de nuestras observaciones originales
+
+(data.count()*1.0)/flights.count()
+
+0.9851937050519507
+
+%pyspark
+
+#Reviso que variables son categoricas, 'AIRLINE','TAIL_NUMBER','ORIGIN_AIRPORT','DESTINATION_AIRPORT'
+
+data.schema
+
+StructType(List(StructField(YEAR,IntegerType,true),StructField(MONTH,IntegerType,true),StructField(DAY,IntegerType,true),StructField(DAY_OF_WEEK,IntegerType,true),StructField(AIRLINE,StringType,true),StructField(FLIGHT_NUMBER,IntegerType,true),StructField(TAIL_NUMBER,StringType,true),StructField(ORIGIN_AIRPORT,StringType,true),StructField(DESTINATION_AIRPORT,StringType,true),StructField(SCHEDULED_DEPARTURE,IntegerType,true),StructField(DEPARTURE_DELAY,IntegerType,true),StructField(SCHEDULED_TIME,IntegerType,true),StructField(DISTANCE,IntegerType,true),StructField(SCHEDULED_ARRIVAL,IntegerType,true)))
+
+%pyspark
+
+#Separamos en un set de entrenamiento y uno de prueba
+
+(training, test) = data.randomSplit([0.7, 0.3])
+
+%pyspark
+
+#Creo un indexador para cada una de las variable categoricas, una por una
+
+airline_indexer = StringIndexer(inputCol='AIRLINE', outputCol='AIRLINE_numeric', handleInvalid='skip').fit(training)
+
+tailNumber_indexer = StringIndexer(inputCol='TAIL_NUMBER', outputCol='TAIL_NUMBER_numeric', handleInvalid='skip').fit(training)
+
+originAirport_indexer = StringIndexer(inputCol='ORIGIN_AIRPORT', outputCol='ORIGIN_AIRPORT_numeric', handleInvalid='skip').fit(training)
+
+destinationAirport_indexer = StringIndexer(inputCol='DESTINATION_AIRPORT', outputCol='DESTINATION_AIRPORT_numeric', handleInvalid='skip').fit(training)
+
+%pyspark
+
+#Creo un indexador para cada una de las variable categoricas, una por una
+
+airline_encoder = OneHotEncoder(inputCol='AIRLINE_numeric', outputCol='AIRLINE_vector')
+
+tailNumber_encoder = OneHotEncoder(inputCol='TAIL_NUMBER_numeric', outputCol='TAIL_NUMBER_vector')
+
+originAirport_encoder = OneHotEncoder(inputCol='ORIGIN_AIRPORT_numeric', outputCol='ORIGIN_AIRPORT_vector')
+
+destinationAirport_encoder = OneHotEncoder(inputCol='DESTINATION_AIRPORT_numeric', outputCol='DESTINATION_AIRPORT_vector')
+
+%pyspark
+
+#Genero la columna features, que contiene todas las variables que usare menos 'DEPARTURE_DELAY' que es la variable 'target'
+
+assembler = VectorAssembler(inputCols=['YEAR', 'MONTH', 'DAY', 'DAY_OF_WEEK', 'AIRLINE_vector', 'FLIGHT_NUMBER','TAIL_NUMBER_vector' 'ORIGIN_AIRPORT_vector', 'DESTINATION_AIRPORT_vector', 'SCHEDULED_DEPARTURE', 'SCHEDULED_TIME','DISTANCE','SCHEDULED_ARRIVAL'], outputCol='features')
+
+%pyspark
+
+#Reduzco la dimensionalidad para tratar de hacer el proceso más eficiente (Antes de agregarlo, me marcaba un error de SparkContext después de 2 horas de estar corriendo)
+
+pca = PCA(k=5, inputCol="features", outputCol="pcafeatures")
+
+%pyspark
+
+#Genero una regresión lineal
+
+lr = LinearRegression(labelCol='DEPARTURE_DELAY', featuresCol='pcafeatures')
+
+%pyspark
+
+#Genero el pipeline con los pasos anteriores
+
+pipelinelr = Pipeline(stages=[airline_indexer, tailNumber_indexer, originAirport_indexer, destinationAirport_indexer, airline_encoder, tailNumber_encoder, originAirport_encoder, destinationAirport_encoder, assembler, pca, lr])
+
+%pyspark
+
+#Genero el grid para los parametros de la regresión lineal, los parametros no serán los mejores a primera impresión, pero se espera sacar el objetivo rápido, si es posible (no me quedan muchos créditos)
+
+paramGridlr = ParamGridBuilder().addGrid(lr.regParam, [0.0, 0.01, 0.5]).addGrid(lr.maxIter, [10, 50, 100]).build()
+
+%pyspark
+
+#Definimos el pipeline que queremos evaluar y el evaluador que ocuparemos, en este caso el RegressionEvaluator toma 'rmse'
+
+crossvallr = CrossValidator(estimator = pipelinelr, estimatorParamMaps = paramGridlr, evaluator = RegressionEvaluator(labelCol='DEPARTURE_DELAY'), numFolds=10)
+
+%pyspark
+
+#Entrenamos con los datos de entrenamiento al estimador crossvallr, regresión lineal
+
+modellr = crossvallr.fit(training)
+
+%pyspark
+
+#Veamos cual fue el mejor modelo para regresión lineal
+
+modellr.bestModel
+
+PipelineModel_48759639964729a17ca5
+
+%pyspark
+
+#Utilizamos el modelo para transformar los datos de prueba
+
+prediction = modellr.transform(test)
+
+%pyspark
+
+#Veamos como se comparan las predicciones con los datos verdaderos
+
+prediction.select("DEPARTURE_DELAY", "prediction").show()
+
++---------------+------------------+
+|DEPARTURE_DELAY|        prediction|
++---------------+------------------+
+|             -5|11.647943982313967|
+|              0|12.375855636169826|
+|             31|11.107200311174259|
+|             -4|3.1320365344840653|
+|              6|20.062626557882787|
+|             46| 5.853963344247095|
+|             -6| 7.025111802320017|
+|             -3|11.028882391434488|
+|             91|   9.0295552138855|
+|             23| 8.588373736832898|
+|             -7| 6.117662448279193|
+|             -5| 5.569534477992065|
+|            190|13.925889016020529|
+|             -2|10.063510110246478|
+|             -4| 6.730074136675235|
+|              4| 5.836710899577691|
+|             16| 7.310613333929556|
+|             10|16.398752765416177|
+|             -5| 7.848072676407591|
+|             -3|13.717609030443436|
++---------------+------------------+
+only showing top 20 rows
+
+%pyspark
+
+#Para el segundo modelo, genero un árbol de decisión
+
+dt = DecisionTreeRegressor(labelCol='DEPARTURE_DELAY', featuresCol='features')
+
+%pyspark
+
+#Genero el pipeline con los pasos anteriores, ahora para el árbol de desición
+
+pipelinedt = Pipeline(stages=[airline_indexer, tailNumber_indexer, originAirport_indexer, destinationAirport_indexer, airline_encoder, tailNumber_indexer, originAirport_encoder, destinationAirport_encoder, assembler, pca, dt])
+
+%pyspark
+
+#Genero el grid para los parametros del árbol de decisión
+
+paramGriddt = ParamGridBuilder().addGrid(dt.maxDepth, [2, 5, 10]).addGrid(dt.minInstancesPerNode, [1, 5, 10]).build()
+
+%pyspark
+
+#Definimos el pipeline que queremos evaluar y el evaluador que ocuparemos, en este caso el RegressionEvaluator toma 'rmse'
+
+crossvaldt = CrossValidator(estimator = pipelinedt, estimatorParamMaps = paramGriddt, evaluator = RegressionEvaluator(labelCol='DEPARTURE_DELAY'), numFolds=10)
+
+%pyspark
+
+#Entrenamos con los datos de entrenamiento al estimador crossvaldt, árbol de decisión
+
+modeldt = crossvaldt.fit(training)
+
+%pyspark
+
+#Veamos cual fue el mejor modelo para el árbol de decisión
+
+modeldt.bestModel
+
+PipelineModel_4361b04d2e2d2853cfca
+
+%pyspark
+
+#Utilizamos el modelo para transformar los datos de prueba
+
+prediction = modeldt.transform(test)
+
+%pyspark
+
+#Veamos como se comparan las predicciones con los datos verdaderos
+
+prediction.select("DEPARTURE_DELAY", "prediction").show()
+
++---------------+------------------+
+|DEPARTURE_DELAY|        prediction|
++---------------+------------------+
+|             -5|  9.04469562647754|
+|              0|10.439819295549489|
+|             31| 20.57836678412747|
+|             -4|0.7816560073581313|
+|              6| 20.57836678412747|
+|             46|14.885714285714286|
+|             -6| 3.115847142113081|
+|             -3|  9.04469562647754|
+|             91|10.439819295549489|
+|             23| 3.115847142113081|
+|             -7| 15.15678809886377|
+|             -5| 6.653059587777689|
+|            190| 20.57836678412747|
+|             -2| 3.115847142113081|
+|             -4| 15.15678809886377|
+|              4| 2.508437241072692|
+|             16| 31.01356589147287|
+|             10| 20.57836678412747|
+|             -5|  9.04469562647754|
+|             -3|10.439819295549489|
++---------------+------------------+
+only showing top 20 rows
+
+
+
+
+
+
+
+
+

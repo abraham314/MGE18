@@ -1,0 +1,116 @@
+---
+title: "Tarea 5: Hive"
+output: html_notebook
+---
+
+Tarea 5 de Métodos de Gran Escala
+
+Ejercicio 1. Con la base de datos de northwind que se encuentran en el dropbox:
+
+a. ¿Cuántos "jefes" hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país?
+
+```{r}
+SELECT lastname, firstname, title, hiredate, count(*) as total_ordenes
+FROM orders
+JOIN employees
+ON orders.employeeid = employees.employeeid
+GROUP BY lastname, firstname, title, hiredate
+ORDER BY total_ordenes DESC
+LIMIT 1 OFFSET 1;
+```
+b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1))
+
+```{r}
+SELECT lastname, firstname, title, hiredate, count(*) as total_ordenes
+FROM orders
+JOIN employees
+ON orders.employeeid = employees.employeeid
+GROUP BY lastname, firstname, title, hiredate
+ORDER BY total_ordenes DESC
+LIMIT 1;
+```
+
+ c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?
+
+```{r}
+SELECT orderid,
+        from_utc_timestamp(date_format(orderdate,'yyyy-MM-dd HH:mm:ss.SSS'),'UTC') orderdate,
+        datediff(orderdate,from_utc_timestamp(date_format(lag(orderdate) OVER(ORDER BY orderid),'yyyy-MM-dd HH:mm:ss.SSS'),'UTC')) delta
+        FROM temp 
+        ORDER BY delta DESC;
+```
+
+Ejercicio 2. Con los archivos de vuelos, aeropuertos y aerolíneas que están en el dropbox
+
+a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"?
+
+```{r}
+select distinct airlines.airline
+from flights1
+join airlines on flights1.airline = airlines.iata_code
+where flights1.destination_airport = "HNL";
+```
+
+ b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"? 
+ 
+ 
+```{r}
+select distinct SUBSTRING( scheduled_departure,1,2) as horario
+from flights1
+where origin_airport == "SFO" and destination_airport == "HNL";
+```
+
+c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible?
+
+```{r}
+select day_of_week, airlines.airline, MIN(departure_delay) AS retraso
+from flights1
+join airlines on flights1.airline = airlines.iata_code
+where destination_airport == "HNL"
+group by day_of_week, airlines.airline
+order by retraso asc
+limit 1;
+```
+
+d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? 
+
+```{r}
+select DESTINATION_AIRPORT, airlines.airline, count(*) as trafico
+from flights
+join airlines on flights.airline = airlines.iata_code
+group by DESTINATION_AIRPORT, airlines.airline
+order by trafico desc
+limit 1;
+```
+e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana? 
+
+```{r}
+select f.day_of_week, f.airline, f.departure_delay
+from (
+   select day_of_week, max(departure_delay) as retraso
+   from flights1 group by day_of_week
+) as x inner join flights1 as f on f.day_of_week = x.day_of_week and f.departure_delay = x.retraso;
+```
+
+f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)? 
+
+```{r}
+select airlines.airline, min(departure_delay) AS retraso
+from flights1
+join airlines on flights1.airline = airlines.iata_code
+where day_of_week == 2
+group by airlines.airline
+order by retraso asc
+limit 1 offset 2;
+```
+
+g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+
+```{r}
+select origin_airport, count(distinct destination_airport) as total
+from flights
+group by origin_airport
+order by total desc
+limit 1;
+```
+

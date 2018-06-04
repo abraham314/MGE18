@@ -1,0 +1,2 @@
+a.employeeid,b.firstname,b.lastname,b.title,b.hiredate,a.num,ord_emp1
+3,Janet,Leverling,Sales Representative,1992-04-01,127,156

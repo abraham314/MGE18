@@ -1,0 +1,140 @@
+---
+title: "Tarea5"
+author: "Cristian Challu"
+date: "March 13, 2018"
+output: html_document
+---
+
+### Pregunta 1
+
+#### a)
+Cantidad de jefes:
+```{sql eval=FALSE}
+SELECT COUNT(DISTINCT reportsto) as cantidad_jefes
+FROM employees
+WHERE reportsto > 0;
+```
+
+Informacion de jefes:
+```{sql eval=FALSE}
+CREATE TEMPORARY TABLE collect AS
+SELECT reportsto, collect_list(firstname) as empleados
+FROM employees
+WHERE reportsto <> ''
+GROUP BY reportsto;
+
+CREATE TEMPORARY TABLE base AS
+SELECT emp.employeeid, emp.firstname, emp.lastname, emp.title, emp.hiredate, emp.city, emp.country, empleados
+FROM employees emp
+JOIN collect ON emp.employeeid = collect.reportsto;
+
+SELECT employeeid, firstname, lastname, title, hiredate, city, country, empleado
+FROM base
+LATERAL VIEW explode(empleados) subView AS empleado;
+```
+
+#### b)
+```{sql eval=FALSE}
+SELECT res.firstname, res.lastname, res.title, res.hiredate, res.cant, LEAD(cant) OVER(ORDER BY cant) maximo
+FROM(
+    SELECT emp.firstname, emp.lastname, emp.title, emp.hiredate, 
+    count(*) as cant
+    FROM northwind.orders ord
+    JOIN northwind.employees emp ON ord.employeeid = emp.employeeid
+    GROUP BY emp.firstname, emp.lastname, emp.title, emp.hiredate
+    ORDER BY cant DESC
+    LIMIT 2) res
+LIMIT 1;
+```
+
+#### c)
+```{sql eval=FALSE}
+SELECT res.delta as delta_maximo
+FROM(
+    SELECT orderid,
+    from_utc_timestamp(date_format(orderdate,'yyyy-MM-dd HH:mm:ss.SSS'),'UTC') orderdate,
+    datediff(orderdate,from_utc_timestamp(date_format(lag(orderdate) OVER(ORDER BY orderid),'yyyy-MM-dd HH:mm:ss.SSS'),'UTC')) delta
+    FROM orders
+    ORDER BY delta DESC) res
+LIMIT 1;
+```
+
+### Pregunta 2
+
+#### a)
+```{sql eval=FALSE}
+SELECT DISTINCT lines.airline
+FROM vuelos v
+JOIN airports ports ON v.destination_airport = ports.iata_code
+JOIN airlines lines ON v.airline = lines.iata_code
+WHERE ports.airport = "Honolulu International Airport";
+```
+
+#### b)
+```{sql eval=FALSE}
+SELECT DISTINCT SUBSTR(v.scheduled_departure,0,2) as hora
+FROM vuelos v
+JOIN airports portsorig ON v.origin_airport = portsorig.iata_code
+JOIN airports portsdest ON v.destination_airport = portsdest.iata_code
+WHERE portsorig.airport = "Honolulu International Airport" AND portsdest.airport = "San Francisco International Airport";
+```
+
+#### c)
+Se calculo el promedio por aereolinea por dia de los vuelos con retraso (como se especifico en el slack). Tambien es posible ver el minimo de retraso total (sin promedio), pero me parecio que esta era una mejor metrica para responder la pregunta.
+```{sql eval=FALSE}
+SELECT v.day_of_week, v.airline, lines.airline, AVG(v.departure_delay) as delay
+FROM vuelos v
+JOIN airlines lines ON v.airline = lines.iata_code
+JOIN airports ports ON v.destination_airport = ports.iata_code
+WHERE ports.airport="Honolulu International Airport" AND v.departure_delay > 0
+GROUP BY v.day_of_week, v.airline, lines.airline
+ORDER BY delay ASC
+LIMIT 1;
+```
+
+#### d)
+```{sql eval=FALSE}
+SELECT ports.airport, count(*) as trafico
+FROM vuelos v
+JOIN airports ports ON v.destination_airport = ports.iata_code
+GROUP BY ports.airport
+ORDER BY trafico DESC
+LIMIT 1;
+```
+
+#### e)
+En este caso se obtuvo la aereolinea con delay MAXIMO por dia.
+```{sql eval=FALSE}
+SELECT aux.day_of_week, aux.maximo, v2.airline, lines.airline
+FROM
+    (SELECT v.day_of_week, MAX(departure_delay) as maximo
+    FROM vuelos v
+    GROUP BY v.day_of_week) aux
+    LEFT JOIN vuelos v2 ON v2.day_of_week = aux.day_of_week AND v2.departure_delay = aux.maximo
+    JOIN airlines lines ON v2.airline = lines.iata_code
+    ORDER BY aux.day_of_week;
+```
+
+#### f)
+Al igual que en el punto c), se calculo el promedio de retrasos (mayores o iguales que 0).
+```{sql eval=FALSE}
+SELECT v.airline, lines.airline, avg(v.departure_delay) as delay_promedio
+FROM vuelos v
+JOIN airlines lines ON v.airline = lines.iata_code
+WHERE v.day_of_week = 2 AND v.departure_delay >= 0
+GROUP BY v.airline, lines.airline, v.day_of_week
+ORDER BY delay_promedio
+LIMIT 3;
+```
+
+#### g)
+```{sql eval=FALSE}
+SELECT v.origin_airport, ports.airport, count(DISTINCT v.destination_airport) as destinos
+FROM vuelos v
+JOIN airports ports ON v.origin_airport = ports.iata_code
+GROUP BY v.origin_airport, ports.airport
+ORDER BY destinos DESC
+LIMIT 1;
+```
+
+

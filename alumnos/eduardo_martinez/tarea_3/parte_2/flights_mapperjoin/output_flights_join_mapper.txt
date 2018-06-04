@@ -1,0 +1,15 @@
+AEROLINEA	CANT.CANCELACIONES
+American Airlines Inc.	10919
+Alaska Airlines Inc.	669
+JetBlue Airways	4276
+Delta Air Lines Inc.	3824
+Atlantic Southeast Airlines	15231
+Frontier Airlines Inc.	588
+Hawaiian Airlines Inc.	171
+American Eagle Airlines Inc.	15025
+Spirit Air Lines	2004
+Skywest Airlines Inc.	9960
+United Air Lines Inc.	6573
+US Airways Inc.	4601
+Virgin America	0
+Southwest Airlines Co.	16043

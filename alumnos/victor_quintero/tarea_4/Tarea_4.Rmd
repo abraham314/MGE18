@@ -1,0 +1,205 @@
+---
+title: "Tarea 4 - Pig"
+author: "Victor Quintero Marmol Gonzalez"
+date: "6 de marzo de 2018"
+output: html_document
+---
+
+Para esta tarea se utilizó AWS de acuerdo a lo recomendado, poniendole al cluster mi nombre.
+
+
+![](C:/Users/Lillian/Documents/Victor/Segundo Semestre/Metodos_gran_escala/tarea_4/AWS_pig.png)
+
+<br>
+![](C:/Users/Lillian/Documents/Victor/Segundo Semestre/Metodos_gran_escala/tarea_4/AWS_pig2.png)
+
+<br>
+
+Agrego unas de fotos de cuando esta corriendo:
+
+![](C:/Users/Lillian/Documents/Victor/Segundo Semestre/Metodos_gran_escala/tarea_4/AWS_pig_run.png)
+
+<br>
+Y de cuando estan completandose (con algunos fail que fueron corregidos):
+
+![](C:/Users/Lillian/Documents/Victor/Segundo Semestre/Metodos_gran_escala/tarea_4/AWS_pig_run2.png)
+
+
+<br>
+
+
+Ejercicio A.
+
+Los datos de northwind se encuentran en dropbox
+
+Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank;
+
+
+```{r, eval=FALSE}
+#Script en Pig (tarea4_ejA.pig)
+
+products = load '$INPUT/products.csv' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+order_details = load '$INPUT/order_details.csv' using PigStorage(',') as (orderid:chararray,productid:chararray,unitprice:float,quantity:int,	discount:float);
+group_orders = group order_details by productid;
+count_products = FOREACH group_orders GENERATE group as productid, COUNT($1) as n;
+names_products = JOIN count_products by productid, products by productid;
+ranked = rank names_products by n DESC;
+limited_rank = limit ranked 10;
+final = FOREACH limited_rank generate $0 as position, $4 as product, $2 as num_orders;
+
+store final into '$OUTPUT/output2/' using PigStorage(',', '-schema');
+
+```
+
+
+Ejercicio B.
+
+Con los datos de aerolíneas, vuelos y aeropuertos que se encuentran en el dropbox y utilizando Pig contesta las siguietnes preguntas:
+
+1. ¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el "Honolulu International Airport"?
+
+Existen 43157 vuelos con ese destino.
+
+
+```{r, eval=FALSE}
+#Script en Pig (tarea4_ejB1.pig)
+
+flights = load '$INPUT/flights.csv' using PigStorage(',') as (YEAR,MONTH,DAY,DAY_OF_WEEK,AIRLINE,FLIGHT_NUMBER,TAIL_NUMBER,ORIGIN_AIRPORT,DESTINATION_AIRPORT,SCHEDULED_DEPARTURE,DEPARTURE_TIME,DEPARTURE_DELAY,TAXI_OUT,WHEELS_OFF,SCHEDULED_TIME,ELAPSED_TIME,AIR_TIME,DISTANCE,WHEELS_ON,TAXI_IN,SCHEDULED_ARRIVAL,ARRIVAL_TIME,ARRIVAL_DELAY,DIVERTED,CANCELLED,CANCELLATION_REASON,AIR_SYSTEM_DELAY,SECURITY_DELAY,AIRLINE_DELAY,LATE_AIRCRAFT_DELAY,WEATHER_DELAY);
+airports = load '$INPUT/airports.csv' using PigStorage(',') as (IATA_CODE,AIRPORT,CITY,STATE,COUNTRY,LATITUDE,LONGITUDE);
+flights_airports = JOIN flights by DESTINATION_AIRPORT, airports by IATA_CODE; 
+dest_honolulu = FILTER flights_airports by AIRPORT in ('Honolulu International Airport');
+dest_group = GROUP dest_honolulu ALL;
+total = FOREACH dest_group GENERATE COUNT(dest_honolulu);
+
+store total into '$OUTPUT/output1/' using PigStorage(',', '-schema');
+
+```
+
+2. ¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es?
+
+El vuelo con mayor retraso es el 1322 de American Airlines Inc.
+
+1322,N598AA,1971,American Airlines Inc.,AA
+
+```{r, eval=FALSE}
+#Script en Pig (tarea4_ejB2.pig)
+
+flights = load '$INPUT/flights.csv' using PigStorage(',') as (YEAR:int,MONTH:int,DAY:int,DAY_OF_WEEK:int,AIRLINE:chararray,FLIGHT_NUMBER:int,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,SCHEDULED_DEPARTURE:chararray,DEPARTURE_TIME:chararray,DEPARTURE_DELAY:int,TAXI_OUT:int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,ELAPSED_TIME:int,AIR_TIME:int,DISTANCE:int,WHEELS_ON:chararray,TAXI_IN:int,SCHEDULED_ARRIVAL:chararray,ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:chararray,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+airlines =load '$INPUT/airlines.csv' using PigStorage(',') as (IATA_CODE:chararray,AIRLINE_2:chararray);
+
+flights_airlines = JOIN flights by AIRLINE, airlines by IATA_CODE;
+
+flights_ord = ORDER flights_airlines BY ARRIVAL_DELAY DESC;
+
+top_delay = LIMIT flights_ord 1;
+
+final = FOREACH top_delay GENERATE FLIGHT_NUMBER, TAIL_NUMBER,  ARRIVAL_DELAY,AIRLINE_2,IATA_CODE;
+
+store final into '$OUTPUT/output2/'  using PigStorage(',', '-schema');
+
+
+```
+
+3. ¿Qué día es en el que más vuelos cancelados hay?
+
+El día 1 de la semana, con 21073 cancelaciones
+
+1,1,21073
+
+```{r,eval=FALSE}
+#Script en Pig (tarea4_ejB3.pig)
+
+flights = load '$INPUT/flights.csv' using PigStorage(',') as (YEAR,MONTH,DAY,DAY_OF_WEEK,AIRLINE,FLIGHT_NUMBER,TAIL_NUMBER,ORIGIN_AIRPORT,DESTINATION_AIRPORT,SCHEDULED_DEPARTURE,DEPARTURE_TIME,DEPARTURE_DELAY,TAXI_OUT,WHEELS_OFF,SCHEDULED_TIME,ELAPSED_TIME,AIR_TIME,DISTANCE,WHEELS_ON,TAXI_IN,SCHEDULED_ARRIVAL,ARRIVAL_TIME,ARRIVAL_DELAY,DIVERTED,CANCELLED,CANCELLATION_REASON,AIR_SYSTEM_DELAY,SECURITY_DELAY,AIRLINE_DELAY,LATE_AIRCRAFT_DELAY,WEATHER_DELAY);
+flights_cancelled = FILTER flights by CANCELLED ==1;
+cancelled_selected = FOREACH flights_cancelled GENERATE DAY_OF_WEEK, CANCELLED;
+cancelled_group = GROUP cancelled_selected BY DAY_OF_WEEK;
+cont = FOREACH cancelled_group GENERATE group as DAY_OF_WEEK, COUNT($1) as n;
+ranked = rank cont by n DESC;
+limited_ranked = limit ranked 1;
+
+store limited_ranked into '$OUTPUT/output3/' using PigStorage(',', '-schema');
+
+```
+
+
+4. ¿Cuáles son los aeropuertos orígen con 17 cancelaciones?
+
+
+Delta County Airport
+Dothan Regional Airport
+Dickinson Theodore Roosevelt Regional Airport
+
+
+```{r, eval=FALSE}
+#Script en Pig (tarea4_ejB4.pig)
+
+flights = load '$INPUT/flights.csv' using PigStorage(',') as (YEAR,MONTH,DAY,DAY_OF_WEEK,AIRLINE,FLIGHT_NUMBER,TAIL_NUMBER,ORIGIN_AIRPORT,DESTINATION_AIRPORT,SCHEDULED_DEPARTURE,DEPARTURE_TIME,DEPARTURE_DELAY,TAXI_OUT,WHEELS_OFF,SCHEDULED_TIME,ELAPSED_TIME,AIR_TIME,DISTANCE,WHEELS_ON,TAXI_IN,SCHEDULED_ARRIVAL,ARRIVAL_TIME,ARRIVAL_DELAY,DIVERTED,CANCELLED,CANCELLATION_REASON,AIR_SYSTEM_DELAY,SECURITY_DELAY,AIRLINE_DELAY,LATE_AIRCRAFT_DELAY,WEATHER_DELAY);
+airports = load '$INPUT/airports.csv' using PigStorage(',') as (IATA_CODE,AIRPORT,CITY,STATE,COUNTRY,LATITUDE,LONGITUDE);
+flights_airports = JOIN flights by ORIGIN_AIRPORT, airports by IATA_CODE; 
+flights_cancelled = FILTER flights_airports by CANCELLED ==1;
+cancelled_group = GROUP flights_cancelled by AIRPORT;
+cont = FOREACH cancelled_group GENERATE group as AIRPORT, COUNT($1) as cancellations;
+cont_17 = FILTER cont by cancellations==17;
+final = FOREACH cont_17 GENERATE AIRPORT, cancellations;
+
+store final into '$OUTPUT/output4/' using PigStorage(',', '-schema');
+
+```
+
+5. ¿Cuál es el aeropuerto origen con más vuelos cancelados?
+
+Chicago O'Hare International Airport,con 8548 cancelaciones
+
+```{r, eval=FALSE}
+#Script en Pig (tarea4_ejB5.pig)
+
+flights = load '$INPUT/flights.csv' using PigStorage(',') as (YEAR,MONTH,DAY,DAY_OF_WEEK,AIRLINE,FLIGHT_NUMBER,TAIL_NUMBER,ORIGIN_AIRPORT,DESTINATION_AIRPORT,SCHEDULED_DEPARTURE,DEPARTURE_TIME,DEPARTURE_DELAY,TAXI_OUT,WHEELS_OFF,SCHEDULED_TIME,ELAPSED_TIME,AIR_TIME,DISTANCE,WHEELS_ON,TAXI_IN,SCHEDULED_ARRIVAL,ARRIVAL_TIME,ARRIVAL_DELAY,DIVERTED,CANCELLED,CANCELLATION_REASON,AIR_SYSTEM_DELAY,SECURITY_DELAY,AIRLINE_DELAY,LATE_AIRCRAFT_DELAY,WEATHER_DELAY);
+airports = load '$INPUT/airports.csv' using PigStorage(',') as (IATA_CODE,AIRPORT,CITY,STATE,COUNTRY,LATITUDE,LONGITUDE);
+flights_airports = JOIN flights by ORIGIN_AIRPORT, airports by IATA_CODE; 
+flights_cancelled = FILTER flights_airports by CANCELLED in ('1');
+cancelled_group = GROUP flights_cancelled by AIRPORT;
+cont = FOREACH cancelled_group GENERATE group as AIRPORT, COUNT($1) as cancellations;
+cont_selected = FOREACH cont GENERATE AIRPORT, cancellations;
+cont_order = ORDER cont_selected by cancellations DESC;
+final = LIMIT cont_order 1;
+
+store final into '$OUTPUT/output5/' using PigStorage(',', '-schema');
+
+```
+
+
+6. ¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? 
+
+El vuelo 202, con 68 aeropuertos destino diferentes, la lista con los nombres se encuentra en output_ejB6
+
+
+```{r, eval=FALSE}
+#Script en Pig (tarea4_ejB6.pig)
+
+flights = load '$INPUT/flights.csv' using PigStorage(',') as (YEAR:int,MONTH:int,DAY:int,DAY_OF_WEEK:int,AIRLINE:chararray,FLIGHT_NUMBER:int,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,SCHEDULED_DEPARTURE:chararray,DEPARTURE_TIME:chararray,DEPARTURE_DELAY:int,TAXI_OUT:int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,ELAPSED_TIME:int,AIR_TIME:int,DISTANCE:int,WHEELS_ON:chararray,TAXI_IN:int,SCHEDULED_ARRIVAL:chararray,ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:chararray,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+
+airports = load '$INPUT/airports.csv' using PigStorage(',') as (IATA_CODE:chararray,AIRPORT:chararray,CITY:chararray,STATE:chararray,COUNTRY:chararray,LATITUDE:float,LONGITUDE:float);
+
+flights_airports = JOIN flights by DESTINATION_AIRPORT LEFT OUTER, airports by IATA_CODE; 
+flights_group = GROUP flights_airports BY FLIGHT_NUMBER;
+air_unique = FOREACH flights_group{dest = FOREACH flights_airports GENERATE DESTINATION_AIRPORT; dist = DISTINCT dest; GENERATE group as FLIGHT_NUMBER, COUNT(dist) as n_unique;};
+destinations_order = ORDER air_unique by n_unique DESC;
+top = limit destinations_order 1;
+
+flights_destination = FOREACH flights GENERATE FLIGHT_NUMBER, DESTINATION_AIRPORT;
+airport_names = FOREACH airports GENERATE IATA_CODE, AIRPORT;
+dest_uniq = distinct flights_destination;
+resumen = join top by FLIGHT_NUMBER, dest_uniq by FLIGHT_NUMBER;
+final1 = join resumen by DESTINATION_AIRPORT LEFT OUTER, airport_names by IATA_CODE;
+final = FOREACH final1 GENERATE $0 as flight_number, $1 as diff_dest, $3 as iata_code, $5 as airport_name;
+
+store final into '$OUTPUT/output6/' using PigStorage(',', '-schema');
+
+```
+
+
+
+
+
+
+

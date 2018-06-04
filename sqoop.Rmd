@@ -1,0 +1,781 @@
+---
+title: "Sqoop, Pig, Hive"
+author: "Liliana Millán, liliana.millan@gmail.com"
+date: "Febrero, 2018"
+output: 
+  html_document:
+    df_print: paged
+    highlight: tango
+    theme: lumen
+    toc: true
+    toc_float: true
+---
+
+![](images/itam_logo.png)
+
+
+### Agenda 
+
++ Sqoop
+    + Ejemplo
++ Pig
+    + Ejemplo
+    + Tarea 4
++ Hive
+    + Ejemplo
++ Referencias
+
+
+### Sqoop 
+
+![](images/sqoop_logo.png)
+<br>
+Fuente: The Apache Foundation
+
+Hasta el momento hemos ocupado HDFS como nuestro sistema de archivos distribuido y hemos "subido" datos a este sistema distribuido a través de los comandos propios de HDFS -`copyFromLocal`, `put`- , sin embargo solo hemos jugado con archivos "planos": csv, txt, psv... pero muchas veces los datos que queremos analizar como científicos de datos se encuentran persistidos y "regados" en tablas de bases de datos estructuradas, es en estos casos en los que ocupamos Sqoop, una tecnología de Apache (2012) que nos permite cargar tablas de bases de datos RDBMS al sistema de archivos distribuido que hayamos seleccionado en nuestra arquitectura lambda.
+
+Sqoop también es ocupado después de que los datos han sido analizados en el clúster para persistirlos de nuevo en bases de datos RDBMS
+
+¿Dónde vive Sqoop?
+
+![](images/where_is_sqoop.png)
+
+Sqoop ocupa MapReduce para poder importar los datos a nuestro HDFS en paralelo, tomando ventaja de nuestro procesamiento en clúster :)
+
+![](images/sqoop_data_flow.png)
+<br>
+Fuente: [Sqoop, The Apache Foundataion](https://blogs.apache.org/sqoop/entry/apache_sqoop_overview)
+
+Las bases de datos de las que queremos importar datos deben tener un driver JDBC (un driver de java) para que Sqoop pueda tener una "conexión" hacia ella, para MySQL y Postgresql no se requiere de bajar un driver porque Sqoop ya lo tiene incluido, para las demás es necesario bajar y poner el driver (un `.jar`) disponible a Sqoop en la ruta `$SQOOP_HOME/lib/` -no todas las RDBMS pueden ser leídas por Sqoop-.  
+
+Las RDBMS con soporte "oficial" son (es posible conectarse a SQLServer...):  
+
+![](images/sqoop_dbs.png)
+<br>
+Fuente: 
+
++ Oracle [jdbc driver](http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html)
++ Postgresql [jdbc driver](https://jdbc.postgresql.org/download.html)
++ SQLServer [jdbc driver](https://docs.microsoft.com/en-us/sql/connect/jdbc/microsoft-jdbc-driver-for-sql-server)
++ MS Access [jdbc driver](https://www.easysoft.com/applications/microsoft-access/jdbc-odbc.html) \* no sé si esto funcione porque no es un driver desarrollado por Microsoft -no hay jdbc driver oficial para ms access!!-
+
+#### Requerimientos 
+
++ Para usar Sqoop se requiere de haber instalado Hadoop
++ La última versión estable es la 1.4.6 (hay una 1.99 pero no es para producción y aún no es estable!, además de que no son compatibles en absoluto)
+
+#### Comandos 
+
++ `sqoop help import`: Tu mejor amigo para conocer los parámetros posibles de un import -de una RDBMS a Sqoop-
+    + `--connect`: especificamos el jdbc driver a ocupar (depende de la RDBMS a la que nos conectaremos)
+    + `--username`: el usuario de la BD que ocuparemos para conectarnos
+    + `-P`: para solicitar el password de manera interactiva (el de la BD)
+    + `--password`: incluir el password **en claro!** en el comando de importación
+    + `--table`: qué tabla importaremos
+    + `--schema`: si el esquema es diferente al de default -public- entonces es necesario que enviémos el nombre del esquema donde se encuentra la tabla que queremos exportar
+    + `--import-all-tables`: si queremos importar todas las tablas de un esquema en un solo `bulk`
+    + `--as-avrodatafile`: guarda la tabla importada como archivos hdfs tipo Avro ＼(＾O＾)／
+    + `--as-parquetfile`: guarda la tabla importada como archivos hdfs tipo Parquet ＼(＾O＾)／
+    + `--query`: si se quiere extraer solo ciertos datos que cumplan con el query
+    + `--direct`: si se desea ocupar el driver de manera directa -optimiza tiempo de ejecución pero requiere más configuración-
++ `sqoop help export`: Manual de ayuda para conocer los parámetros posibles de un export -de Sqoop a una RDBMS- 
++ `sqoop-list-databases`: Muestra los esquemas disponibles dentro de una BD
++ `sqoop-list-tables`: Las tablas que se encuentran en un esquema
+
+#### Ejemplo Postgresql 9.5
+
+```
+$sqoop version #atencion en los warnings!
+
+--
+$sqoop import --connect jdbc:postgresql://localhost/northwind --username lmillan --table orders -P
+
+
+```
+
+### Pig
+
+![](images/pig_logo.png)
+<br>
+Fuente: The Apache Foundation (está bien chido su logo!)
+
+Pig es una tecnología de análisis de datos de gran escala, lo que implica que el análisis se hace en un clúster distribuido, será la primer tecnología que veremos de análisis de datos en un clúster distribuido. 
+
+Debido a que el análisis sucede en paralelo -el ambiente es distribuido- ocupamos el paradigma MapReduce, pero lo más hermoso es que no lo ocupamos a bajo nivel como lo vimos anteriormente, Pig tiene un lenguaje de alto nivel montado sobre MapReduce -**Pig Latin**-, tiene un compilador que convierte las instrucciones de alto nivel que nosotros programamos a trabajos de MapReduce ╭(◔ ◡ ◔)/
+
+Pig fue desarrollado en Yahoo! (2008, [Pig Latin: A Not-So-Foreign Language for Data Processing](http://infolab.stanford.edu/~olston/publications/sigmod08.pdf)) como una alternativa a ocupar MapReduce a tan bajo nivel, además de que lo consideraban muy rígido para poder realizar ciertas operaciones en los datos. Debido a que Hadoop fue desarrollado en Yahoo! el equipo a cargo del proyecto de Hadoop adoptó Pig y para 2009 Pig ya formaba parte de Apache. En 2009 casi la mitad de los trabajos de Hadoop en Yahoo! eran trabajos hechos en Pig.
+
+¿Por qué se llama así? 
+
+No es un acrónimo, es el nombre que decidieron ponerle los que ocupaban el lenguaje en Yahoo!, el nombre era pegajoso así que se quedó, además de que se divertían generando nombres a las cosas alrededor de Pig: *grunt* para el *shell*, *piggy-bank* para el repositorio de los *U*ser *D*efined *F*unctions (UDF). Tonz en concreto... porque yolo.
+
+
+¿Dónde vive Pig? 
+
+![](images/where_is_pig.png)
+
+<br>
+
+#### ¿Cuándo ocupar Pig?
+
+Se recomienda utilizar Pig en los siguientes 3 casos de uso: 
+
+1. En ETLs tradicionales
+2. Cuando se hace *research* en datos *raw*
+3. Procesamiento iterativo 
+
+El mayor uso de Pig es en pipelines -normalmente implementados por ingenieros de datos- para limpieza de datos antes de guardarlos en *datawarehouses* (DWH). El ejemplo más típico es limpiar logs de servidores/aplicaciones/procesos limpiando los datos, haciendo algunos preprocesamientos a los mismos, en este caso de uso los datos son cargados a Hadoop y son procesados con Pig.
+
+Normalmente para realizar preguntas a los datos ocupamos alguna abstracción de SQL o SQL plano, Pig es más flexible en este aspecto ya que permite que "preguntemos" a los datos sin que éstos tengan un esquema o que el mismo sea desconocido, incompleto o inconsistente además, es muy sencillo manejar datos con ciclos (JSON, XML) por lo que se vuelve una herramienta de uso frecuente.
+
+$\rightarrow$ Aunque ... Hive y Spark siguen siendo una mejor opción la mayoría de las veces ... 
+
+#### Filosofía Pig
+
++ Pig como lo que sea
+
+Puede operar con datos que no tienen esquema, metadatos, datos relacionales, *nested* o no estructurados. Se puede extender fácilmente a datos que no vienen de archivos incluyendo archivos con pares llave/valor, bases de datos y otros.
+
++ Pig vive en cualquier lado
+
+Pig es un lenguaje para procesamiento de datos en paralelo, por naturaleza está hecho para datos de gran escala -aunque no limitado a esta escala-, no está atado a un *framework* específico de procesamiento en paralelo como Hadoop aunque fue implementado para el mismo pero puede ser ocupado en otros *frameworks* de procesamiento en paralelo. 
+
++ Los Pig son animales domésticos
+
+    + Pig está diseñado para ser controlado y modificado fácilmente por los usuarios que lo ocupan
+    + Permite la integración de funciones definidas por el usuario (UDF)
+    + Permite que el usuario administre el nivel de paralelismo en los trabajos de reduce (si se desea)
+    + Tiene optimización interna para mejorar la eficiencia de trabajos escritos en Pig Latin -al estilo de los *execution planners* de algunas RDMBS- aunque se puede apagar esta función -no entiendo por qué la querrían apagar!!!-
+
++ Los trabajos de Pig "vuelan"
+
+Pig procesa datos rápidamente y todas modificaciones/ampliaciones que se hacen al sistema son tomando en cuenta que el procesamiento no debe perder esta propiedad
+
+
+#### Pig Latin 
+
+Para correr Pig como línea de comando, basta con llamar en consola `pig`, por default Pig estará "montado" sobre MapReduce pero es posible que Pig trabaje con Spark -`pig -x spark`- o de manera local -sin clúster distribuido ni HDFS, `pig -x local`-. La llamada a Pig abrirá el *Grunt shell* en donde podemos escribir nuestros comandos de *Pig Latin*.
+
+Pig Latin, el lenguaje de Pig, está pensado como un lenguaje de flujo de datos, cada paso de procesamiento en los datos genera un nuevo dataset o relación, estos nuevos datasets son *alias* que pudieran confundirse con variables pero no lo son, cada dataset es permanente, aunque estos nombres de puede reusar.
+
+![](images/pig_aliases.png)
+<br>
+
+*Keywords* de Pig Latin son *case insensitive*, es lo mismo poner `LOAD` que `load` pero los nombes de relaciones, variables y nombres de UDF SI son *case sensivitve*, esto es, `field_1` es diferente a `Field_1`
+
+#### Tipos de datos complejos
+
+En Pig hay 3 tipos de datos complejos que pueden contener cualquier tipo de dato, inclusive otro tipo complejo
+
++ `map` Como un diccionario en python, puede haber mapas tipados o no, si no son tipados Pig les pondrá un tipo de acuerdo a cómo usamos ese dato en el resto del script. Para declarar un mapa se ocupa los corchetes `[]` las llaves se separan de los valores con un hash `#` y cada par llave/valor se separa con una coma `,`. Por ejemplo: `['nombre'#'liliana:chararray','matricula'#'54903']`
++ `tuple`: Colección ordenada de elementos con longitud fija, pensemos en este tipo de datos como si fuera noa observación en SQL -un renglón-, donde se tienene atributos y cada atributo/variable puede ser de tipos diferentes. Como los elementos están ordenados se puede solicitar un registro en particular por su posición. Para declarar una tupla se ocupa los paréntesis `()`, la separación entre valores de la tupla es con coma `,`, es posible declarar el tipo (con esquema) o no. Por ejemplo: `('liliana','54903',37:int)`
++ `bag`: Es una colección **no** ordenada de tuplas. _ara declarar un *bag* se ocupan las llaves `{}` 
+
+$\rightarrow$ En Pig no hay `set` pero se puede ocupar un `bag` de 1 sola variable para imitar el comportamiento de un `set`.
+
+
+
+#### Comandos básicos
+
+Los trabajos de Pig corren por default en tu directorio como usuario: `/users/lmillan`
+
++ Input/Output
+  + `load`: Carga los datos a analizar desde el sistema distribuido ocupado (HDFS por el momento). Pig por default busca los datos en HDFS y con los datos separados por tab `\t`. Si los datos no están en este formato podemoss especificar en la función `PigStorage`. Por ejemplo: 
+  
+```
+divs = load 'NYSE_dividends' using PigStorage(',');
+```
+
+Se puede especificar qué variables cargar y el esquema -tipo de dato- asociado. Por ejemplo: 
+
+```
+divs = load 'NYSE_dividends' as (exchange, symbol, date, dividends);
+```
+  
+  + `store`: Para guardar los datos procesados en Pig. Por default los resultados se guardan en HDFS separados con un tab `\t`, al igual que `load` se puede ocupar `PigStorage()` para definir cómo guardar. También es posible guardar los resultados directamente en Avro ocupando `AvroStorage()`
+  
+![](images/pig_store.png)
+<br>
+Fuente: Libro "Programming Pig"
+  
+  + `dump`: Para desplegar salidas en el *grump shell*, se ocupa para hacer debuggeo o pequeñas pruebas del proceso sobre los datos. A diferencia del `store` que se ejecuta hasta que se haya terminado el script el `dump` se va escribiendo línea por línea... lo que lo hace menos eficiente y en exceso verbose...
+
++ Operaciones relacionales
+
+  + `foreach`/ `generate`: Permite aplicar una o más funciones a cada registro en un dataset
+  
+![](images/pig_foreach_1.png)
+
+<br>
+Fuente: Libro "Programming Pig"
+
+![](images/pig_foreach_2.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+![](images/pig_foreach_3.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+Se pueden ocupar UDFs en un `foreach`
+
+  + `filter`: Nos permite filtrar observaciones que cumplan con ciertas condiciones 
+
+![](images/pig_filter_1.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+![](images/pig_filter_2.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+  + `group`: Permite agrupar los datos a través de una llave que tengan en común, a diferencia del `group by` de SQL en donde siempre va ligado un `group by` a una o más funciones de agregación en Pig un group solo agrupa y ya la salida de un group by es un `bag`
+  + `join`: Al igual que en SQL permite unir dos tablas a través de una o más llaves que tengan en común. Es posible hacer *outer joins*: left, right y full.
+  + `sample`: Obtiene un subconjunto de los datos, lee todos los datos y regresa solo un porcentaje de los mismos definida en escala de 0 a 1. El subconjunto es seleccionado aleatoriamente 
+  + `parallel`: Permite optimizar los tiempos de ejcución al indicar el número de *reducer tasks* para los trabajos de MapReduce que se generen por Pig, si no se especifica este parámetro solo se genera 1 solo *reducer*. Se puede especificar este parámetro en cada operador que inicie una fase *reduce*: distinct, group, join, order. Los comandos de `parallel` solo aplican a la declaración de código donde se ocupa, no se sigue en todo el script a partir de su declaración
+
+![](images/pig_parallel.png)
+<br>
+Fuente: Libro "Programming Pig"
+
++ Advanced Pig Latin
+  + `flatten`: OOperador que se ocupa cuando los datos están en un `bag` o en una tupla y se desea eliminar ese grado de anidación. Si el `flatten` es combinado con un `foreach` se realiza un producto punto cruz entre cada elemento en el `bag` con cada variable que se encuentre en el `generate` del `foreach`
+  
+![](images/pig_flatten_foreach_1.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+![](images/pig_flatten_foreach_2.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+![](images/pig_flatten_foreach_3.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+Si un elemento en el `bag` está vacío, este registro no se generará ya que matemáticamente el producto cruz entre "algo" y "vacío" es vacío, si se desea que el registro forme parte de la salida del flatten se puede ocupar `IsEmpty` para poner un valor cuando viene vacío y que se pueda ejecutar su flatten.
+
+![](images/pig_flatten_empty.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+#### UDF
+
+Los UDF (User Defined Fucntions) aumentan el poder de Pig pues podemos generar nuestro código en un UDF en Java, Jython, JavaScript, Ruby, Groovy y Python :) y combinarlos con los operadores definidos por Pig. Pig ya viene con varios UDF predefinidos.
+
+Hay UDFs desarrollados por usuarios que están disponibles en el repo de UDFs colaborativos *Piggy Bank*, para ocupar estos UDF es necesario registrar manualmente el PiggyBank en nuestros scripts. Para registrar el *PiggyBank* que ya viene en la distribución de Pig se requiere de registrar el jar al que está asociado que se encuentra en `$PIG_HOME/contrib/piggybank/java/piggybank.jar`. No hay una documentación linda sobre qué hay en el PiggyBank y normalmente todas las UDF que se encuentran aquí están en Java :( -pueden registrar una en python sin pex!-
+
+![](images/pig_udf_register.png)
+<br>
+Fuente: Libro "Programming Pig"
+
+Para registrar nuestro propio UDF podemos ocupar `register 'production.py' using streaming_python as bballudfs;`
+
+Existen otros repos públicos con UDFs interesantes como [DataFu](https://datafu.incubator.apache.org/) para pipelines asociados a datos de LinkedIn y [ElephantBird](https://github.com/twitter/elephant-bird/) para datos de Twitter.
+
+
+#### Ejemplos
+
+Ocuparemos los datos de [Nortwind]() (Previamente los cargué en Postgres y luego los cargué a HDFS con Sqoop!)
+
+![](images/entity_relation_model.png)
+<br>
+
+
+Ejemplo 1: Cantidad promedio de productos por orden
+```
+--average quantity per order
+grunt> order_details = load '/user/lmillan/order_details/' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+grunt> order_grp = group order_details by orderid;
+grunt> a = foreach order_grp generate AVG(order_details.quantity);
+grunt> dump a;
+grunt> store a into '/user/lmillan/output/test_avg' using AvroStorage();
+
+grunt> test_avg = load '/user/lmillan/output/test_avg/' using AvroStorage();
+grunt> describe test_avg;
+grunt> dump test_avg;
+```
+
+Como script de pig en AWS: los parámetros `$INPUT` y `$OUTPUT` corresponden a los directorios de S3 que nosotros ponemos cuando cargamos el script desde la consola de administración de EMR.
+
+![](images/pig_aws.png)
+<br>
+
+```
+--borrar la salida
+rmf $OUTPUT
+
+order_details = load '$INPUT' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+order_grp = group order_details by orderid;
+a = foreach order_grp generate AVG(order_details.quantity);
+store a into '$OUTPUT' using PigStorage(',');
+```
+
+
+Ejemplo 2: Join entre clientes y órdenes
+
+```
+--join between order and customers
+grunt> orders = load '/user/lmillan/orders/' using PigStorage(',') as (orderid:chararray, customerid:chararray, employeeid:chararray);
+grunt> customers = load '/user/lmillan/customers/' using PigStorage(',') as (customerid:chararray, companyname:chararray, contactname:chararray);
+grunt> join_customers_orders = JOIN orders by customerid, customers by customerid;
+grunt> limit_join = limit join_customers_orders 10;
+grunt> store limit_join into '/user/lmillan/output/pig/join/' using PigStorage(',');
+```
+
+Ejemplo 3: Window functions (rank): Queremos saber cuál es el producto mejor rankeado -window functions-
+
+```
+grunt> products = load '/user/lmillan/products/' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+grunt> order_details = load '$INPUT2' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+grunt> products_orders = join order_details by productid, productos by productid;
+grunt> group_orders = group products by productid;
+grunt> count_products = FOREACH group_orders GENERATE COUNT(productid) as n;
+grunt> ranked = rank count_products by n DESC;
+grunt> limited_rank = limit ranked 10;
+grunt> store limited_rank into '/user/lmillan/output/rank';
+```
+
+
+#### Tarea 4 - Pig
+
+
+Ejercicio A. 
+
+Los datos de northwind se encuentran en [dropbox](https://www.dropbox.com/sh/qormkgqgt5o8zk3/AADNbqwqeXEfM_tNcieeX0B-a?dl=0)
+
+Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank
+
+Ejercicio B. 
+
+Con los datos de aerolíneas, vuelos y aeropuertos que se encuentran en el [dropbox](https://www.dropbox.com/sh/rdd78b7nofjb5vy/AAAwUm97baTusv5l8QY2ZAi2a?dl=0) y **utilizando Pig** contesta las siguietnes preguntas:
+
+
+1. ¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el "Honolulu International Airport"?
+2. ¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es? 
+3. ¿Qué día es en el que más vuelos cancelados hay? 
+4. ¿Cuáles son los aeropuertos orígen con 17 cancelaciones? 
+5. ¿Cuál es el aeropuerto origen con más vuelos cancelados? 
+6. ¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? (ocupar bag te ayudará en esta pregunta)
+
+
+¿Qué se entrega? 
+
++ Se entrega el **Lunes 5 marzo 2018 máximo 23:59:59 CST** en tu carpeta `alumnos/nombre_apellido/tarea_4`
++ La tarea es individual, puedes ocupar tu clúster de AWS (recomendado) utilizando 2 nodos de slave y 1 master
++ Foto de tu clúster de AWS (management console, tu clúster tiene que llamarse con tu `nombre_apellido`), también puedes hacerlo en tu máquina con la misma configuración mencionada anteriormente  
++ RMD y html con los queries realizados en pig de cada pregunta
++ Subir el archivo de salida de cada query (el que sale en el hdfs/S3)
+
+¿Qué se califica?
+
++ Ejercicio A. 1
++ Ejercicio B. 
+    + pregunta 1: 1.5  
+    + pregunta 2: 2
+    + pregunta 3: 1.5
+    + pregunta 4: 1.5
+    + pregunta 5: 1.5
+    + pregunta 6: 2
+
+Total: 11 
+
+
+### Hive 
+
+![](images/hive_logo.png)
+<br>
+
+Hive también es un proyecto de *The Apache Foundation* 
+
+Hive fue desarrollado por las mismas fechas que Pig solo que Hive fue desarrollado en Facebook por lo que se pueden considerar como alternativas el uno del otro. Al ser *frameworks* del mismo "tipo", Hive también es normalmente ocupado en los *pipelines* de ETLs, aunque la forma en la que se manejan los flujos de datos es diferente entre *frameworks*.
+
+Una de las desventajas más grandes de Pig es que ocupa su propio lenguaje -PigLatin-, eso implica que la gente que sabe SQL y que lo requiere en su día a día tenga que aprender la "sintáxis" de un nuevo lenguaje para poder aprovechar el procesamiento de datos distribuidos -clústers-. Hive por su parte, provee de un "dialecto" de SQL que se llama *Hive Query Language* (HQL) a través del cuál es posible querear los datos almacenados en un clúster de Hadoop (o de procesamiento distribuido) si bien no es SQL estándar es muy parecido al dialecto de MySQL.
+
+¿Cuándo ocupar Hive? 
+
++ Hive se utiliza para aplicaciones DWH donde los datos a analizar son relativamente estáticos $\rightarrow$ no se requiere de regresar una respuesta rápidamente y los datos no están cambiando rápidamente.
++ Hive **no** es una BD completa en el sentido de que en Hive no se pueden hacer las operacicones de *update*, *insert*, *delete* a nivel renglón $\rightarrow$ no es apto para hacer procesamiento analítico en línea (*Online Analitic Processing*, OLAP) -por la parte online-
+
+Hive es considerado un software de DWH utilizado para facilitar lectura, escritura y manejo de datos de gran escala utilizando como sistema de almacenamiento algún sabor de DFS y SQL para hacer queries a los datos. 
+
+
+¿En dónde vive Hive?
+
+![](images/where_is_hive.png)
+<br>
+
+**Componentes** 
+
+![](images/hive_modules.png)
+<br>
+Fuente: Libro Programming Hive
+
++ **Driver:** Es el que compila nuestro código de Hive para convertirlo en trabajos de MapReduce -la mayoría- 
+
++ **Metastore:** Es utilizado por Hive para guardar los esquemas de las tablas y otros metadatos, este metastore es un RDBMS que por default ocupa *Derby SQL* pero se normalmente se ocupa MySQL o PostgreSQL
+
++ **CLI:** *Command Line Interface*, la forma más común de interactuar con Hive, y la que nosotros ocuparemos
+
++ **HWI:** Una muy simple interfaz gráfica web a través de la cuál se puede acceder a Hive de manera remota (se puede ocupar una interfaz gráfica como [Hue de Cloudera](https://github.com/cloudera/hue), [Karmasphere](http://karmasphere.com), [Qubole](http://qubole.com), etc)
+
++ **Thrift Server:** Otra forma de interactuar con Hive, es un componente opcional que permite que desde un proceso que se encuentra en otro lenguaje -C++, Java, Ruby-  nos podamos comunicar con Hive  de forma remota accediendo a través de un puerto específico
+
++ **JDBC, ODBC:** Acceso a Hive a través de JDBC y ODBC implementados sobre Trift
+
+<div style="background-color:#ffcf40">
+
+Es tentador pensar que Hive es una BD relacional, pero no lo es! Hacer queries en Hive tiene mayor latencia debido a tener que pasar a trabajos MapReduce y luego ejecutarlos, si se compara un query realizado en un RDBMS tradicional con el mismo ejecutado en Hive al primero le tomará segundos mientras que a Hive le tomará más aunque sea para data sets pequeños... de nuevo esto es porque Hadoop está hecho para correr con datos de gran escala y procesar de forma distribuida.
+
+</div>
+
+
+**Arquitectura de Hive**
+
+![](images/hive_process.png)
+<br>
+Fuente: [Documentación Apache Hive](https://cwiki.apache.org/confluence/display/Hive/Design)
+
+#### Tipos de datos
+
+Datos primitivos
+
+![](images/hive_data_type_primitive.png)
+<br>
+Fuente: Libro [Programming Hive](http://shop.oreilly.com/product/0636920023555.do)
+
+![](images/hive_data_type_collection.png)
+<br>
+Fuente: Libro [Programming Hive](http://shop.oreilly.com/product/0636920023555.do)
+
+![](images/hive_data_types.png)
+<br>
+
+#### Definición de datos 
+
+\* Las imágenes de esta sección fueron tomas del libro [Programming Hive](https://www.amazon.com.mx/Programming-Hive-Warehouse-Language-Hadoop-ebook/dp/B009D76316/ref=sr_1_1?ie=UTF8&qid=1519596579&sr=8-1&keywords=programming+hive)
+
+Aquí veremos cómo crear, borrar y alterar bases de datos, vistas, funciones e índices. 
+
++ `CREATE DATABASE` Para Hive una base de datos es un catálogo de tablas asociada a un nombre, característica que resulta últil cuando se tienen muchos equipos y usuarios en un mismo clúster. Si nosotros no ponemos un nombre de base de datos se quedan en la base de datos `default` $\leftarrow$ esto se parece al uso de esquemas en RDBMS tradicionales
+
+![](images/hive_create_db.png)
+<br>
+
+Cada vez que creamos una base de datos Hive genera un directorio en HDFS con ese nombre, todas las tablas que se creen en esta base de datos serán subdirectorios -esto no aplica para tablas creadas sin definir una base de datos, están en `default`-. Por ejemplo: cuando creamos la base de datos `financials` esta se crea bajo el directorio: `user/hive/warehouse/financials.db`, podemos hacer *override* de este directorio indicándole a Hive en dónde queremos que se guarden los datos (toma en cuenta que si estás en un clúster el directorio debe quedar en el nodo master por lo que hay que indicar el nombre del nodo master y el puerto a ocupar: `hdfs://master-server/user/hive/warehouse/financials.db` master-server debe ser cambiado por el DNS name y el puerto -opcional-):
+
+![](images/hive_create_db_location.png)
+<br>
+
++ `SHOW` Permite mostrar las bases de datos existentes en Hive 
+    + `SHOW TABLES` Muestra las tablas existentes en una BD
+
+![](images/hive_show_db.png)
+<br>
+
++ `DESCRIBE` Muestra información asociada a una base de datos específica (nombre y directorio en el que se encuentra)
+
++ `USE` En Hive no hay un comando que nos ayude a saber en qué base de datos estamos (╯°□°)╯︵ ┻━┻ por lo que el comando `use` nos permite decirle a Hive en cuál base de datos estaremos trabajando, es como cambiar de directorio
+
++ `DROP` Este comando permite borrar una base de datos. Hive no permite borrar bases de datos que contengan tablas por lo que este comando casi siempre se usa con un `CASCADE` que permite borrar las tablas y luego la base de datos
+    + `DROP TABLE` Borra una tabla 
+
+![](images/hive_drop.png)
+<br>
+
++ `ALTER DATABASE` Solamente es posible modificar metadata asociada a la base de datos como las propiedades de la misma `DBPROPERTIES` que son las asociadas a la información que se muestra cuando ocupamos el comando `DESCRIBE`
+
+![](images/hive_alter_db.png)
+<br>
+
++ `CREATE TABLE` Además de crear una tabla en Hive, también es posible agregar otras propiedades a la tabla como comentarios, el creador de la tabla, la fecha de creación y el directorio en donde se desea que se guarde; así como comentarios a cada columna en la tabla
+
+![](images/hive_create_table.png)
+<br>
+
+**External Tables** 
+
+Es posible que Hive no sea dueño de una tabla y aún así poder interactuar con los datos de la misma. Este tipo de tablas se ocupan cuando no queremos que Hive administre la vida de una tabla (o de los datos) y que por lo tanto al hacer `drop` no borremos los datos que están contenidos en la misma solo borraremos los metadatos de la tabla que se guardaron en el metastore. 
+
+Las tablas de Hive se llaman *managed* pero aún este tipo de tablas puede ser modificada por otras herramientas de hadoop como borrar directamente con comandos de hdfs, esto complica la adminstración de estos datos y Hive no tiene completo control aún de las tablas que le pertenecen. Por esta razón, si creemos que una tabla será compartida por varias herramientas de hadoop debemos declararla como externa para ser explícitos con su administración.
+
+Para saber si una tabla es externa o administrada se ocupa el comando `DESCRIBE EXTENDED tablename`. Si decidimos crear una tabla externa ésta, debe estar en el dfs utilizado.
+
+![](images/hive_create_external.png)
+<br>
+
+En el caso de borrar una tabla administrada por Hive tanto los datos como los metadatos son borrados, en el caso de tablas externas solo los metadatos son borrados.
+
++ *Partitioning* 
+
+Hive puede administrar tablas -administradas y externas- particionadas. En las tablas administradas por Hive generar una partición hace que los datos se estructuren diferente en su almacenamiento, cada partición generará subcarpetas con la estrategia de **particionamiento** que vimos en HDFS -la que tiene un $=$ en el nombre de la carpeta. 
+
+![](images/hive_managed_partitioning.png)
+<br>
+
+![](images/hive_partitioning_strategy.png)
+<br>
+
+La razón más importante para hacer *partitioning* es para mejorar el desempeño de los queries y hacerlos más rápidos. Es posible generar un trabajo de MapReduce gigantesco si no se ocupan cláusulas `where` en lso queries, y es por esta razón que podemos limitar el comportamiento de Hive utilizando la configuración estricta o no estricta. En la configuración estricta Hive generará un error a los queries que no incluyen la cláusula `where` evitando generar trabajos de MapReduce muy grandes, en la configuración no estricta Hive permitirá que haya queries sin cláusula `where` generando trabajos de MapReduce muy costosos que no aprovechan la jerarquización de los datos hecha a través de particionamiento -if any-
+
+![](images/hive_set_mode.png)
+
+Es posible mostrar las particiones existentes en la base de datos a través del comando `SHOW PARTITIONS tablename;`, también es posible buscar por una partición en particular con el comando `SHOW PARTITIONS tablename PARTITION(key=value);`, también es posible obtener las particiones a través del comando `DESCRIBE EXTENDED tablename`
+
+Para tablas externas no administradas por Hive se require de crear primero la tabla y luego alterarla para indicar la localización de cada partición de los datos
+
+![](images/hive_external_partitioning.png)
+<br>
+![](images/hive_external_partitioning_2.png)
+<br>
+
+
++ `ALTER TABLE` permite modificar el nombre de una tabla, agregar y borrar columnas, cambiar el tipo de una columna, cambiar el nombre de una columna, reemplazar todas las columnas existentes por otras... 
+
+![](images/hive_alter_table.png)
+<br>
+
+#### Manipulación de datos 
+
+En esta parte veremos cómo cargar datos a Hive. Debido a que en Hive no es posible insertar, borrar o modificar por renglón solo hay una manera de cargar datos a una tabla con `load`
+
++ `LOAD DATA` Permite cargar los datos a una tabla de Hive. Si ocupamos la opción `LOCAL` Hive buscará los datos en un directorio localmente -en tu compu-, si no ponemos `LOCAL` hive busca el directorio en DFS. Con `LOCAL` Hive **copia** los datos locales a DFS, si no ponemos `local` Hive **mueve** los datos a HDFS.
+
+Con `OVERWRITE` le decimos a Hive que queremos sobreescribir la tabla con estos nuevos datos, si no ponemos `OVERWRITE` Hive agregará datos a los ya existentes en esta tabla -if any-
+
+![](images/hive_load.png)
+<br>
+
++ `INSERT` Permite cargar datos a una tabla utilizando queries. Si ocupamos `INSERT OVERWRITE` borraremos el contenido de la tabla -o de la partición-, si ocupamos `INSERT INTO` agregaremos los datos a la tabla.
+
+![](images/hive_insert.png)
+<br>
+
+También es posible crear y cargar datos a la tabla creada al mismo tiempo: 
+
+![](images/hive_create_insert.png)
+
+<br>
+
++ Exportar datos: Para exportar datos de Hive a otras herramientas/formatos se puede simplemente copiar el directorio de DFS donde viven y ponerlos en el directorio de DFS deseado, o bien ocupar `INSERT ... DIRECTORY`. El número de archivos generados de esta operación dependerá del número de *reducers* que se tengan.
+
+```
+hdfs dfs -cp source_hive_path target_hdfs_path
+```
+
+![](images/hive_insert_dir.png)
+<br>
+
+![](images/hive_export_partition.png)
+<br>
+
+#### Queries
+
+En Hive podemos ocupar el SQL estándar: select, from , group by, order by, having, joins, limit, etc. 
+
++ `ORDER BY` vs `SORT BY`. En hive existe la clásica función de `order by` a través de la cual es posible ordenar la salida de un query, sin embargo es importante destacar que `order by` requiere de tener todos los datos involucrados en el *query* para después ordenarlos (después de los *reducers*), con `sort by` hive ordena los resultados **por** *reducer* para que el ordenamiento final después de la etapa de *reduce* sea más eficiente -más rápida-. 
+
++ **Funciones**: Para ver todas las funciones disponibles en Hive puedes ocupar `show FUNCTIONS`, para ver la documentación de una función basta con poner `DESCRIBE FUNCTION`
+
+`explode()`: Esta función permite iterar sobre un arreglo regresando cada elemento en la lista como un registro separado. Cuando ocupamos esta función solo es posible aplicarlo a una columna y no se pueden obtener más columnas en el mismo query (tengan o no explode :() para lograr hacer un explode con otras columnas en un select es necesario ocupar `LATERAL VIEW`. Por ejemplo: Queremos encontrar los nombres de empleados y subordinados por empleado, como una persona puede tener varios subordinados ocuparemos `explode`
+
+![](images/hive_explode.png)
+<br>
+\* Es necesario hacer un alias a la vista creada y al campo generado con el explode
+
+**UDF** 
+
+Al igual que con Pig, en Hive es posible que nosotros definamos nuestras propias funciones -UDF- y es posible que las definamos usando python :). Para ocupar estas UDF tendremos que cargar el archvo python donde tenemos la definición de nuestra UDF y ocupar `TRANSFORM`. 
+
+![](images/hive_transform.png)
+<br>
+Fuente: [Use python UDF with Hive and Pig](https://docs.microsoft.com/en-us/azure/hdinsight/hadoop/python-udf-hdinsight)
+
+El `add file` hace que se encuentre disponible para el cluster el archivo de python, el `transform ... using` permite que se ocupe la UDF indicando de qué archivo tiene que ir a buscar esta definición.
+
+#### Hive en AWS/EMR
+
+[Capítulo: Hive and Amazon Web Services de Programming Hive](http://shop.oreilly.com/product/0636920023555.do)
+
+En EMR el nodo master tiene instalado un MySQL que es el que ocuparemos en Hive para ser su metastore, todos los datos que se encuentran en los nodos del clúster son borrados en cuanto decidimos terminar el clúster, esto incluye los datos del nodo master... y eso implica perder los esquemas alamacenados en el metastore... para dejar estos datos persistentes se pueden hacer 2 cosas: 
+
+1. Utilizar un metastore externo al proporcionado por el EMR: Esto requiere de hacer configuraciones al momento de instalar el Hive, es posible ocupar un RDS de Amazon ＼(＾O＾)／... esta es la mejor opción para compartir un metastore entre diferentes clústers EMR, o bien un mismo clúster EMR pero que ocupa diferentes versiones de Hive.
+
+2. Proporcionar un script de inicio (*start-up*): En esta opción utilizaremos el metastore que tenemos por default en el clúster de EMR pero tenemos que proporcionar un script de inicio, este script puede ser *custom* o bien podemos ocupar `.hiverc` que es un script que ejecuta en automático el Hive CLI cuando inicia... si este script es proporcionado entonces en cada invocación del CLI se ejecutará, esto puede ser contraproducente al hacer *overhead* en las invocaciones pues solo requerimos de que se invoque una sola vez :(.
+
+Esta segunda solución solo se recomienda cuando se tienen muy pocas tablas y particiones que cargar, de otra manera el tiempo de inicialización del clúster será cada vez mayor conforme el metastore va creciendo. 
+
+3. También es posible guardar un *backup* del metastore en S3 antes de terminar el clúster... aunque esta solución esta chunda -está muy mal visto entre los ingenieros de datos- 
+
+#### Hive en *Streaming *
+
+Es posible ocupar Hive con datos en *streaming*, regresaremos a este punto cuando veamos *streaming* :)
+
+
+### Hue
+
+Hue es una interfaz gráfica open source que se ocupa para conectarse a Hive y Pig de manera más orgánica y fácil que ocupando solo la interfaz de EMR o solo el *shell* de Hive y Pig.
+
+EMR viene con Hue instalado, solo que para ocuparlo tenemos que "habilitarlo" con los [siguientes pasos](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/accessing-hue.html): 
+
+1. Crear un [tunel ssh](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-ssh-tunnel.html):
+    + Abrir una terminal
+    + `ssh -i ~/tus_llaves.pem -ND 8157 hadoop@el-master-public-DNS-de-tu-cluster`
+    + escribe `yes`
+    + si es la primera vez que abres un ssh a aws seguramente te dirá que tus llaves están "muy abiertas" `permission denied`, para arreglar esto tienes que cambiar los permisos de tu archivo `.pem` con el siguiente comando: `chmod 400 archivo.pem`
+2. Una vez hablitado el túnel hay que habilitar el uso proxy a través de Chrome (el de Firefox no pifo correctamente :(), las instrucciones las puedes encontrar en 
+
+![](images/enable_hue.png)
+
+<br>
+
+![](images/hue_proxy_management_tool.png)
+<br>
+
+
+#### Ejemplos
+
+Ocuparemos la base de datos de Northwind para "pasarla" a Hive y jugar con algunos queries. 
+
+1. Creareamos la base de datos para northwind (esquema) (con EMR)
+
+```
+create database if not exists northwind 
+location 's3://metodos-gran-escala/hive/northwind/';
+```
+
+2. Creamos las tablas products, orders, order_details y las "llenamos" con sus respectivos datos (con EMR)
+
+```
+drop database if exists northwind cascade;
+
+create database if not exists northwind location "s3://metodos-gran-escala/hive/northwind/";
+
+create external table if not exists northwind.products (productid smallint,
+productname string,
+supplierid smallint,
+categoryid smallint,
+quantityperunit string,
+unitprice float,
+unitsinstock smallint,
+unitsonorder smallint,
+reorderlevel smallint,
+discontinued int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://metodos-gran-escala/hive/northwind/products';
+
+LOAD DATA INPATH 's3://metodos-gran-escala/products.csv' INTO table northwind.products;
+
+create external table if not exists northwind.orders (
+orderid smallint,
+customerid string,
+employeeid smallint,
+orderdate timestamp,
+requireddate timestamp,
+shippeddate timestamp,
+shipvia smallint,
+freight float,
+shipname string,
+shipaddress string,
+shipcity string,
+shipregion string,
+shippostalcode string,
+shipcountry string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://metodos-gran-escala/hive/northwind/orders';
+
+
+LOAD DATA INPATH 's3://metodos-gran-escala/orders.csv'
+INTO table northwind.orders;
+
+create external table if not exists northwind.order_details (orderid smallint,
+productid smallint,
+unitprice float,
+quantity smallint,
+discount float)
+row format delimited fields terminated by ','
+location 's3://metodos-gran-escala/hive/northwind/orderdetails';
+
+LOAD DATA INPATH 's3://metodos-gran-escala/order_details.csv'
+INTO table northwind.order_details;
+```
+
+3. Busquémos qué productos se han comprado al menos 50 veces entre todas las órdenes registradas en la base de datos con Hue
+
+```
+select od.productid, productname, count(*) as num
+from orders o join order_details od
+on o.orderid = od.orderid
+join products p 
+on p.productid = od.productid
+group by od.productid, productname
+having count(*) > 50
+order by num desc
+limit 10;
+```
+
+#### Tarea 5 
+
+A entregar de manera individual el **12 marzo 2018** máximo 23:59:59 CST en tu carpeta `alumnos/nombre_apellido/tarea_5/` 
+
+**Ejercicio 1.** Con la base de datos de northwind que se encuentran en el [dropbox](https://www.dropbox.com/sh/qormkgqgt5o8zk3/AADNbqwqeXEfM_tNcieeX0B-a?dl=0):
+
+a. ¿Cuántos "jefes" hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? (atributo `reportsto`, ocupa `explode` en tu respuesta)
+b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1))
+c. ¿Cuál es el delta de tiempo más grande entre una orden y otra? 
+
+**Ejercicio 2.** Con los archivos de vuelos, aeropuertos y aerolíneas que están en el [dropbox](https://www.dropbox.com/sh/rdd78b7nofjb5vy/AAAwUm97baTusv5l8QY2ZAi2a?dl=0)
+
+a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"? 
+b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"?
+c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible? 
+d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? 
+e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana? 
+f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)? 
+g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?  
+
+Tu clúster se debe llamar `nombre_apellido`
+
+¿Qué se entrega? 
+
++ RMD y html con los queries que ejecutaste para cada pregunta/inciso
++ Los archivos de salida de Hive después de correr los scripts (puedes correrlos desde Hue)
++ Imagen del *summary* de tu clúster
+
+¿Qué se califica? 
+
++ No entregó RMD y html: -2
++ No agregó imágenes: -2
++ No agregó el código de cada script: -4
++ No agregó archivos de salida del clúster (part-r-00000): -4
++ Ejercicio 1: 
+    + a: 1
+    + b: 1
+    + c: 1
++ Ejercicio 2: 
+    + a: 1
+    + b: 1
+    + c: 1
+    + d: 1
+    + e: 1
+    + f: 1 
+    + g: 1
+
+**Total: 10**
+
+
+### Referencias 
+
++ [How to install Sqoop 1.4.6](https://hadoop7.wordpress.com/2017/09/05/installing-and-configuring-apache-sqoop-1-4-6/)
++ [Sqoop user guide](http://sqoop.apache.org/docs/1.4.7/SqoopUserGuide.html)
++ [Libro recomendado de Sqoop](https://www.safaribooksonline.com/library/view/apache-sqoop-cookbook/9781449364618/)
++ [How to install Pig](http://pig.apache.org/docs/r0.17.0/start.html#Pig+Setup)
++ [Libro recomendado de Pig](https://www.amazon.com.mx/Programming-Pig-Dataflow-Scripting-Hadoop-ebook/dp/B01N8TQ46A/ref=sr_1_1?ie=UTF8&qid=1518333194&sr=8-1&keywords=apache+pig+oreilly)
++ [Pig cookbook](http://pig.apache.org/docs/r0.7.0/cookbook.html)
++ [Pig tutorial](https://pig.apache.org/docs/r0.17.0/basic.html#flatten)
++ [UDF DataFu](https://datafu.incubator.apache.org/blog/2012/01/10/introducing-datafu.html)
++ [JavaDoc UDF piggybank](http://svn.apache.org/viewvc/pig/trunk/contrib/piggybank/java/src/main/java/org/apache/pig/piggybank/)
++ [How to install Hive](https://hive.apache.org/downloads.html)
++ [Libro Programming Hive](http://shop.oreilly.com/product/0636920023555.do)
++ [Hive window functions and analytics](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics)
++ [Configurar ssh tunel para ver el master de AWS](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-ssh-tunnel.html)

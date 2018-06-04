@@ -1,0 +1,2 @@
+codigo,aeropuerto,trafico_entrada
+ATL,Hartsfield-Jackson Atlanta International Airport,346904

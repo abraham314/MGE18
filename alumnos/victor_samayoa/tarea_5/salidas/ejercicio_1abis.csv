@@ -1,0 +1,3 @@
+employeeid,firstname,lastname,title,birthdate,hiredate,city,country,reportsto
+2,Andrew,Fuller,"""Vice President",NULL,1952-02-19,908 W. Capital Way,98401,NULL
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,NULL

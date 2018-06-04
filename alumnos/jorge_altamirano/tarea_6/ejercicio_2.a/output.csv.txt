@@ -1,0 +1,7 @@
+AA,American Airlines Inc.
+AS,Alaska Airlines Inc.
+DL,Delta Air Lines Inc.
+HA,Hawaiian Airlines Inc.
+UA,United Air Lines Inc.
+US,US Airways Inc.
+VX,Virgin America

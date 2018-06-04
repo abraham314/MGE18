@@ -1,0 +1,2 @@
+day_of_week,total_cancelaciones
+1,21073

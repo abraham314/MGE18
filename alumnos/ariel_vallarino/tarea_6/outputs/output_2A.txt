@@ -1,0 +1,8 @@
+airline_name
+Alaska Airlines Inc.
+American Airlines Inc.
+Delta Air Lines Inc.
+Hawaiian Airlines Inc.
+US Airways Inc.
+United Air Lines Inc.
+Virgin America

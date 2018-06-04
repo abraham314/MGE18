@@ -1,0 +1,15 @@
+products = load 's3://cristian-challu/tarea4/products.csv' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+
+orders = load 's3://cristian-challu/tarea4/order_details.csv' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+
+orders_grouped = GROUP orders by productid;
+
+products_count = FOREACH orders_grouped GENERATE group AS productid,COUNT($1) as amount;
+
+products_named = JOIN products_count BY productid, products BY productid;
+
+products_ranked = RANK products_named BY amount DESC;
+
+result = LIMIT products_ranked 1;
+
+STORE result INTO 's3://cristian-challu/tarea4/output/output_a_1/' using PigStorage(',');

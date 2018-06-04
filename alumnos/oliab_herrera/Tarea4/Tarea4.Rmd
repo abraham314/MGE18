@@ -1,0 +1,199 @@
+---
+title: "Tarea 4"
+output: html_notebook
+---
+
+
+Ejercicio A.
+
+Los datos de northwind se encuentran en dropbox
+
+Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank
+
+Código:
+```{r}
+borrar la salida
+rmf $OUTPUT
+
+order_details = load '$INPUT/order_details' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+
+products = load '$INPUT/products' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+
+
+order_grp = group order_details by productid;
+count_products = FOREACH order_grp GENERATE group as productid,COUNT($1) as n;
+
+
+
+ranked = rank count_products by n DESC;
+top = LIMIT ranked 5;
+
+join_products= JOIN top by productid, products by productid;
+
+rank_final= rank join_products by n DESC;
+
+
+store rank_final into '$OUTPUT' using PigStorage(',', '-schema');
+```
+
+Ejercicio B.
+
+Con los datos de aerolíneas, vuelos y aeropuertos que se encuentran en el dropbox y utilizando Pig contesta las siguietnes preguntas:
+
+¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el "Honolulu International Airport"?
+Código:
+```{r}
+--borrar la salida
+rmf $OUTPUT
+
+vuelos = load '$INPUT/flights' using PigStorage(',') 
+as (YEAR:chararray, MONTH:chararray, DAY:chararray, DAY_OF_WEEK:chararray,AIRLINE:chararray,
+    FLIGHT_NUMBER:chararray,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,
+    SCHEDULED_DEPARTURE:int, DEPARTURE_TIME:int, DEPARTURE_DELAY:int,TAXI_OUT: int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,
+    ELAPSED_TIME:chararray,AIR_TIME:int, DISTANCE: int, WHEELS_ON:chararray, TAXI_IN:int, SCHEDULED_ARRIVAL:chararray, 
+    ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:int,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,
+    SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+
+filt_hono = FILTER vuelos by DESTINATION_AIRPORT=='HNL';
+
+group_hono = GROUP filt_hono ALL;
+
+count_hono =FOREACH group_hono GENERATE COUNT(filt_hono);
+
+store count_hono into '$OUTPUT' using PigStorage(',', '-schema');
+```
+
+¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es?
+
+```{r}
+
+vuelos = load '$INPUT/flights' using PigStorage(',') 
+as (YEAR:chararray, MONTH:chararray, DAY:chararray, DAY_OF_WEEK:chararray,AIRLINE:chararray,
+    FLIGHT_NUMBER:chararray,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,
+    SCHEDULED_DEPARTURE:int, DEPARTURE_TIME:int, DEPARTURE_DELAY:int,TAXI_OUT: int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,
+    ELAPSED_TIME:chararray,AIR_TIME:int, DISTANCE: int, WHEELS_ON:chararray, TAXI_IN:int, SCHEDULED_ARRIVAL:chararray, 
+    ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:int,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,
+    SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+
+aerolineas = load '$INPUT/airlines'  using PigStorage(',') as (IATA_CODE:chararray,AIRLINE:chararray);
+
+join_vuelos = JOIN vuelos by AIRLINE, aerolineas by IATA_CODE;
+
+ordenar = ORDER join_vuelos by ARRIVAL_DELAY DESC;
+
+top = LIMIT ordenar 3;
+
+store limit INTO '$OUTPUT/ej2' using PigStorage(',', '-schema');
+```
+¿Qué día es en el que más vuelos cancelados hay?
+
+```{r}
+vuelos = load '$INPUT/flights' using PigStorage(',') 
+as (YEAR:chararray, MONTH:chararray, DAY:chararray, DAY_OF_WEEK:chararray,AIRLINE:chararray,
+    FLIGHT_NUMBER:chararray,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,
+    SCHEDULED_DEPARTURE:int, DEPARTURE_TIME:int, DEPARTURE_DELAY:int,TAXI_OUT: int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,
+    ELAPSED_TIME:chararray,AIR_TIME:int, DISTANCE: int, WHEELS_ON:chararray, TAXI_IN:int, SCHEDULED_ARRIVAL:chararray, 
+    ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:int,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,
+    SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+
+
+filtro= FILTER vuelos by CANCELLED==1;
+group_dias= GROUP filtro by DAY_OF_WEEK;
+count_dias= FOREACH group_dias GENERATE group, COUNT($1) as n;
+
+arrange_dias= ORDER count_dias by n DESC;
+dump arrange_dias;
+
+store arrange_dias INTO '$OUTPUT/ej3' using PigStorage(',');
+```
+
+¿Cuáles son los aeropuertos orígen con 17 cancelaciones?
+
+```{r}
+vuelos = load '$INPUT/flights' using PigStorage(',') 
+as (YEAR:chararray, MONTH:chararray, DAY:chararray, DAY_OF_WEEK:chararray,AIRLINE:chararray,
+    FLIGHT_NUMBER:chararray,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,
+    SCHEDULED_DEPARTURE:int, DEPARTURE_TIME:int, DEPARTURE_DELAY:int,TAXI_OUT: int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,
+    ELAPSED_TIME:chararray,AIR_TIME:int, DISTANCE: int, WHEELS_ON:chararray, TAXI_IN:int, SCHEDULED_ARRIVAL:chararray, 
+    ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:int,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,
+    SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+
+aeropuertos = load '$INPUT/airports' using PigStorage(',') as (IATA_CODE:chararray, AIRPORT:chararray, CITY:chararray, STATE:chararray, COUNTRY:chararray, LATITUDE:float, LONGITUDE:float);
+
+filtro= FILTER vuelos by CANCELLED==1;
+
+group_port= GROUP filtro by ORIGIN_AIRPORT;
+sum_port= FOREACH group_port GENERATE group as origin_airport, COUNT($1) as n;
+
+filtro_dos = FILTER sum_port by n==17;
+dump filtro_dos;
+
+join_air= JOIN filtro_dos by origin_airport, aeropuertos by IATA_CODE;
+
+
+
+store join_air INTO '$OUTPUT/ej4' using PigStorage(','); 
+```
+
+¿Cuál es el aeropuerto origen con más vuelos cancelados?
+
+```{r}
+
+vuelos = load '$INPUT/flights' using PigStorage(',') 
+as (YEAR:chararray, MONTH:chararray, DAY:chararray, DAY_OF_WEEK:chararray,AIRLINE:chararray,
+    FLIGHT_NUMBER:chararray,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,
+    SCHEDULED_DEPARTURE:int, DEPARTURE_TIME:int, DEPARTURE_DELAY:int,TAXI_OUT: int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,
+    ELAPSED_TIME:chararray,AIR_TIME:int, DISTANCE: int, WHEELS_ON:chararray, TAXI_IN:int, SCHEDULED_ARRIVAL:chararray, 
+    ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:int,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,
+    SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+
+aeropuertos = load '$INPUT/airports' using PigStorage(',') as (IATA_CODE:chararray, AIRPORT:chararray, CITY:chararray, STATE:chararray, COUNTRY:chararray, LATITUDE:float, LONGITUDE:float);
+
+filtro = FILTER vuelos by CANCELLED==1;
+
+group_air = GROUP filtro by ORIGIN_AIRPORT;
+count_air = FOREACH group_air GENERATE group as airport, COUNT($1) as n;
+
+
+join_rank = JOIN count_air by airport, aeropuertos by IATA_CODE;
+
+rank_j = RANK join_rank by n DESC;
+
+top = limit rank_j 5;
+
+
+store top INTO '$OUTPUT/ej5' using PigStorage(',');
+```
+¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? (ocupar bag te ayudará en esta pregunta)
+
+
+```{r}
+
+vuelos = load '$INPUT/flights' using PigStorage(',') 
+as (YEAR:chararray, MONTH:chararray, DAY:chararray, DAY_OF_WEEK:chararray,AIRLINE:chararray,
+    FLIGHT_NUMBER:chararray,TAIL_NUMBER:chararray,ORIGIN_AIRPORT:chararray,DESTINATION_AIRPORT:chararray,
+    SCHEDULED_DEPARTURE:int, DEPARTURE_TIME:int, DEPARTURE_DELAY:int,TAXI_OUT: int,WHEELS_OFF:chararray,SCHEDULED_TIME:chararray,
+    ELAPSED_TIME:chararray,AIR_TIME:int, DISTANCE: int, WHEELS_ON:chararray, TAXI_IN:int, SCHEDULED_ARRIVAL:chararray, 
+    ARRIVAL_TIME:chararray,ARRIVAL_DELAY:int,DIVERTED:chararray,CANCELLED:int,CANCELLATION_REASON:chararray,AIR_SYSTEM_DELAY:chararray,
+    SECURITY_DELAY:chararray,AIRLINE_DELAY:chararray,LATE_AIRCRAFT_DELAY:chararray,WEATHER_DELAY:chararray);
+
+aeropuertos = load '$INPUT/airports' using PigStorage(',') as (IATA_CODE:chararray, AIRPORT:chararray, CITY:chararray, STATE:chararray, COUNTRY:chararray, LATITUDE:float, LONGITUDE:float);
+
+flights= FOREACH vuelos generate FLIGHT_NUMBER, DESTINATION_AIRPORT;
+aero = FOREACH aeropuertos generate IATA_CODE,AIRPORT;
+group_vuelo = group flights by FLIGHT_NUMBER;
+aero_unico  = FOREACH group_vuelo {
+               dest = flights.DESTINATION_AIRPORT;
+               unico = distinct dest;
+               generate group as flight_number, COUNT(unico) as n;
+};
+ranked = rank aero_unico by n DESC;
+ranked1 = limit ranked 1;
+vuelo_dist = distinct flights;
+join_vuelos = join ranked1 by flight_number, vuelo_dist by FLIGHT_NUMBER; 
+
+store join_vuelos into '$OUTPUT/ej6' using PigStorage(',');
+
+
+```
+

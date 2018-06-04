@@ -1,0 +1,301 @@
+---
+title: "TAREA_5"
+author: "David_Rivera_160668"
+date: "March 21, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+CLUSTER
+
+![Cluster](./hive1.png)
+
+Carga de datos
+
+```{r, eval=FALSE}
+drop database if exists north cascade;
+
+create database if not exists north
+location "s3://driflore94maestria/tarea5/bases_hive/north";
+
+create external table if not exists north.employees (employeeid smallint,
+lastname string,
+firstname string,
+title string,
+titleofcourtesy string,
+birthdate string,
+hiredate string,
+address string,
+city string,
+region string,
+postalcode string,
+country string,
+homephone string,
+extension string,
+photo string,
+notes string,
+reportsto string,
+photopath string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = "\,",
+   "quoteChar"     = "\"")
+location 's3://driflore94maestria/tarea5/northwind/employees'
+tblproperties ("skip.header.line.count"="1");
+
+DROP TABLE IF EXISTS north.orders;
+create external table if not exists north.orders (orderid smallint,
+customerid string,
+employeeid smallint,
+orderdate date,
+requireddate date,
+shippeddate date,
+shipvia smallint,
+freight float,
+shipname string,
+shipaddress string,
+shipcity string,
+shipregion string,
+shippostalcode string,
+shipcountry string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = "\,",
+   "quoteChar"     = "\"")
+LOCATION 's3://driflore94maestria/tarea5/northwind/orders'
+tblproperties ("skip.header.line.count"="1");
+
+
+
+
+
+drop database if exists flights cascade;
+
+create database if not exists flights
+location "s3://driflore94maestria/tarea5/bases_hive/flights";
+
+create external table if not exists flights.vuelos (year smallint,
+month smallint,
+day smallint,
+day_of_week	smallint, 
+airline string,
+flight_number smallint,  
+tail_number string,
+origin_airport string,
+destination_airport string,
+scheduled_departure smallint,
+departure_time smallint,
+departure_delay smallint,    
+taxi_out smallint,
+wheels_off smallint,
+scheduled_time smallint,
+elapsed_time smallint,
+air_time smallint,
+distance smallint,           
+wheels_on smallint,
+taxi_in smallint,
+scheduled_arrival smallint,
+arrival_time smallint,
+arrival_delay smallint,
+diverted smallint,
+cancelled smallint,
+cancellation_reason string,
+air_system_delay smallint,
+security_delay smallint,
+airline_delay smallint,
+late_aircraft_delay smallint,
+weather_delay smallint)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://driflore94maestria/tarea5/flights/vuelos'
+tblproperties ("skip.header.line.count"="1");
+
+create external table if not exists flights.airports (iata_code string,
+airport string,
+city string,
+state string,
+country string,
+latitude string,
+longitude string)  
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://driflore94maestria/tarea5/flights/airports'
+tblproperties ("skip.header.line.count"="1");
+
+
+create external table if not exists flights.airlines (iata_code string,
+airline string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://driflore94maestria/tarea5/flights/airlines'
+tblproperties ("skip.header.line.count"="1");
+
+```
+
+
+##Ejercicio 1
+
+a. ¿Cuántos "jefes" hay en la tabla empleados? 
+
+```{r, eval=FALSE}
+SELECT COUNT(DISTINCT reportsto) as numero_jefes  from employees 
+WHERE reportsto>0 ;
+
+```
+
+¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país?
+
+```{r, eval=FALSE}
+SELECT employeeid as numero_empleado,
+       firstname as nombre, 
+       lastname as apellido,
+       title as titulo,
+       hiredate as fecha_entrada,
+       city as ciudad,
+       country as pais, 
+       sub2.empleado as empleado_a_cargo 
+FROM north.employees jefes 
+    JOIN(SELECT * FROM 
+            (SELECT reportsto, collect_set(firstname) AS empleados 
+            FROM north.employees WHERE reportsto > 0 GROUP BY reportsto) sub1
+    LATERAL VIEW explode(sub1.empleados) name as Empleado) sub2
+    ON jefes.employeeid = sub2.reportsto;
+
+```
+
+ b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado?
+ 
+```{r, eval=FALSE}
+SELECT  emp.firstname as nombre, 
+        emp.lastname as apellido, 
+        emp.title as titulo, 
+        emp.hiredate as ingreso, 
+        sub2.cant as ordenes_generadas,
+        sub2.maximo as ordenes_mejor_empleado from
+(Select sub1.employeeid, sub1.cant,
+MAX(sub1.cant) over (partition by NULL) as maximo from
+(SELECT employeeid,count(employeeid) as cant
+                    	FROM north.orders
+                    	GROUP BY employeeid) sub1
+                    ORDER BY cant DESC
+                    LIMIT 1 OFFSET 1) sub2
+        JOIN (SELECT employeeid, firstname, lastname, title, hiredate
+    	        FROM north.employees) emp 
+    	        ON sub2.employeeid = emp.employeeid;
+
+```
+ 
+c. ¿Cuál es el delta de tiempo más grande entre una orden y otra? 
+
+```{r, eval=FALSE}
+SELECT max(datediff(lagg.orderdate,lagg.orderdate_1)) AS max_delta_tiempo
+FROM
+(SELECT orderid, orderdate, 
+                 lag(orderdate) OVER (partition by NULL) orderdate_1
+            FROM north.orders 
+            ORDER BY orderdate)lagg
+
+```
+
+##Ejercicio 2
+
+a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"? 
+
+```{r,eval=FALSE}
+SELECT DISTINCT sub1.airline, airlines.airline FROM
+(SELECT vuelos.airline, vuelos.destination_airport, airports.airport
+FROM vuelos JOIN airports ON vuelos.destination_airport = airports.iata_code
+where airports.airport='Honolulu International Airport') sub1
+LEFT JOIN airlines ON sub1.airline = airlines.iata_code
+
+```
+
+b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"? 
+
+```{r,eval=FALSE}
+SELECT DISTINCT CASE
+    WHEN LENGTH(cast(sub1.departure_time as string)) = "3" then cast(substr(sub1.departure_time, 1, 1) as int) 
+    WHEN LENGTH(cast(sub1.departure_time as string)) = "4" then cast(substr(sub1.departure_time, 1, 2) as int)
+    ELSE 0
+    END as hora
+FROM (SELECT vuelos.airline, vuelos.origin_airport, vuelos.destination_airport,
+        airports.airport, vuelos.departure_time
+        FROM vuelos JOIN airports ON vuelos.destination_airport = airports.iata_code
+        where airports.airport='Honolulu International Airport') sub1
+    WHERE sub1.origin_airport = 'SFO'
+    AND sub1.departure_time IS NOT NULL
+    ORDER BY hora
+
+```
+
+c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible?
+
+```{r,eval=FALSE}
+SELECT sub1.airline, airlines.airline, sub1.day_of_week, sub1.arrival_delay FROM    
+        (SELECT vuelos.airline, vuelos.day_of_week, vuelos.destination_airport,
+        airports.airport, vuelos.arrival_delay
+        FROM vuelos JOIN airports ON vuelos.destination_airport = airports.iata_code
+        where airports.airport='Honolulu International Airport') sub1
+    LEFT JOIN airlines ON sub1.airline = airlines.iata_code
+    WHERE arrival_delay IS NOT NULL
+    ORDER BY arrival_delay
+    LIMIT 1
+
+```
+
+d. ¿Cuál es el aeropuerto con mayor tráfico de entrada?
+
+```{r,eval=FALSE}
+SELECT airports.airport, sub1.num_vuelos
+FROM (SELECT vuelos.destination_airport, COUNT(vuelos.airline) as num_vuelos
+        FROM vuelos
+        GROUP BY destination_airport
+        ORDER BY num_vuelos DESC
+        LIMIT 1)sub1
+    JOIN airports on sub1.destination_airport = airports.iata_code
+    
+```
+
+e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana? f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)?
+
+```{r,eval=FALSE}
+SELECT airlines.airline, sub2.day_of_week, sub2.maximo_retraso FROM(
+SELECT vuelos.airline, sub1.day_of_week, sub1.maximo_retraso FROM
+    (SELECT vuelos.day_of_week, max(vuelos.arrival_delay) as maximo_retraso
+        FROM vuelos
+        GROUP BY day_of_week
+        ORDER BY day_of_week) sub1
+        JOIN vuelos 
+ON (vuelos.day_of_week = sub1.day_of_week 
+AND vuelos.arrival_delay = sub1.maximo_retraso)) sub2
+JOIN airlines ON sub2.airline= airlines.iata_code
+ORDER BY day_of_week;
+
+```
+
+f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)?
+
+```{r,eval=FALSE}
+select airlines.airline, sub1.retraso_salida
+FROM (SELECT vuelos.airline, MIN(vuelos.departure_delay) as retraso_salida
+        FROM vuelos
+        WHERE vuelos.day_of_week = 2
+        GROUP BY vuelos.airline
+        ORDER BY retraso_salida ) sub1
+JOIN airlines ON sub1.airline = airlines.iata_code
+limit 1 OFFSET 2
+
+```
+
+g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+
+```{r,eval=FALSE}
+SELECT sub1.origin_airport, airports.airport, sub1.numero_de_destinos
+FROM (SELECT vuelos.origin_airport, COUNT(vuelos.destination_airport) as numero_de_destinos
+        FROM vuelos
+        GROUP BY vuelos.origin_airport
+        ORDER BY numero_de_destinos DESC
+        LIMIT 1) sub1
+    JOIN airports on sub1.origin_airport = airports.iata_code
+
+```

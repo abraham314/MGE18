@@ -1,0 +1,22 @@
+Nombre y apellidos: 
+Carlos Castro Correa
+
+Carrera, universidad donde la estudiaste, fecha de titulación:
+Matemáticas Aplicadas, ITAM, 2013.
+
+¿Estudiante de tiempo completo?
+Tiempo Completo.
+
+Si eres de tiempo parcial agrega el nombre de la empresa en la que trabajas -> soy de tiempo completo pero trabajo.
+
+Trabajo para el Gobierno de la República en representación para la ONU, Grupo Frente (Chilango, Pictoline, Más por Más, editorial Sexto Piso, etc.), Bridgefy y en Francia.
+
+y una pequeña descripción de lo que haces en tu día a día:
+
+Mis actividades cambian en función del proyecto, en el gobierno soy asesor sobre estadística y matemáticas en un proyecto de desastres naturales utilizando análisis de datos, también en algunos otros sobre políticas públicas. Soy el enlace entre las actividades oficiales, otros gobiernos y empresas que donan información a la ONU para el análisis.
+
+Grupo Frente: asesoro al CEO del grupo y en algunas empresas realizo actividades de consultoría estadística, matemáticas y diseño de experimentos con equipos no técnicos en las empresas del grupo en actividades editorial, mercadotecnia y deportiva.
+
+Brigefy: Matemáticas, simulación e investigación de operaciones.
+
+Proyectos restante: Administración de riesgos, análisis actuarial, matemáticas financieras y simulación.

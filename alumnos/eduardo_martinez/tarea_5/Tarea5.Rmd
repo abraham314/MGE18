@@ -1,0 +1,534 @@
+---
+title: "Tarea 5"
+author: "Eduardo Selim Martínez - 175921"
+date: "13 de marzo de 2018"
+output: 
+  html_document:
+    highlight: zenburn
+    theme: journal
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Ejercicio 1. Con la base de datos de northwind que se encuentran en el dropbox:
+
+Primero se creará la base de datos y las correspondientes tablas de `northwind` en HUE. Aunque estos archivos se guardaron sin encabezados, en HUE se guardarán las "columnas" con los nombres que tenían los data-sets originales.
+
+```
+drop database if exists base_northwind cascade;
+
+create database if not exists base_northwind location "s3://eduardomtz/northwind/input_data/tablas_hive_tarea5/northwind/";
+```
+
++ Ahora se creará la tabla de empleados, que se llamará `base_northwind.employees`
+
+```
+create external table if not exists base_northwind.employees (employeeid smallint,
+lastname string,
+firstname string,
+title string,
+titleofcourtesy string,
+birthdate string,
+hiredate string,
+address string,
+city string,
+region string,
+postalcode string,
+country string,
+homephone string,
+extension string,
+photo string,
+notes string,
+reportsto string,
+photopath string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://eduardomtz/northwind/input_data/employees/';
+```
+
++ Ahora se creará la tabla de productos, que se llamará `base_northwind.products`
+
+```
+create external table if not exists base_northwind.products (productid smallint,
+productname string,
+supplierid smallint,
+categoryid smallint,
+quantityperunit string,
+unitprice float,
+unitsinstock smallint,
+unitsonorder smallint,
+reorderlevel smallint,
+discontinued int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://eduardomtz/northwind/input_data/products/';
+```
+
++ Ahora se creará la tabla de detalles de órdenes, que se llamará `base_northwind.orderdetails`
+
+```
+create external table if not exists base_northwind.orderdetails (orderid smallint,
+productid smallint,
+unitprice float,
+quantity smallint,
+discount float)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://eduardomtz/northwind/input_data/orderdetails/';
+```
+
++ Ahora se creará la tabla de clientes, que se llamará `base_northwind.customers`
+
+```
+create external table if not exists base_northwind.customers (customerid string,
+companyname string,
+contactname string,
+contacttitle string,
+address string,
+city string,
+region string,
+postalcode string,
+country string,
+phone string,
+fax string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://eduardomtz/northwind/input_data/costumers/';
+```
+
++ Ahora se creará la tabla de órdenes, que se llamará `base_northwind.orders`
+
+Con esta se tuvo especial cuidado pues dentro del contenido de cada "celda" tiene el símbolo ",", que se está usando como delimitador. Es por esto que la sintaxis de la creación de ésta cambia.
+
+```
+create external table if not exists base_northwind.orders (
+orderid smallint,
+customerid string,
+employeeid smallint,
+orderdate date,
+requireddate date,
+shippeddate date,
+shipvia smallint,
+freight float,
+shipname string,
+shipaddress string,
+shipcity string,
+shipregion string,
+shippostalcode string,
+shipcountry string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = "\,",
+   "quoteChar"     = "\""
+)
+LOCATION 's3://eduardomtz/northwind/input_data/orders/';
+```
+
+### a.1. ¿Cuántos "jefes" hay en la tabla empleados?
+
+Si tiene personal quien le reporta, se considerará como "jefe".
+
+```
+SELECT COUNT(DISTINCT reportsto) as num_jefes
+    FROM base_northwind.employees
+    WHERE reportsto > 0;
+```
+
+Con esto se obtiene
+
+```
+num_jefes
+2
+```
+
+Que está guardado en el archivo `Pregunta1-a.csv`. Es decir, hay dos personas que tienen empleados a su cargo.
+
+### a.2 ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? (atributo "reportsto", ocupa "explode"" en tu respuesta) 
+
+```
+SELECT DISTINCT tabla_jefes.employeeid as id, 
+    tabla_jefes.firstname as nombre, 
+    tabla_jefes.lastname as apellido,  
+    tabla_jefes.title as titulo, 
+    tabla_jefes.birthdate as fecha_nac, 
+    tabla_jefes.hiredate as fecha_ingreso, 
+    tabla_jefes.city as ciudad, 
+    tabla_jefes.country as pais
+    FROM base_northwind.employees tabla_jefes JOIN base_northwind.employees empleados
+        ON tabla_jefes.employeeid = empleados.reportsto;
+```
+
+Con esto se obtiene:
+
+```
+id,nombre,apellido,titulo,fecha_nac,fecha_ingreso,ciudad,pais
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK
+```
+
+Que está guardado en `Pregunta1-b_sin_exp.csv`.
+
+Si se quiere realizar con el uso de `explode()`
+
+```
+SELECT  tabla_jefes1.employeeid as id, 
+        tabla_jefes1.firstname as nombre, 
+        tabla_jefes1.lastname as apellido,  
+        tabla_jefes1.title as titulo, 
+        tabla_jefes1.birthdate as fecha_nac, 
+        tabla_jefes1.hiredate as fecha_ingreso, 
+        tabla_jefes1.city as ciudad, 
+        tabla_jefes1.country as pais,
+        tabla_jefes1.empleado as empleado
+FROM (SELECT tabla_jefes.employeeid, 
+            tabla_jefes.firstname, 
+            tabla_jefes.lastname,  
+            tabla_jefes.title, 
+            tabla_jefes.birthdate, 
+            tabla_jefes.hiredate, 
+            tabla_jefes.city, 
+            tabla_jefes.country,
+            empleados.empleado as empleado
+        FROM (SELECT reportsto, COLLECT_SET(lastname) as empleado
+            FROM base_northwind.employees
+            WHERE reportsto > 0
+            GROUP BY reportsto) empleados
+            JOIN base_northwind.employees as tabla_jefes
+            ON empleados.reportsto = tabla_jefes.employeeid) tabla_jefes1
+    LATERAL VIEW explode(tabla_jefes1.empleado) tabla_jefes1 as empleado
+    ORDER BY id;
+```
+
+Con esto es obtiene
+
+```
+id,nombre,apellido,titulo,fecha_nac,fecha_ingreso,ciudad,pais,empleado
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Davolio
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Leverling
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Peacock
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Callahan
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,Dodsworth
+```
+Que está guardado en `Pregunta1-b_sin_exp.csv`.
+
+### b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1)) 
+
+```
+SELECT  ord.employeeid, 
+        emplead.firstname, 
+        emplead.lastname, 
+        emplead.title, 
+        emplead.hiredate, 
+        ord.cuantos, 
+        ord.maximo
+    FROM (SELECT * 
+        FROM (SELECT orders.employeeid, orders.cuantos, 
+                lead(orders.cuantos) over (partition by NULL) as maximo
+            	FROM (SELECT DISTINCT employeeid, 
+            	        COUNT(*) over (PARTITION BY employeeid) as cuantos
+                    	FROM orders
+                    	ORDER BY cuantos ASC) orders
+                ORDER BY cuantos DESC
+            	LIMIT 2) as auxil
+            	ORDER BY cuantos ASC
+            	LIMIT 1) ord
+    	JOIN (SELECT employeeid, firstname, lastname, title, hiredate
+    	    FROM employees) emplead
+			ON ord.employeeid = emplead.employeeid;
+```
+
+Con esto se obtiene:
+
+```
+ord.employeeid,emplead.firstname,emplead.lastname,emplead.title,emplead.hiredate,ord.cuantos,ord.maximo
+3,Janet,Leverling,Sales Representative,1992-04-01,127,156
+```
+
+Que est? guardado en `PreguntaB.csv`. Es decir que la representante de ventas Janet Leverling es la segunda mejor empleada en t?rminos de n?mero de ?rdenes generadas.
+
+### c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?
+
+```
+SELECT max(datediff(rankeos.orderdate, rankeos.ord_prev)) as delta_mayor 
+    FROM (SELECT orderid, 
+                 orderdate, 
+                 lag(orderdate) OVER (PARTITION BY NULL) ord_prev
+            FROM base_northwind.orders 
+ORDER BY orderdate) rankeos;
+```
+
+Con esto se obtiene que
+
+```
+delta_mayor
+3
+```
+Que está guardado en `Pregunta1-b_sin_exp.csv`. Es decir, que la máxima diferencia es de 3 unidades temporales.
+
+## Ejercicio 2. Con los archivos de vuelos, aeropuertos y aerolíneas que están en el dropbox
+
+Primero se creará la base de datos y las correspondientes tablas de `flights` en HUE. Aunque estos archivos se guardaron sin encabezados, en HUE se guardarán las "columnas" con los nombres que ten?an los data-sets originales.
+
+```
+drop database if exists base_flights cascade;
+
+create database if not exists base_flights location "s3://eduardomtz/flights/input_data/tablas_hive_tarea5/flights/";
+```
+
++ Ahora se creará la tabla de aerolíneas, que se llamará `base_flights.airlines`
+
+```
+create external table if not exists base_flights.airlines (iata_code string,
+airline string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://eduardomtz/flights/input_data/airlines/';
+```
+
++ Ahora se creará la tabla de aeropuertos, que se llamará `base_flights.airports`
+
+```
+create external table if not exists base_flights.airports (iata_code string,
+airport string,
+city string,
+state string,
+country string,
+latitude string,
+longitude string)  
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://eduardomtz/flights/input_data/airports/';
+```
+
++ Ahora se creará la tabla de vuelos, que se llamará `base_flights.flights`
+
+```
+create external table if not exists base_flights.flights (year smallint,
+month smallint,
+day smallint,
+day_of_week	smallint, 
+airline string,
+flight_number smallint,  
+tail_number string,
+origin_airport string,
+destination_airport string,
+scheduled_departure smallint,
+departure_time string,
+departure_delay smallint,    
+taxi_out smallint,
+wheels_off smallint,
+scheduled_time smallint,
+elapsed_time smallint,
+air_time smallint,
+distance smallint,           
+wheels_on smallint,
+taxi_in smallint,
+scheduled_arrival smallint,
+arrival_time smallint,
+arrival_delay smallint,
+diverted smallint,
+cancelled smallint,
+cancellation_reason string,
+air_system_delay smallint,
+security_delay smallint,
+airline_delay smallint,
+late_aircraft_delay smallint,
+weather_delay smallint
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION 's3://eduardomtz/flights/input_data/flights/';
+```
+
+### a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"? 
+
+Se requiere la únicas aerolíneas (con sus respectivos códigos) de los vuelos cuyo destino es "Honolulu International Airport", i.e. los renglones únicos de cuyo aeropuerto de el "Honolulu International Airport" de $$(flights \Join airports) \Join airlines$$
+
+para poder ver el nombre explícito y no sólo el código.
+
+```
+SELECT DISTINCT airlines.iata_code as codigo, 
+                airlines.airline as aerolinea
+    FROM ((flights JOIN airports
+    ON flights.destination_airport = airports.iata_code)
+        JOIN airlines
+        ON flights.airline = airlines.iata_code)
+    WHERE airports.airport = "Honolulu International Airport";
+```
+
+Con esto se obtiene 
+
+```
+codigo,aerolinea
+AS,Alaska Airlines Inc.
+US,US Airways Inc.
+AA,American Airlines Inc.
+DL,Delta Air Lines Inc.
+HA,Hawaiian Airlines Inc.
+UA,United Air Lines Inc.
+VX,Virgin America
+```
+Que está guardado en el archivo `Pregunta2-a.csv`.
+
+### b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"?
+
+Observación: `departure_time` se definió como string.
+
+```
+SELECT DISTINCT substr(vuelos.departure_time, 1, 2) as hora_salida
+FROM 
+((SELECT flights.origin_airport, flights.destination_airport, flights.departure_time
+    FROM flights
+    WHERE flights.origin_airport = "SFO") vuelos JOIN
+(SELECT airports.iata_code, airports.airport
+    FROM airports
+    WHERE airports.airport = "Honolulu International Airport") aerop
+ON vuelos.destination_airport = aerop.iata_code)
+ORDER BY hora_salida;
+```
+
+Con esto se obtiene:
+ 
+ ```
+ hora_salida
+1
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+```
+
+Que está guardado en el archivo `Pregunta2-b.csv`. Es decir, hubo vuelos del SFO al "Honolulu International Airport" a todas horas excepto a de 00:00-00:59 y de 2:00-5:59.
+
+### c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible?
+
+Se seleccionará el menor delay **promedio** de entre todas las parejas día de la semana / aerolínea 
+
+```
+SELECT vuelos.day_of_week as dia_de_la_semana, vuelos.promedio as delay_promiedo, airlines.airline as nom_aerolinea
+FROM
+(SELECT day_of_week, airline, avg(departure_delay) as promedio, destination_airport
+    FROM flights
+    GROUP BY day_of_week, airline, destination_airport) vuelos 
+        JOIN  (SELECT airports.iata_code, airports.airport
+                FROM airports
+                WHERE airports.airport = "Honolulu International Airport") aerop
+        ON vuelos.destination_airport = aerop.iata_code 
+JOIN airlines ON vuelos.airline = airlines.iata_code
+ORDER BY delay_promiedo
+LIMIT 1
+```
+Con esto se obtiene:
+
+```
+dia_de_la_semana,delay_promiedo,nom_aerolinea
+3,-1.8235294117647058,Alaska Airlines Inc.
+```
+
+Que está guardado en el archivo `Pregunta2-c.csv`. Es decir que nos conviene viajar al "Honolulu International Airport" el tercer día de la semana por "Alaska Airlines Inc", que en promedio sale dos minutos *adelantado*.
+
+### d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? 
+
+```
+SELECT airports.airport, tabla_conteos.conteo
+FROM
+    (SELECT destination_airport, COUNT(*) as conteo
+        FROM flights
+        GROUP BY destination_airport) tabla_conteos 
+    JOIN airports
+    ON tabla_conteos.destination_airport = airports.iata_code
+ORDER BY tabla_conteos.conteo DESC
+LIMIT 1
+```
+
+Con esto se obtiene:
+
+```
+airports.airport,tabla_conteos.conteo
+Hartsfield-Jackson Atlanta International Airport,346904
+```
+Que está guardado en el archivo `Pregunta2-d.csv`. Es decir que el aeropuerto que es destino con mayor frecuencia es el "Hartsfield-Jackson Atlanta International Airport" con 346,904 vuelos hacia él.
+
+### e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana? 
+
+```
+SELECT retrasomax.day_of_week, retrasomax.grande, airlines.airline
+FROM
+    (SELECT day_of_week, MAX(departure_delay) as grande
+        FROM flights
+        GROUP BY day_of_week) retrasomax JOIN flights
+            ON retrasomax.grande = flights.departure_delay JOIN
+                airlines
+    ON flights.airline = airlines.iata_code
+ORDER BY retrasomax.day_of_week ASC
+```
+Con esto se obtiene:
+
+```
+retrasomax.day_of_week,retrasomax.grande,airlines.airline
+1,1625,American Airlines Inc.
+2,1609,American Airlines Inc.
+3,1589,American Airlines Inc.
+4,1649,American Airlines Inc.
+5,1988,American Airlines Inc.
+6,1878,American Airlines Inc.
+7,1670,American Airlines Inc.
+```
+Que está guardado en el archivo `Pregunta2-e.csv`.
+
+### f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)? 
+
+Se usará el promedio por aerolínea los d?as martes (day of week = 2) para ordenar de menor a mayor los retrasos (promedio) de cada aerolínea.
+
+```
+SELECT *
+FROM
+    (SELECT airlines.airline, promaero.delaypromedio, row_number() OVER (ORDER BY promaero.delaypromedio) as rn
+        FROM
+        (SELECT flights.airline, AVG(flights.departure_delay) as delaypromedio
+            FROM flights
+            WHERE flights.day_of_week = 2 AND flights.departure_delay IS NOT NULL
+            GROUP BY flights.airline) promaero JOIN 
+            airlines ON promaero.airline = airlines.iata_code
+    ORDER BY promaero.delaypromedio ASC) posicion
+WHERE rn = 3
+```
+Con esto se obtiene:
+
+```
+posicion.airline,posicion.delaypromedio,posicion.rn
+US Airways Inc.,6.475248598806726,3
+```
+
+Que está guardado en el archivo `Pregunta2-f.csv`. Es decir que la tercera aerolínea cpn más retraso los `day_of_week = 2` es "US Airways Inc." con un retraso promedio de 6.47 minutos.
+
+### g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+
+```
+SELECT diferentes.conteo, airports.airport
+FROM
+    (SELECT origin_airport, COUNT(DISTINCT destination_airport) as conteo
+    FROM flights
+    GROUP BY origin_airport) diferentes 
+    JOIN airports ON diferentes.origin_airport = airports.iata_code
+ORDER BY diferentes.conteo DESC
+LIMIT 1
+```
+
+Con esto se obtiene:
+
+```
+diferentes.conteo,airports.airport
+169,Hartsfield-Jackson Atlanta International Airport
+```
+
+Que está guardado en el archivo `Pregunta2-g.csv`. Es decir, que el aeropuerto "Hartsfield-Jackson Atlanta International Airport" es el que más destinos tiene (i.e. 169 destinos)

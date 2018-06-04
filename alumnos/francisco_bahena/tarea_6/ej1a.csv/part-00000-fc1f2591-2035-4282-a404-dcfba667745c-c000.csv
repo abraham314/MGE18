@@ -1,0 +1,9 @@
+firstname,lastname,employeeid,title,birthdate,hiredate,city,country,reporta_a,empleado
+Steven,Buchanan,5,Sales Manager,1955-03-04,1993-10-17,London,UK,5,Robert
+Steven,Buchanan,5,Sales Manager,1955-03-04,1993-10-17,London,UK,5,Anne
+Steven,Buchanan,5,Sales Manager,1955-03-04,1993-10-17,London,UK,5,Michael
+Andrew,Fuller,2,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,2,Janet
+Andrew,Fuller,2,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,2,Laura
+Andrew,Fuller,2,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,2,Nancy
+Andrew,Fuller,2,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,2,Margaret
+Andrew,Fuller,2,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,2,Steven

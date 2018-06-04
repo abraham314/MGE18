@@ -1,0 +1,6 @@
+﻿database,tableName,isTemporary
+,airlines,true
+,airports,true
+,employees,true
+,flights,true
+,orders,true

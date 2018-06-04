@@ -1,0 +1,46 @@
+flights_flatt::flight_number,flights_flatt::n_destinations,flights_flatt::destination,airports::airport,airports::city,airports::state,airports::country
+202,68,ATL,Hartsfield-Jackson Atlanta International Airport,Atlanta,GA,USA
+202,68,AUS,Austin-Bergstrom International Airport,Austin,TX,USA
+202,68,BDL,Bradley International Airport,Windsor Locks,CT,USA
+202,68,BNA,Nashville International Airport,Nashville,TN,USA
+202,68,BOS,Gen. Edward Lawrence Logan International Airport,Boston,MA,USA
+202,68,BWI,Baltimore-Washington International Airport,Baltimore,MD,USA
+202,68,CAK,Akron-Canton Regional Airport,Akron,OH,USA
+202,68,CLE,Cleveland Hopkins International Airport,Cleveland,OH,USA
+202,68,DCA,Ronald Reagan Washington National Airport,Arlington,VA,USA
+202,68,DEN,Denver International Airport,Denver,CO,USA
+202,68,DTW,Detroit Metropolitan Airport,Detroit,MI,USA
+202,68,EWR,Newark Liberty International Airport,Newark,NJ,USA
+202,68,FLL,Fort Lauderdale-Hollywood International Airport,Ft. Lauderdale,FL,USA
+202,68,FNT,Bishop International Airport,Flint,MI,USA
+202,68,IAD,Washington Dulles International Airport,Chantilly,VA,USA
+202,68,IAH,George Bush Intercontinental Airport,Houston,TX,USA
+202,68,IND,Indianapolis International Airport,Indianapolis,IN,USA
+202,68,ITO,Hilo International Airport,Hilo,HI,USA
+202,68,JFK,John F. Kennedy International Airport (New York International Airport),New York,NY,USA
+202,68,LAS,McCarran International Airport,Las Vegas,NV,USA
+202,68,LAX,Los Angeles International Airport,Los Angeles,CA,USA
+202,68,LGA,LaGuardia Airport (Marine Air Terminal),New York,NY,USA
+202,68,MCO,Orlando International Airport,Orlando,FL,USA
+202,68,MDW,Chicago Midway International Airport,Chicago,IL,USA
+202,68,MKE,General Mitchell International Airport,Milwaukee,WI,USA
+202,68,MSN,Dane County Regional Airport,Madison,WI,USA
+202,68,MSP,Minneapolis-Saint Paul International Airport,Minneapolis,MN,USA
+202,68,OAK,Oakland International Airport,Oakland,CA,USA
+202,68,OGG,Kahului Airport,Kahului,HI,USA
+202,68,OKC,Will Rogers World Airport,Oklahoma City,OK,USA
+202,68,ORD,Chicago O'Hare International Airport,Chicago,IL,USA
+202,68,PDX,Portland International Airport,Portland,OR,USA
+202,68,PHL,Philadelphia International Airport,Philadelphia,PA,USA
+202,68,PHX,Phoenix Sky Harbor International Airport,Phoenix,AZ,USA
+202,68,PIT,Pittsburgh International Airport,Pittsburgh,PA,USA
+202,68,RDU,Raleigh-Durham International Airport,Raleigh,NC,USA
+202,68,RNO,Reno/Tahoe International Airport,Reno,NV,USA
+202,68,RSW,Southwest Florida International Airport,Ft. Myers,FL,USA
+202,68,SAN,San Diego International Airport (Lindbergh Field),San Diego,CA,USA
+202,68,SAT,San Antonio International Airport,San Antonio,TX,USA
+202,68,SEA,Seattle-Tacoma International Airport,Seattle,WA,USA
+202,68,SFO,San Francisco International Airport,San Francisco,CA,USA
+202,68,SLC,Salt Lake City International Airport,Salt Lake City,UT,USA
+202,68,SMF,Sacramento International Airport,Sacramento,CA,USA
+202,68,TPA,Tampa International Airport,Tampa,FL,USA

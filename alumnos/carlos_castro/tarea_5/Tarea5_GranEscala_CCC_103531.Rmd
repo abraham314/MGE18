@@ -1,0 +1,83 @@
+---
+title: "Tarea5_CCC_103531"
+output: html_document
+---
+## Cluster - 2 slave | 1 master
+```{r, include=TRUE}
+#Imagen del summary de tu clúster
+```
+
+![](https://www.dropbox.com/s/mlbsr9es5l8aiyd/cluster_1.png?dl=1)
+
+![](https://www.dropbox.com/s/j8hx9tku0cbitzv/cluster_2.png?dl=1)
+
+## Pregunta 1 - A
+```{r, include=TRUE}
+#a. ¿Cuántos "jefes" hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? (atributo reportsto, ocupa explode en tu respuesta)  
+```
+
+![](https://www.dropbox.com/s/lkx64e8k89hxvwz/ej1_a.png?dl=1)
+
+## Pregunta 1 - B
+```{r, include=TRUE}
+#b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1)) 
+```
+
+![](https://www.dropbox.com/s/0nbtqu0vv7oi0xf/ej1_b.png?dl=1)
+
+## Pregunta 1 - C
+```{r, include=TRUE}
+#c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?
+```
+
+![](https://www.dropbox.com/s/b1r68p5ydoicach/ej1_c.png?dl=1)
+
+## Pregunta 2 - A
+```{r, include=TRUE}
+#a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"? 
+```
+
+![](https://www.dropbox.com/s/3xkg5euf8rhx6sx/ej2_a.png?dl=1)
+
+## Pregunta 2 - B
+```{r, include=TRUE}
+#b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"? 
+```
+
+![](https://www.dropbox.com/s/3u3y203dak5myq4/ej2_b.png?dl=1)
+
+## Pregunta 2 - C
+```{r, include=TRUE}
+#c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible? 
+```
+
+![](https://www.dropbox.com/s/umcb60je9ob9p9d/ej2_c.png?dl=1)
+
+## Pregunta 2 - D
+```{r, include=TRUE}
+#d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? 
+```
+
+![](https://www.dropbox.com/s/s9lq5yhqv2co9vu/ej2_d.png?dl=1)
+
+## Pregunta 2 - E
+```{r, include=TRUE}
+#e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana?
+```
+
+![](https://www.dropbox.com/s/g5bax5mj4ncsmjo/ej2_e.png?dl=1)
+
+## Pregunta 2 - F
+```{r, include=TRUE}
+#f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)?
+```
+
+![](https://www.dropbox.com/s/0lkyoc1mw1zqcts/ej2_f.png?dl=1)
+
+## Pregunta 2 - G
+```{r, include=TRUE}
+#g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+```
+
+![](https://www.dropbox.com/s/qxlt3codrpocvvl/ej2_g.png?dl=1)
+

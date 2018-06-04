@@ -1,0 +1,3 @@
+a.employeeid,a.firstname,a.lastname,a.title,a.birthdate,a.hiredate,a.address,a.city,a.country
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,1992-08-14,908 W. Capital Way,98401
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,14 Garrett Hill,London,UK

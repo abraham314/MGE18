@@ -1,0 +1,18 @@
+---
+title: "Tarea3_Gran_Escala"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Hadoop Multinode | Master
+
+![](https://www.dropbox.com/s/2lhh64wv74d4f1z/master.png?dl=1)
+
+
+## Hadoop Multinode | Slave
+
+![](https://www.dropbox.com/s/4z1o0zf1eibzj5j/slave.png?dl=1)
+

@@ -1,0 +1,204 @@
+---
+title: "tarea_spark"
+author: "Francisco_Bahena_Galeana123084"
+date: "March 20, 2018"
+output: html_document
+---
+
+¿Cuántos “jefes” hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? (atributo reportsto, ocupa explode en tu respuesta)
+
+```{r, eval=FALSE}
+
+employees.filter(employees.reportsto > 0).select('reportsto').distinct().count()
+
+empleados = employees.filter(employees.reportsto > 0).selectExpr("firstname as name", "reportsto as reporta_a").groupby('reporta_a').agg((collect_set("name")).alias('empleados'))
+
+df3 = empleados.join(employees, empleados.reporta_a==employees.employeeid)
+
+ej1a = df3.withColumn("empleado", explode(df3.empleados)).\
+select('firstname','lastname','employeeid','title','birthdate','hiredate','city','country','reporta_a','empleado')
+
+ej1a.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej1a.csv', header=True)
+```
+
+
+¿Quién es el segundo “mejor” empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1))
+
+```{r, eval=FALSE}
+
+
+
+%pyspark
+from pyspark.sql.functions import *
+
+
+#¿Quién es el segundo “mejor” empleado que más órdenes ha generado?
+ordenes = orders.groupby('employeeid').count().selectExpr('employeeid as idempleado','count as ordenes')
+tabla = employees.join(ordenes, employees.employeeid==ordenes.idempleado).select('firstname','lastname','hiredate','title','ordenes').\
+orderBy(desc('ordenes'))
+
+ej1b = tabla.withColumn('maximo',lit(tabla.groupby().max('ordenes').collect()[0][0])).limit(2).orderBy('ordenes').limit(1)
+
+ej1b.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej1b.csv', header=True)
+
+
+```
+
+¿Cuál es el delta de tiempo más grande entre una orden y otra?
+Ejercicio 2. Con los archivos de vuelos, aeropuertos y aerolíneas que están en el dropbox
+
+```{r, eval=FALSE}
+
+%pyspark
+from pyspark.sql import Window
+
+#¿Cuál es el delta de tiempo más grande entre una orden y otra?
+
+tabla_lag = orders.orderBy("orderId").select("orderid","orderdate", lag("orderdate").over(Window.orderBy("orderid")).alias("laggeada"))
+tabla_lag = tabla_lag.withColumn("diff",datediff(to_date("orderdate"),to_date("laggeada"))).orderBy("diff",ascending=False)
+ej1c = tabla_lag.groupby().agg({'diff':'max'})
+ej1c.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej1c.csv', header=True)
+
+```
+
+¿Qué aerolíneas (nombres) llegan al aeropuerto “Honolulu International Airport”?
+
+```{r, eval=FALSE}
+
+
+%pyspark
+#Ejercicio 2
+
+#a) ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"?
+
+vuelos_unicos = vuelos.selectExpr('AIRLINE','DESTINATION_AIRPORT').distinct()
+vuelos_target = vuelos_unicos.join(airports, vuelos_unicos.DESTINATION_AIRPORT==airports.IATA_CODE).\
+filter(airports.AIRPORT== 'Honolulu International Airport').select('AIRLINE','AIRPORT','IATA_CODE')
+
+aerolineas = airlines.selectExpr('IATA_CODE as cod','AIRLINE as aerolinea')
+ej2a = aerolineas.join(vuelos_target, aerolineas.cod == vuelos_target.AIRLINE)
+ej2a.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej2a.csv', header=True)
+
+
+```
+
+¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco (“SFO”) a “Honolulu International Airport”?
+
+```{r, eval=FALSE}
+
+%pyspark
+
+# b) ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco (“SFO”) a “Honolulu International Airport”?
+
+vuelos_hon = vuelos.select('SCHEDULED_DEPARTURE','DESTINATION_AIRPORT','ORIGIN_AIRPORT').filter((col("DESTINATION_AIRPORT") == "HNL") & (col("ORIGIN_AIRPORT") == "SFO"))
+ej2b=vuelos_hon.withColumn('hora',vuelos_hon['SCHEDULED_DEPARTURE'].substr(0, 2)).groupby('hora').count().\
+selectExpr('hora','count as vuelos').orderBy('vuelos',ascending=False)
+
+ej2b.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej2b.csv', header=True)
+
+```
+
+¿Qué día de la semana y en qué aerolínea nos conviene viajar a “Honolulu International Airport” para tener el menor retraso posible?
+
+```{r, eval=FALSE}
+
+%pyspark
+
+# c) ¿Qué día de la semana y en qué aerolínea nos conviene viajar a “Honolulu International Airport” para tener el menor retraso posible?
+
+ej2c = vuelos.filter((col('DEPARTURE_DELAY') > 0) & (col('DESTINATION_AIRPORT') == 'HNL')).\
+select('DAY_OF_WEEK','AIRLINE','DEPARTURE_DELAY','DESTINATION_AIRPORT').\
+groupby('DAY_OF_WEEK','AIRLINE').agg({'DEPARTURE_DELAY':'avg'}).orderBy('avg(DEPARTURE_DELAY)').limit(1)
+ej2c.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej2c.csv', header=True)
+
+```
+¿Cuál es el aeropuerto con mayor tráfico de entrada?
+
+```{r, eval=FALSE}
+
+%pyspark
+# d) ¿Cuál es el aeropuerto con mayor tráfico de entrada?
+
+puerto = vuelos.selectExpr('ORIGIN_AIRPORT AS origin','DESTINATION_AIRPORT as destination').\
+groupby('destination').count().selectExpr('destination','count as vuelos_que_llegan').\
+orderBy('vuelos_que_llegan',ascending=False).limit(1)
+
+ej2d = puerto.join(airports, puerto.destination==airports.IATA_CODE)
+
+ej2d.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej2d.csv', header=True)
+
+
+```
+¿Cuál es la aerolínea con mayor retraso de salida por día de la semana?
+
+```{r, eval=FALSE}
+
+%pyspark
+
+#e) ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana?
+
+retraso_max = vuelos.filter(col('DEPARTURE_DELAY') > 0).\
+select('DAY_OF_WEEK','AIRLINE','DEPARTURE_DELAY','DESTINATION_AIRPORT').\
+groupby('DAY_OF_WEEK','AIRLINE').agg({'DEPARTURE_DELAY':'avg'}).orderBy('avg(DEPARTURE_DELAY)').\
+select("DAY_OF_WEEK", "AIRLINE",col("avg(DEPARTURE_DELAY)").alias("retraso")).\
+groupby('DAY_OF_WEEK').agg({'retraso':'max'}).\
+select('DAY_OF_WEEK',col('max(retraso)').alias("max_retraso_avg"))
+
+airlines_delay = vuelos.filter(col('DEPARTURE_DELAY') > 0).\
+select('DAY_OF_WEEK','AIRLINE','DEPARTURE_DELAY','DESTINATION_AIRPORT').\
+groupby('DAY_OF_WEEK','AIRLINE').agg({'DEPARTURE_DELAY':'avg'}).orderBy('avg(DEPARTURE_DELAY)').\
+select(col("DAY_OF_WEEK").alias('dsem'), "AIRLINE",col("avg(DEPARTURE_DELAY)").alias("retraso_prom"))
+
+tabla = retraso_max.join(airlines_delay, retraso_max.max_retraso_avg==airlines_delay.retraso_prom).\
+select('DAY_OF_WEEK',col('AIRLINE').alias('aerolinea'),'max_retraso_avg').orderBy('DAY_OF_WEEK')
+
+ej2e = tabla.join(airlines, tabla.aerolinea==airlines.IATA_CODE)
+
+ej2e.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej2e.csv', header=True)
+
+
+
+
+```
+¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)?
+
+```{r, eval=FALSE}
+
+%pyspark
+
+# f)
+
+retrasos = vuelos.filter(vuelos.DAY_OF_WEEK==2).filter(vuelos.DEPARTURE_DELAY>0).\
+select(col('AIRLINE').alias('aerolinea'),'DEPARTURE_DELAY').\
+groupby('aerolinea').agg({'DEPARTURE_DELAY':'avg'}).\
+select('aerolinea',col('avg(DEPARTURE_DELAY)').alias('avg_delay_mondays')).orderBy('avg_delay_mondays',ascending=True).\
+limit(3)
+
+ej2f = retrasos.join(airlines, retrasos.aerolinea==airlines.IATA_CODE).orderBy('avg_delay_mondays',ascending=False).limit(1)
+
+ej2f.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej2f.csv', header=True)
+
+
+```
+¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+
+```{r, eval=FALSE}
+
+%pyspark
+
+#g)
+
+salidas = vuelos.select('ORIGIN_AIRPORT','DESTINATION_AIRPORT').\
+groupBy("ORIGIN_AIRPORT").agg(countDistinct("DESTINATION_AIRPORT").alias('destinos_diferentes')).\
+orderBy('destinos_diferentes',ascending=False)
+
+ej2g = salidas.join(airports, salidas.ORIGIN_AIRPORT==airports.IATA_CODE).limit(1)
+
+ej2g.coalesce(1).write.csv('s3://tristanvhbucket/tarea_spark/ej2g.csv', header=True)
+
+
+```
+
+
+
+

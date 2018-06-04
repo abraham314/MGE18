@@ -1,0 +1,74 @@
+---
+title: "Tarea 2"
+author: "Karen Peña 175952 - Fernando Briseño 171349"
+date: "5 de febrero de 2018"
+output: html_document
+---
+
+Los pasos que se siguien para realizar esta tarea fueron los siguientes:
+
++ Descargar una imagen de docker
++ Inicializarla en un contenedor con volumen
++ Crear el directorio en HDFS
++ Copiar el archivo de ecobici
++ Verificar el funcionamiento del sistema
+
+## 1. Descargar una imagen de docker
+
+Se descarga la imagen sequenceiq/hadoop-docker en su versión 2.7.1 desde https://hub.docker.com/r/sequenceiq/hadoop-docker/ con el comando  
+`docker pull sequenceiq/hadoop-docker:2.7.1`
+
+## 2. Inicializar un contenedor
+
+`docker run -it -v $PWD:/home/data sequenceiq/hadoop-docker:2.7.1 /etc/bootstrap.sh -bash`
+ 
+![Imagen 1. Contenedor de docker corriendo Hadoop](img/01docker_run.png) 
+ 
+## 3. Crear el directorio en HDFS
+
++ Crea el directorio /metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/ con mkdir verifica la opción -p
+
+`cd $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/ `
+ 
+![Imagen 2. Creación del directorio](img/02hdfs.png)  
+
++ Muestra que el directorio está vacío -no hay datos cargados- con ls
+
+`bin/hdfs dfs -ls /metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/ `
+
+![Imagen 3. No hay contenidos](img/03datos_cargados.png)  
+ 
+## 4. Copiar el archivo de Ecobici
+
++ Carga los datos a este directorio que creaste ocupando copyFromLocal
+
+`bin/hdfs dfs -copyFromLocal /home/data/ecobici_2017_sem1.csv $PWD/metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/`
+ 
+![Imagen 4. Se copian los archivos](img/04copyfromlocal.png)  
+
++ Muestra que los datos están cargados haciendo un ls
+
+`bin/hdfs dfs -ls $PWD/metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/`
+ 
+![Imagen 5. Archivos en la carpeta](img/05datos_cargados_ls.png)  
+
+`bin/hdfs dfs -cat $PWD/metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/ecobici_2017_sem1.csv | head -3`
+
+![Imagen 6. Head](img/06head.png)  
+
+## 5. Verificar el funcionamiento del sistema
+
++ Muestra que el NameNode, DataNode, ResourceManager y el NodeManager están activos en tu clúster de Hadoop con jps
+ 
+![Imagen 7. JPS](img/07jps.png)  
+
++ Muestra la salida del reporte generado con dfsadmin report
+
+`bin/hdfs dfsadmin -report` 
+ 
+![Imagen 8. Reporte dfsadmin](img/08report.png)  
+
++ ¿Cuál es el % de DFS utilizado una vez que ya subiste los datos?
+
+10.01%
+

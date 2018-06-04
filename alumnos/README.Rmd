@@ -1,0 +1,27 @@
+---
+title: 'Readme'
+author: "Liliana Millán"
+date: "January 8, 2018"
+output: html_document
+---
+
+![](../images/itam_logo.png)
+
+### Reglas de convivencia en git
+
++ Tu carpeta debe seguir el formato `nombre_apellido`. Por ejemplo: `alumnos\liliana_millan` -nota que no hay mayúsculas!!!-
++ Siempre sube tus tareas **únicamente** a tu carpeta
++ No subas los archivos de datos: csv, feather, psv, excel... a menos que explícitamente se solicite 
++ **Siempre** solicita un *pull request* comparando con la rama **master**
++ Si *accidentalmente* modificas las notas de la clase tendrás un -1 en tu calificación final -se van acumulando-
++ Si *accidentalmente* borras el repo tendrás un -2 en tu calificación final -se van acumulando-
++ Si modificas carpetas de otras personas tendrás un -2 en tu calificación final -a menos que formen parte de tu equipo- 
++ Cuando las tareas sean en equipo los archivos requeridos tendrán que estar en las carpetas de todos los integrantes del equipo -reviso aleatoriamente una de las carpetas por equipo-
++ La fecha asignada a la entrega de la tarea queda registrada con la úlitma modificación que realizaste -git log- 
+
+#### Referencias 
+
++ [Tutorial de GitHub](https://try.github.io/levels/1/challenges/1)
++ [Cómo hacer fork](https://help.github.com/articles/fork-a-repo/)
++ [Cómo hacer pull request](https://help.github.com/articles/creating-a-pull-request/)
++ [git commands cheat sheet](https://www.git-tower.com/blog/git-cheat-sheet/)

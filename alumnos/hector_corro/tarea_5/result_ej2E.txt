@@ -1,0 +1,5 @@
+OK
+5	American Airlines Inc.	1988
+6	American Airlines Inc.	1878
+Time taken: 104.798 seconds, Fetched: 2 row(s)
+

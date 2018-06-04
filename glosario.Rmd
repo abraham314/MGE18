@@ -1,0 +1,46 @@
+---
+title: "Glosario"
+author: "Liliana Millán, liliana.millan@gmail.com"
+date: "January 2, 2018"
+output: html_document
+---
+
+![](images/itam_logo.png)
+
+### Glosario
+
++ **3NF:** Tercera forma normal de los datos. Propiedades que cumple una tabla en una BD transaccional tradicional para resguardar la integridad de los datos al hacer actualizaciónes y evitar tener redundancia de los mismos.
++ **ACID:** Propiedades que se deben cumplir en bases de datos transaccionales. Cada transacción debe tener las siguientes 4 propiedades de forma obligatoria:
+    + **A**tomicity: O se ejecuta toda la transacción o no, si no es posible ejectuarla se hace roll back (una transacción puede tener más de una operación)
+    + **C**onsistency: Se refiere a mantener la integridad de los datos respetando todas las restricciones -normalmente de negocio, pero también operativas- en la BD. Por ejemplo: En una transferencia electrónica se disminuye el saldo de la tabla del saldos del cliente y además de las otras tablas que tengan ese campo que debe ser modificado con el nuevo saldo disponible
+    + **I**solation: Múltiples operaciones se pueden hacer concurrentemente -al mismo tiempo- sin dejar inconsistencias en la BD -base de datos- ya que cada transacción se toma como atómica 
+    + **D**urability: Una vez que una transacción ha sido ejecutada -commit- las actualizaciones y modificaciones a la BD son persistidas en disco y aún cuando haya una falla en el sistema la BD mantiene los datos como hayan sido guardados por última vez
++ **Asynchronous processing:** Proceso que no requieren de esperar una respuesta para continuar el procesamiento
++ **Atributos de calidad:** Requerimientos no funcionales de un sistema, características que tienen que incluir una métrica
+    + **Desempeño y escalabilidad:** Tiempo de respuesta a una peticion(es), incluyendo el desempeño al procesar volúmenes de carga incrementados Las métricas que se incluyen en este atributo son: Tiempo de respuesta, latencia y throughput, picos de carga, cuellos de botella
+    + **Disponibilidad y resilencia:** Que es el sistema este disponible o parcialmente disponible cuando se requiera ocuparlo. Las métricas que se incluyen en este atributo son: Tiempo fuera planeado, tiempo de recuperación, tasa de fallas, recuperación de desastres
+    + **Seguridad:** Administración de quién puede realizar qué, cuándo y en dónde y la detección de fallas
+    + **Modificabilidad:** La flexibilidad que tiene el sistema para adecuarse a cambios durante el desarrollo y despliegue
++ **Clúster:** Conjunto de máquinas que trabajan en conjunto para realizar un procesamiento. Las máquinas que forman parte del cluster son conocidas como nodos. Normalmente se tiene un diseño maestro/esclavo donde 1 nodo sirve como maestro y el resto de los nodos disponibles como esclavos
++ **DB:** DataBase
++ **Elastic cloud:** *Infrastructure as a Service IaaS* permite rentar hardware bajo demanda para que no lo tengas que adquirir físicamente, al ser elástica permite que escales hacia arriba o hacia abajo de maneroa horizontal. AWS es la *elastic cloud* más famosa
++ **ETL:** Extract, Transform, Load. Típico *pipeline* de adquisición, limpieza y guardado de datos para su posterior análisis/modelado
++ **Heap size:** La memoria "apartada" para los objetos que se ocupan, se configura al levantarse la máquina virtual de Java
++ **JVM:** Java Virtual Machine, una máquina virtual que corre todo los proceso de Java
++ **Latencia:** Tiempo de respuesta de una petición
+    + Latencia baja se refiere a contestar **muy** rápido -el motor central de índices de la BMV tiene una latencia de 300 microsegundos por transacción-; latencia
+    + Latencia alta se refeire a contestar lentamente, hay sistemas que tienen una latencia de horas -procesos nocturnos de bancos: conciliaciones...-
++ **Framework:** La definición de estándares que se se siguen en el diseño y desarrollo de un sistema. Por ejemplo: Si se deseara construir un edificio autosuficiente y ecológico deberemos cumplir con ciertos estándares establecidos en el framework autosuficiente y ecológico  
++ **Metadata:** Datos de los datos. Puede ser el profiling de los datos.
++ **ODBC:** Open Database Connectivity, un API estándar para conectarse a DBMs, diseñado para ser independiente del sistema operativo y del sistema de base de datos por lo que si una aplicación utiliza ODBC puede ser "portada" a otras plataformas tanto en el lado del cliente como en el lado del servidor
++ **Queue:** Estructura de dato que permite registrar *eventos* ordenados en forma FIFO -first in first out-  
++ **RDBMS:** Relational DataBase Management System - manejadores de bases de datos; algunos ejemplos: Oracle, Postgresql, MySql 
++ **Rack:** En HDFS, es una colección de 30 o 40 nodos que están físicamente cerca y que están conectados al mismo switch de red, esto provoca que los nodos que están en um mismo rack tengan un mejor ancho de banda de red que aquellos que están en racks diferentes
++ **Robustness:** Tolerante a fallas
++ **Scalability:** Poder crecer la infraestructura conforme nuestra cantidad de datos aumenta
+    + **Horizontal scaling:** Mejorar la infraestructura actual al tener más máquinas -no necesariamente mejores máquinas- que al ocuparlas en conjunto sean mejores que una sola máquina
+    + **Veritcal scaling:** Hacer que una máquina sea mejor en alguna(s) características: almacenamiento, velocidad de procesamiento, número de cores, tipo de procesador, etc.
++ **Sharding:** Separar una tabla en varias tablas de acuerdo a cierto criterio. El caso de uso más común es para optimizar escritura a una tabla que tiene muchos registros. 
++ **SQL:** Structured Query Language, lenguaje estandar para obtener información de bases de datos estructuradas
++ **Switch:** 
++ **Throughput:** La canitdad de peticiones que pasan por un sistema

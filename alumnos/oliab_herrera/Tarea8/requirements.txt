@@ -1,0 +1,6 @@
+luigi
+python 3.6
+pyspark
+json
+subprocess
+time

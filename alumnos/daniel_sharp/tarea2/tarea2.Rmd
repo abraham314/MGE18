@@ -1,0 +1,44 @@
+---
+title: "Tarea2"
+author: "Francisco Bahena, Cristian Challu, Daniel Sharp"
+date: "January 31, 2018"
+output: html_document
+---
+
+<style>
+    body .main-container {
+        max-width: 1000px;
+    }
+</style>
+
+#### **Carga de la imagen de Hadoop en Docker**
+![Carga de imagen de Docker](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/imgtarea2/carga_docker.png)
+  
+Se utilizó la imgen de sequenceiq/hadoop-docker, que se puede obtener desde https://hub.docker.com/r/sequenceiq/hadoop-docker/. El Dockerfile de esta imagen se encuentra en la misma carpeta que este Rmd con el nombre de 'Dockerfile-Hadoop'. En el momento de ejecutar la imagen se incluyeron las banderas (opciones) necesarias para crear un volumen dentro del contenedor que contuviera los datos de Ecobici que utilizaremos después. Además, se incluyó la instrucción que sugiere el creador de la imagen en la página mencionada anteriormente para que se ejecute de manera interactiva y podamos utiizar el bash del contenedor.  
+  
+#### **Crear el directorio /metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/ con mkdir verifica la opción -p** 
+#### **Muestra que el directorio está vacío -no hay datos cargados- con ls**  
+![Creación de directorio y listar](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/imgtarea2/crear_vacio.png)  
+
+  
+  En la imagen anterior se puede observar que se creó el directorio dentro del filesystem de Hadoop bajo la ruta que especifica la tarea utilizando la opción -p para que pueda crearlo con el signo de = en el particionamiento por año. Además, se utilizó el comando de -ls para verificar que el directorio estuviera vacío. Como se puede observar en la imgen este comando no generó ninguna salida, indicando que el directorio efectivamente está vacío.  
+  
+#### **Carga los datos a este directorio que creaste ocupando copyFromLocal**  
+#### **Muestra que los datos están cargados haciendo un ls**  
+![Carga de los datos y listar](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/imgtarea2/carga_ls.png) 
+  
+  En la imagen anterior se puede observar la utilización de la función copyFromLocal para insertar los datos de Ecobici al sistema HDFS de Hadoop. Posteriormente, utilizando el mismo comando de -ls que se utilizó en el inciso anterior, podemos observar que los datos ya se encuentran en la ruta indicada por la tarea.
+  
+#### **Muestra que el NameNode, DataNode, ResourceManager y el NodeManager están activos en tu clúster de Hadoop con jps**  
+  ![Verificar que los nodos están activos](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/imgtarea2/jps.png) 
+  
+  Utilizando el comando jps podemos confirmar que el tanto el DataNode, como el ResourceManager, el NameNode y el NodeManager se encuentran activos dentro de nuestro 'clúster' de Hadoop.  
+
+#### **Muestra la salida del reporte generado con dfsadmin report**  
+![Reporte DFSadmin](/home/daniel/Documents/DataScience/Repos/Sem2/metodos_gran_escala/alumnos/daniel_sharp/imgtarea2/dfsadmin.png)  
+  La función de dfsadmin produce el reporte anterior, incluyendo los datos para el único datanode que tenemos activo.  
+    
+#### **¿Cuál es el % de DFS utilizado una vez que ya subiste los datos?**  
+  De acuerdo con la imagen anterior, podemos ver que se encuentra utilizado el 3.23% (1.79 GB) del DFS, esto es, el 3.23% de la capacidad de almancenamiento total de el equipo que utilizamos. Por otro lado, hay un 23.91% (13.26 GB) aún disponible en el que podríamos agregar más datos. El porcentaje restante, 72.86% (40.42 GB), ya está siendo utilizado por el sistema operativo y las herramientas que se encuentran instaladas.
+  
+  

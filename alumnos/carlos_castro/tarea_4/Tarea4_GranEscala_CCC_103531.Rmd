@@ -1,0 +1,65 @@
+---
+title: "Tarea4_CCC_103531"
+output: html_document
+---
+## Cluster - 2 slave | 1 master
+```{r, include=TRUE}
+#Foto de tu clúster de AWS (management console, tu clúster tiene que llamarse con tu nombre_apellido), también puedes hacerlo en tu máquina con la misma configuración mencionada anteriormente
+```
+
+![](https://www.dropbox.com/s/mwp1hy8nue5mptj/cluster1.png?dl=1)
+
+![](https://www.dropbox.com/s/wj0u2fmnmquskb0/cluster2.png?dl=1)
+
+## Pregunta 1- A
+```{r, include=TRUE}
+#Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank
+```
+
+![](https://www.dropbox.com/s/ofxfemhcmt5yb3z/ej_a.png?dl=1)
+
+## Pregunta 1 -B
+```{r, include=TRUE}
+#¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el "Honolulu International Airport"?
+```
+
+![](https://www.dropbox.com/s/11v4bmtzsimyn0t/ej1_b.png?dl=1)
+
+## Pregunta 2 -B
+```{r, include=TRUE}
+#¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es?
+```
+
+![](https://www.dropbox.com/s/gaunm769m5sphm9/ej2_b_aerolinea.png?dl=1)
+
+![](https://www.dropbox.com/s/dqlv7fgm031xvpz/ej2_b_numvuelo.png?dl=1)
+
+## Pregunta 3 -B
+```{r, include=TRUE}
+#¿Qué día es en el que más vuelos cancelados hay?
+```
+
+![](https://www.dropbox.com/s/3q3271vy6uex64u/ej3_b.png?dl=1)
+
+## Pregunta 4 -B
+```{r, include=TRUE}
+#¿Cuáles son los aeropuertos orígen con 17 cancelaciones?
+```
+
+![](https://www.dropbox.com/s/jef5lujl7dsmixa/ej4_b.png?dl=1)
+
+## Pregunta 5 -B
+```{r, include=TRUE}
+#¿Cuál es el aeropuerto origen con más vuelos cancelados?
+```
+
+![](https://www.dropbox.com/s/5ig15kiy033zbvf/ej5_b.png?dl=1)
+
+## Pregunta 6 -B
+```{r, include=TRUE}
+#¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? 
+```
+
+![](https://www.dropbox.com/s/xyjkgvjnpqhggho/ej6_b_destinos.png?dl=1)
+
+![](https://www.dropbox.com/s/d58fw1oi4t0ti0d/ej6_b_numvuelo.png?dl=1)

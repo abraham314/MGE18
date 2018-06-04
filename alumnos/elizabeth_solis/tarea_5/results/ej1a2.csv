@@ -1,0 +1,6 @@
+aux_explode.employeeid,aux_explode.firstname,aux_explode.lastname,aux_explode.title,aux_explode.birthdate,aux_explode.hiredate,aux_explode.city,aux_explode.n_freq,aux_explode.reportsto,aux_explode.subordinates,subordinates_a.subordinates_b
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,2,5,"[""Anne""]",Anne
+2,Andrew,Fuller,"""Vice President",NULL,1952-02-19,908 W. Capital Way,2,2,"[""Nancy"",""Janet"",""Margaret"",""Laura""]",Nancy
+2,Andrew,Fuller,"""Vice President",NULL,1952-02-19,908 W. Capital Way,2,2,"[""Nancy"",""Janet"",""Margaret"",""Laura""]",Janet
+2,Andrew,Fuller,"""Vice President",NULL,1952-02-19,908 W. Capital Way,2,2,"[""Nancy"",""Janet"",""Margaret"",""Laura""]",Margaret
+2,Andrew,Fuller,"""Vice President",NULL,1952-02-19,908 W. Capital Way,2,2,"[""Nancy"",""Janet"",""Margaret"",""Laura""]",Laura

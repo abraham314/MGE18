@@ -1,0 +1,89 @@
+---
+title: "Tarea 4 Pig"
+author: "Mariana Godina Abasolo"
+output: 
+  html_notebook:
+    toc: yes
+---
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>
+
+### Foto de tu clúster de AWS 
+
++ management console
+
+![](consola_aws.png)
+
+### Ejercicio A
+
++ Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank
+
+    - Raclette Courdavoult es el producto con mejor rank
+
+```{bash}
+cat ./EjercicioA/output_a
+```
+
+
+### Ejercicio B
+
+1. ¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el “Honolulu International Airport”?
+
+    - Existen 43,157 vuelos cuyo aeropuerto de destino es Honolulu International Airport.
+    
+```{bash}
+cat ./EjercicioB/output_b1
+```
+
+
+2. ¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es?
+
+    - El vuelo con más retraso es el 1322 de American Airlines.
+
+```{bash}
+cat ./EjercicioB/output_b2
+```
+
+
+3. ¿Qué día es en el que más vuelos cancelados hay?
+
+    - El día de la semana con más vuelos cancelados es Lunes(1)
+
+```{bash}
+cat ./EjercicioB/output_b3
+```
+
+
+4. ¿Cuáles son los aeropuertos orígen con 17 cancelaciones?
+    
+    - DHN,Dothan Regional Airport
+    - DIK,Dickinson Theodore Roosevelt Regional Airport
+    - ESC,Delta County Airport
+    
+```{bash}
+cat ./EjercicioB/output_b4
+```
+
+5. ¿Cuál es el aeropuerto origen con más vuelos cancelados?
+
+    - ORD,Chicago O'Hare International Airport
+    
+```{bash}
+cat ./EjercicioB/output_b5
+```
+
+
+6. ¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? (ocupar bag te ayudará en esta pregunta)
+
+  - El vuelo con mayor diversidad de aeropuertos de destino es el 202
+
+```{bash}
+cat ./EjercicioB/output_b6
+```
+
+

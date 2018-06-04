@@ -1,0 +1,150 @@
+---
+title: "Tarea 4"
+author: "m1ch3ll3"
+date: "3/4/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Entregables
+
+### Foto de mi cluster
+
+![](cluster.png)
+
+### Ejercicio a
+
+Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank
+
+* pig query
+
+```{bash}
+cat ./a/a.pig
+```
+
+El output se encuentra en [./a/output](./a/output) y se ve así
+
+```{bash}
+cat ./a/output/*
+```
+
+### Ejercicio b1
+
+1. ¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el "Honolulu International Airport"?
+
+* pig query
+
+```{bash}
+cat ./b1/b1.pig
+```
+
+* El output se encuentra en [./b1/output](./b1/output)
+
+Existen 43172 vuelos que parten de HNL.
+
+```{bash}
+cat ./b1/output/*
+```
+
+### Ejercicio b2
+
+2. ¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es?
+
+* pig query
+
+```{bash}
+cat ./b2/b2.pig
+```
+
+* El output se encuentra en [./b2/output](./b2/output)
+
+El vuelo con más retraso (departure_delay) es el vuelo 1322 de American Airlines.
+
+```{bash}
+cat ./b2/output/*
+```
+
+### Ejercicio b3
+
+3. ¿Qué día es en el que más vuelos cancelados hay?
+
+* pig query
+
+```{bash}
+cat ./b3/b3.pig
+```
+
+* El output se encuentra en [./b3/output](./b3/output)
+
+El día con más vuelos cancelados es el 27 de enero de 2015.
+
+Aquí los cinco días con más vuelos cancelados:
+
+```{bash}
+cat ./b3/output/*
+```
+
+### Ejercicio b4
+
+4. ¿Cuáles son los aeropuertos orígen con 17 cancelaciones?
+
+* pig query
+
+```{bash}
+cat ./b4/b4.pig
+```
+
+* El output se encuentra en [./b4/output](./b4/output)
+
+Los aeropuertos orígen con 17 cancelaciones son:
+
+Dothan Regional Airport
+
+Dickinson Theodore Roosevelt Regional Airport
+
+Delta County Airport
+
+```{bash}
+cat ./b4/output/*
+```
+
+### Ejercicio b5
+
+5. ¿Cuál es el aeropuerto origen con más vuelos cancelados?
+
+* pig query
+
+```{bash}
+cat ./b5/b5.pig
+```
+
+* El output se encuentra en [./b5/output](./b5/output)
+
+Los aeropuertos orígen con más vuelos cancelados es:
+
+Chicago O'Hare International Airport
+
+```{bash}
+cat ./b5/output/*
+```
+
+### Ejercicio b6
+
+6. ¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? (ocupar bag te ayudará en esta pregunta)
+
+* pig query
+
+```{bash}
+cat ./b6/b6.pig
+```
+
+* El output se encuentra en [./b6/output](./b6/output)
+
+El vuelo con más aeropuertos destino es el 202 con 66 aeropuertos destino.
+
+```{bash}
+cat ./b6/output/*
+```

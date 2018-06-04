@@ -1,0 +1,4 @@
+OK
+2       Fuller  Andrew  "Vice President Dr.     19/02/52        908 W. Capital Way      98401   0
+5       Buchanan        Steven  Sales Manager   04/03/55        17/10/93        London  UK      2
+Time taken: 20.42 seconds, Fetched: 2 row(s)

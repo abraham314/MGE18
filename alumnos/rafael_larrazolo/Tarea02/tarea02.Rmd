@@ -1,0 +1,69 @@
+##Tarea 2
+###Ejercicio Hadoop  
+
+
+#### Larrazolo de la Cruz Rafael 118426 
+#### Estrada Rivera Diego Alejandro 165352  
+#### Quintero Mármol González Victor 175897  
+
+
+Utilizamos la siguiente imágen de docker (https://github.com/sequenceiq/hadoop-docker), con este [Dockerfile](https://github.com/sequenceiq/hadoop-docker/blob/master/Dockerfile).  
+
+![](dockerpull.png)
+  
+---  
+
+![](dockerrun.png)
+  
+---  
+
+![](haddoppre.png)
+  
+---  
+
+1. Crear el directorio /metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/ con mkdir verifica la opción -p  
+
+![](mkdir.png)  
+
+---  
+
+2. Muestra que el directorio está vacío -no hay datos cargados- con ls  
+
+![](directorio_vacio_2.png)
+
+---  
+
+3. Carga los datos a este directorio que creaste ocupando copyFromLocal  
+
+![](copyfromlocal.png)
+
+---  
+
+4. Muestra que los datos están cargados haciendo un ls  
+
+![](ls.png)
+
+---  
+
+5. Muestra que el NameNode, DataNode, ResourceManager y el NodeManager están activos en tu clúster de Hadoop con jps  
+
+![](jps_2.png)
+
+---  
+
+6. Muestra la salida del reporte generado con dfsadmin report  
+
+![](dfsadmin_2.png)
+
+---  
+
+7. ¿Cuál es el % de DFS utilizado una vez que ya subiste los datos?  
+
+DFS Used%: 1.91%
+DFS Used: 1.79GB
+
+
+
+
+
+

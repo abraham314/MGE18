@@ -1,0 +1,8 @@
+day_of_week	iata_code	airline
+1	NK	Spirit Air Lines
+2	NK	Spirit Air Lines
+3	UA	United Air Lines Inc.
+4	UA	United Air Lines Inc.
+5	NK	Spirit Air Lines
+6	NK	Spirit Air Lines
+7	NK	Spirit Air Lines

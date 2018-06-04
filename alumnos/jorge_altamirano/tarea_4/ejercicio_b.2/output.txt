@@ -1,0 +1,2 @@
+flights_limit::flight_number,flights_limit::airline,flights_limit::arrival_delay,airlines::iata_code,airlines::airline
+1322,AA,1971,AA,American Airlines Inc.

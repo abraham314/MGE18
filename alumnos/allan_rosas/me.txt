@@ -1,0 +1,16 @@
+Nombre y apellidos: 
+Allan Eduardo Rosas Garcia
+
+Carrera, universidad donde la estudiaste, fecha de titulación:
+Actuaría, UNAM, 2011.
+
+¿Estudiante de tiempo completo?
+No.
+
+Si eres de tiempo parcial agrega el nombre de la empresa en la que trabajas
+-Trabajo en Presidencia de la república y doy consultoria en temas financieros y economicos para diferentes empresas
+
+y una pequeña descripción de lo que haces en tu día a día:
+-No tengo un "business as usual" doy asesoría estadistica a diferentes dependencias del gobierno federal, 
+tengo a mi cargo proyectos propios con la CNS y como consultor hago análisis financiero y económico, 
+las actividades siemrpe dependen del proyecto pero todas estan involucradas con temas economicos financieros y datos.

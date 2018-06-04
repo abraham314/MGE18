@@ -1,0 +1,16 @@
+---
+title: "Tarea_3"
+output: html_document
+---
+
+### Parte 1
+
+Ponemos la imagen del jps una vez que conectamos el cluster
+
+![](/home/victor/Pictures/jps.png)
+
+
+Ponemos imagen localhost:8088 seleccionando la opción Nodes:
+
+![](/home/victor/Pictures/localhost.png)
+

@@ -1,0 +1,9 @@
+%pyspark
+
+# 1a. ¿Cuántos "jefes" hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? 
+
+id_jefes = empleados.select("reportsto").distinct().select("reportsto").rdd.flatMap(lambda x: x).collect()
+
+jefes = empleados.filter(empleados.employeeid.isin(id_jefes))
+
+jefes.select('employeeid','firstname','lastname','title','birthdate','hiredate','city','country').show()

@@ -1,0 +1,266 @@
+---
+title: "Introducción Arquitectura Lambda"
+author: "Liliana Millán, liliana.millan@gmail.com"
+date: "Enero 2017"
+output: 
+  html_document:
+    df_print: paged
+    highlight: tango
+    theme: lumen
+---
+
+![](images/itam_logo.png)
+
+## Agenda {.tabset .tabset-fade .tabset-pills}
+
++ Límites de una BD tradicional
++ Propiedades deseables de un sistema *'Big Data'*
++ Arquitectura Lambda 
+
+
+### Limites de una BD tradicional 
+
+**Objetivo:** Queremos identificar por qué la tecnología/arquitectura "tradicional" no es "adecuada" cuando estamos tratando con "Big Data" -en esta clase la llamaremos datos a gran escala- 
+
++ Por "tradicional" nos referimos a manejadores de basos de datos (RDBMS) sql: PostgreSQL, MySQL, Oracle, Sybase, etc.
++ Por "adecuada" nos referimos a que sea robusta y escalable
+    + Escalabilidad: Crecer la infraestructura conforme se van incrementando los datos. Existen 2 tipos de escalamient: horizontal y vertical
+        + Escalar verticalmente: mejorar el equipo actual en alguna(s) características: memoria, cpu, velocidad de procesamiento, tipo de disco, etc.
+        + Escalar horizontalmente: poner más máquinas "pequeñas" que ocupadas de manera conjunta pueden contar como escalamiento vertical
++ Evitaremos en la medida de lo posible ocupar el *buzzword* Big Data ...
+
+Como referencia, los límites actuales de [Postgresql 9.6](https://www.postgresql.org/about/) son:
+
+| Métrica | Tamaño| 
+|:--------------------------------------------|:----------------------------------------------|
+| Máximo tamaño de base de datos| sin límite| 
+| Máximo tamaño de tabla| 32 TB|
+| Máximo tamaño por observación (renglón)| 1.6 TB| 
+| Máximo tamaño por campo (columna)| 1 GB | 
+| Máximo número de observaciones por tabla| sin límite|
+| Máximo número de campos por tabla | 250 - 1600 dependiendo de los tipos de columna|
+| Máximo número de índices por tabla| sin límite|
+
+
+Imagina que trabajas en una empresa de publicidad -terrible tu trabajo :(- y que están empezando la transición a publicidad digital -aunque no lo creas hay muchas empresas en México que actualmente están en esta situación- y que necesitan contabilizar como KPI el número de pageviews en todos los diferentes URL que tienen -digamos que 3000-. Cada vez que un usuario -cookie- entra a una URL de nuestra empresa nosotros debemos incrementar en 1 el número de pageviews asociados a ese URL. También necesitamos obtener el top 100 de URL con más pageviews para conocer cuáles son los sitios que más visitas tienen. 
+
+![](images/pointer.png) ¿Cómo se te ocurre que debemos diseñar la base de datos para contabilizar el número de pageviews que tienen por URL? 
+
+![](images/sql_design.png)
+
+<br>
+
+Todo va muy bien en el negocio, pero estamos teniendo tanto exito en las páginas asociadas que de pronto vemos en el *log* de nuestra aplicacion -siempre ten un log!- que existen varios mensajes de error causados por "*timeout* al insertar en la BD" .... 
+
+![](images/pointer.png) ¿Qué crees que está pasando? 
+
+... la cosa es que a la BD no le está dando tiempo de insertar todas las transacciones porque están sucediendo demasiado rápido... ¿qué se te ocurre que podamos hacer? (sin salir de la tecnología tradicional)
+
+La respuesta normalmente es hacer el proceso asíncrono, para ello agregamos una cola -*queue*- que permita esperar a juntar 100 transacciones en batch y luego hacer commit a la bd en una sola transacción -worker-. Esta solución permite arreglar el problema del *timeout*, además de que si la BD se vuelve ha sobrecargar los eventos se encolarán lo que hará que la cola sea más "grande" pero los datos no se perderán (ﾉ^_^)ﾉ
+
+![](images/queue.png)
+
+Fuente: *Big Data: Principles and best practices of scalable realtime data systems*
+
+... seguimos teniendo mucho éxito en nuestras URL por lo que eventualmente el destino nos alcanza y ahora el worker no se da abasto para escribir... ¿qué se te ocurre hacer? 
+
+Normalmente la respuesta sería pongo más workers que trabajen en paralelo... pero el patrón indica que el problema no es lo que está pasando aldedor de la BD, el problema ES la BD... ¿qué podríamos hacer para mejorar el problema en la BD? 
+
+La siguiente solución en el camino a la luz es hacer *sharding* a la BD 
+
+![](images/sharding.png)
+
+Fuente: *[https://docs.oracle.com/en/database/oracle/oracle-database/12.2/admin/sharding-schema-design.html](https://docs.oracle.com/en/database/oracle/oracle-database/12.2/admin/sharding-schema-design.html)*
+
+Existen varias formas de hacer el *sharding* para saber qué observaciones van en qué *shard*, nosotros sabremos en qué *shard* va cada observación obteniendo un *hash* de la llave -id- y sacando el módulo del número de *shards* que definimios con anticipación... digamos que 4 *shards*- Para implementar esta solución tendremos que generar un pequeño script que haga el cálculo de en qué *shard* va una observación, y tener otro archivo de configuración en *algún* lado que contiene el número de shards que tienes. También tenemos que modificar nuestro cálculo de top 100 URLs pues ahora las tenemos dispersas entre nuestros diferentes *shards*. 
+
+Conforme la cantidad de datos va aumentando tendremos que ir aumentando el \# de *shards* y eso aumenta el número de cosas que tenemos que coordinar, pronto tener un solo script de *resharding* no es buena idea... pues tardamos mucho en hacer resharding por lo que hacemos el *resharding* en paralelo... lo tenemos todo bajo control... excepto que un día no había café en la oficina y por falta de cafeína se nos olvidó actualizar el número de *shards* que tenemos actualmente -en nuestro archivo de configuración- ...  ahora hay llaves mapeadas a *shards* equivocados actualizando el \# de pageviews a URLs equivocadas (╯°□°)╯︵ ┻━┻
+ahora tendremos que arreglar el problema a mano identificando cuáles fueron las llaves en las que nos equivocamos... suerte :( 
+
+Eventualmetne llegaremos al problema de que tenemos tantos *shards* que alguna de las máquinas donde tenemos la BD -ya hasta tenemos varias máquinas!- tenga problemas en el disco y que por un momento la máquina no esté disponible para actualizaciones a ese *shard*, para solventar esto tendremos que agregar a nuestra arquitectura otra cola de transacciones pendientes para que no se pierdan y que solo sea utilizada si la máquina a la que tienen que hacerse las actualizaciones está temporalmente inactiva... y para no afectar la visibildad del conteo en el front end aprovechamos la propiedad de replicación de nuestra BD y ponemos un esclavo a cada *shard* en forma de *backup* para que cuando el *master* no este disponible el esclavo pueda devolver al front end el \# de pageviews por URL -no actualizaremos en el slave!, es solo réplica-
+
+$\rightarrow$ ... esto ya se complicó mucho para un sistemita de conteo de pageviews ... ¿qué salió mal?
+
++ La BD no "sabe" que es distribuida por lo que nosotros nos tenemos que hacer cargo de implementar un contexto artificial de BD distribuida
++ Nuestro sistema no está diseñado para poder lidiar con errores humanos y de esos **siempre** va a haber!! 
++ El sistema mientras "evoluciona" debido a la cantidad de datos que maneja se vuelve cada vez más complejo y más propenso a tener errores en diferentes puntos 
+
+$\rightarrow$ ... introduciendo técnicas de gran escala 
+
+Las técnicas/tecnologías/arquitecturas que estaremos viendo en el curso están diseñadas para administrar los problemas que surgen orgánicamente en tecnologías tradicionales al querer escalarlas para trabajar con grandes cantidades de datos. Dos de las características más importantes que tienen estas tecnologías serán: 
+
+1. Las BD de gran escala -normalmente NoSQL- son por naturaleza distribuidas por lo que gestionan el *sharding*, la replicación y todo el trabajo relacionado por nosotros. Los *frameworks* de gran escala también son distribuidos ╭(◔ ◡ ◔)/
+2. La forma en la que se almacenan los datos requiere hacer los datos inmutables, por lo que guarmdaremos los datos en la manera mas *raw* posible -lo veremos más adelante-. Esto requiere de cambiar el *mindset* natural de diseñar los esquemas de almacenamiento de datos de forma que resuelvan las necesidades operativas en un diseño pensado en *análisis*
+
+<div style="background-color:#ffcf40">
+
+$\rightarrow$ No debemos olvidar que nada es gratis en esta vida, estas tecnologías implican sacrificios en alguno(s) de los atributos de calidad que se especifican en la arquitectura de software de un sistema, por lo que se deben tomar en cuenta al momento de diseñar y seleccionar entre todas las tecnologías disponibles, cada caso es único, pero con la arquitectura lambda podremos generalizar lo suficiente para tener los cimientos que necesitaremos. 
+
+</div>
+
+### Propiedades deseables de sistemas de gran escala
+
+Al diseñar un sistema de gran escala debemos tener en cuenta tanto la complejidad del sistema como la escalabilidad del mismo -siempre van juntas-
+
+1. **Robustez y tolerancia a fallos:** El sistema debe funcionar a pesar de que algunas máquinas se encuentren abajo o no estén funcionando. SIEMPRE debemos hacer el sistema tolerante a fallos de humanos
+2. **Baja latencia en lectura y actualización:** Normalmente se requiere baja latencia en escritura -cientos de milisegundos- mientras que la latencia de actualización varía. Deberemos lograr baja latencia en actualizaciones cuando se requiera sin comprometer la robustez del sistema  
+3. **Escalabilidad:** Tenemos que mantener el desempeño del sistema al incrementar el volúmen de datos
+4. **Generalización** El diseño debe generalizarse para que se pueda usar en diversas aplicaciones: aplicaciones financieras, análisis de contenidos sociales, redes sociales, etc.
+5. **Extensabilidad:** Agregar funcionalidad al sistema con un costo de desarrollo mínimo -en tiempo, recursos y complejidad-
+6. **Queries ad-hoc:** Poder *minar* los datos arbitrariamente nos birnda la oportunidad de buscar optimizaciones de negocio en las que aún no hemos pensado $\rightarrow$ esta propiedad es de las que más nos interesa como científicos de datos...
+7. **Mantenimiento mínimo:** Nos referimos al trabajo que se requiere para mantere un sistema corriendo *smoothly*, eso incluye aumentar el número de máquinas antes de necesitarlas -cluster dinámico/elsástico-, tener todos los procesos arriba y corriendo y *debuggear* lo que salga mal en producción
+8. **Debugueable:** Poder trazar para cada valor del sistema las causas de que tomara ese valor
+
+
+### Arquitectura Lambda
+
+No hay una sola herramienta que provea una solución completa a todos los problemas vistos, se requiere de utilizar una variedad de herramientas y técnicas para que un sistema de gran escala cumpla con todas las propiedades mencionadas.
+
+La arquitectura lambda se basa en la idea de tener capas donde cada una satisface un subconjunto de las propiedades de los sistemas de gran escala y construye sobre la funcionalidad habilitada por las capas inferiores. 
+
+Todo incia de la ecuación $$\text{query}=\text{function(all data)}$$
+
+![](images/lambda_architecture.png)
+
+Fuente: *[https://www.safaribooksonline.com/library/view/big-data-principles/9781617290343/kindle_split_007.html][https://www.safaribooksonline.com/library/view/big-data-principles/9781617290343/kindle_split_007.html]*
+
+Quisieramos poder resolver esta ecuación de manera eficiente e idealmente "al vuelo", pero aunque esto fuera posible sería computacionalmente muy caro, veamos cómo lo resolvemos con la arquitectura lambda.
+
+#### 1. Batch layer
+
+**Propiedades:** 
+
+1. Debe ser capaz de guardar una copia inmutable y en constante crecimiento de nuestro dataset
+2. Debe poder calcular funciones arbitrarias sobre nuestro dataset. La salida de este punto son *batch views* pre calculadas sobre el dataset. 
+
+Para cumplir con estos 2 puntos se ocupan sistemas de procesamiento en batch -Hadoop es el sistema de referencia de este tipo- 
+
+**Características:** 
+
++ Tiene una **alta latencia** pues requiere de correr una función sobre todo el dataset para generar las *batch views*
++ Para cuando terminamos de procesar una batch view ya hay nuevos valores! y los queries que ejecutemos sobre los *batch views* estarán desfasados de los datos por varias horas... atenderemos este problema en capas más arriba.
++ Esta capa escala horizontalmente agregando más máquinas para poder hacer el procesamiento en paralelo -usaremos MapReduce ;)-
++ Entradas: El dataset en crudo lo más *raw* posible -lo veremos más adelante- y en constante crecimiento
++ Salidas: *Batch views*
+
+Entonces, lo que queremos hacer en esta capa se puede representar de la siguiente manera: 
+
+$$\text{batch view}=\text{function(all data)}$$
+$$\text{query}=\text{function(batch_view)}$$
+
+El resumen de lo que queremos hacer en esta capa se puede representar en el siguiente pseudo-código: 
+
+```
+function runBatchLayer():
+  while(true):
+    recomputeBatchViews()
+```
+
+Ejemplo: En nuestro sistema de conteo de pageviews por URL; queremos obtener el número de pageviews por URL en un cierto rango de días. 
+
++ Forma tradicional: Buscar las URL de las que queremos obtener los pageviews en los rangos de fecha deseados sobre toda la base de datos -si tenemos petabytes... estaremos fritos!!- 
++ Arquitectura lambda: Corremos una función en todos los pageviews para precalcular un índice con la llave $[url, day]$ y contar el número de pageviews asociados generando un *batch view* de todo el dataset, para obtener la respuesta a nuestro query buscamos sobre este *batch view* todos los días que están en el rango y sumamos los conteos.
+
+
+#### 2. Serving layer
+
+**Propiedades:** 
+
++ Poner disponibles a consultar aleatoriamente las vistas generadas por la capa anterior -*batch layer*- 
++ Actualizar las *batch views* en cuanto hay nuevas generadas por el *batch layer*
+
+**Características:** 
+
++ Base de datos distribuida especializada para poder hacer **lecturas** aleatorias a las vistas *batch*
++ **NO** se requiere que esta BD permita hacer **escritura** aleatoria a las vistas *batch*, esto hace que estas BD sean bastante simples, lo que hace de estas BD que sea robustas, predecibles, fáciles de configurar y fáciles de operar ＼(＾O＾)／. Ejemplo de estas BD son: [ElephantDB](https://github.com/nathanmarz/elephantdb), [HBase](https://hbase.apache.org/)
++ Entradas: Las vistas *batch* de la capa anterior 
+
+#### Verificación de propiedades del sistema en las 2 primeras capas
+
+1. **Robustez y tolerancia a fallos:** 
+
++ Hadoop gestiona el proceso de *failover* cuando alguna(s) máquinas se caen 
++ La capa *serving* usa replicación como proceso que esta corriendo por debajo para asegurar disponibilidad de los datos cuando alguna máquina se cae
++ Tanto la capa de *batch* como la *serving* son tolerantes a fallos humanos porque almacenan los datos de forma inmutable = en la forma más "cruda" posible, de esta forma si algo salió mal podemos corregir el algoritmo y borrar los datos generados del mismo 
+
+2. **Baja latencia en lectura y actualización:** No se cumple :(
+
+3. **Escalabilidad:** 
+
++ La capa de *batch* y la de *serving* son sistemas distribuidos y escalarlos es muy sencillo agregando máquinas -escalamiento horizontal-
+
+4. **Generalización** 
+
++ La arquitectura descrita en ambas capas es lo más general posible, es posible calcular y actualizar vistas arbitrarias de un set de datos arbitrario
+
+5. **Extensabilidad:** 
+
++ Se puede agregar una vista agregando una nueva función a los datos -$\text{query}=\text{function(all data)}$-
++ Se pueden agregar nuevos tipos de datos al dataset ya que el master dataset puede contener datos arbitrarios
++ No tenemos que mantener diferentes versiones de las vistas solo se deja 1 -es posible cambiar la vista sin problema, pero eso genera una nueva vista-
+
+6. **Queries ad-hoc:** 
+
++ La capa de *batch* es la que recibe los queries de manera orgánica, nos facilita el que todos los datos están en un "mismo" lugar
+
+7. **Mantenimiento mínimo:** 
+
++ El componente principal hasta estas 2 capas es Hadoop, sin embargo Hadoop no es "tan" difícil de aprender en adminstración -un ingeniero de datos lo administra sin problemas-
++ En la capa *serving*, como tenemos BDs que no tienen que escribir aleatoriamente se baja por mucho su complejidad y admininstración... pocas cosas pueden salir mal
+
+8. **Debugueable:** 
+
++ Por la composición de esta arquitectura tendremos las entradas y salidas de todos los cálculos realizados en la capa *batch*. En una BD tradicional una salida puede actualizar la entrada original -por ejemplo al incrementar los pageviews- ... es es un problema en el *debugging* pues perdemos los datos originales.
+
+#### 3. Speed layer
+
+**Propiedades:**
+
++ Compensar la alta latencia de las otras dos capas
++ Algoritmos de incremento rápido
++ La capa *batch* eventualmente hace *override* de esta capa
+
+Esta capa permite tener un sistema en tiempo real, lo que implica aplicar funciones arbitrarias sobre datos arbitrarios en tiempo real. Su objetivo es asegurar que los nuevos datos estén representados en funciones de búsqueda tan rápido como lo requiera la aplicación.
+
+Se puede pensar como la capa *batch* en el sentido de que provee "vistas" de datos basadas en los datos que recibe con la diferencia de que **solo** ve datos recientes mientras que la *batch* ve *todos* los datos en una vez.
+
+Para evitar tener una alta latencia, esta capa actualiza las vistas de tiempo real -*realtime views*- como va recibiendo nuevos datos en lugar de volver a calcular desde 0 como lo hace la capa batch. Esta capa hace procesamiento incremental en lugar de reprocesamiento.
+
+Una vista en tiempo real -*realtime view*- es actualizada basada en los nuevos datos y en la vista de tiempo real existente, esto es: 
+
+$$\text{realtime view}= \text{function(realtime view, new data)}$$
+
+**Características:** 
+
++ Utiliza BD que permiten tener lectura y escritura aleatoria. Debido a que aquí si se requiere escritura aleatoria las BD ocupadas en esta capa son mucho más complejas que las ocupadas en la capa *serving* tanto en implementación como en operación. 
++ Los resultados de esta capa son efímeros. Una vez que los datos llegan a la capa *serving* a través de la capa *batch* las vistas correspondientes a esos datos en la capa *speed* ya no se necesitan, por lo que se pueden descartar estas piezas de la vista *realtime*. Esta propiedad se conoce como -*complexity isolation*- y significa que la complejidad se encuentra en una sola capa -no en todas las capas- además de que en la capa en la que se encuentra los resultados son temporales, si algo sale mal se puede descartar el estado completo de la capa *speed* y todo volverá a la normalidad en unas horas.
+
+Tecnologías en esta capa: 
+
+Storm, SQLStream, Spark, Kafka, etc.
+
+Continuando con nuestro ejemplo de conteo de *pageviews*: La capa *speed* tiene una vista separada de $[url, day]$ para contar los pageviews. En la capa *batch* se cuenta literalmente cada observación de pageviews mientras que en la capa *speed* se actualiza en cuanto llega una nueva observación. Para resolver el query debemos buscar tanto en la capa *batch* como en la *speed* para después sumar los resultados obtenidos de ambas capas. 
+
+![](images/pointer.png) ¿Tiene sentido? ¿Por qué necesitamos ver en ambas capas?
+
+La separación en ambas capas nos permite ocupar algoritmos exactos en la capa *batch* y aproximaciones en la capa *speed*, eventualmente la aproximación en la capa *speed* se corrige debido a que la *batch* continuamente actualiza la capa *speed* lo que hace que se cumpla la propiedad *eventual accuracy*.
+
+Un ejemplo de algoritmos exactos/aproximaciónes utilizado en *profiling* es hacer un conteo del número de observaciones de una tabla, el algoritmo exacto consiste en hacer un `count()` mientras que la aproximación consisten en hacer un `HiperLogLog`. La solución exacta puede tardar mucho tiempo en ser calculada si se tienen "muchos" datos, mientras que la segunda es una aproximación al orden de magnitud sin conocer exactamente el número de observaciones pero se obtiene de manera muy rápida. 
+
+Con esta capa completamos las 8 propiedades que un sistema de gran escala debe cumplir agregando una baja lantencia en lectura y actualización 
+
+La arquitectura lambda con las 3 capas queda entonces de la siguiente manera: 
+
+$$\text{batch view} = \text{function(all data)}$$
+
+$$\text{realtime view} = \text{function(realtime view, new data)}$$
+
+$$\text{query} = \text{function(batch view, realtime view)}$$
+
+
+![](images/lambda_arq.png)
+
+Fuente: Libro Big Data: Prnciples and best practices of scalable realtime data systems
+
+
+

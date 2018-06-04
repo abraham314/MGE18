@@ -1,0 +1,4 @@
+f.day_of_week,a.airline,minimo
+2,Alaska Airlines Inc.,0
+2,American Airlines Inc.,0
+2,American Eagle Airlines Inc.,0

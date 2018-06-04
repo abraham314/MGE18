@@ -1,0 +1,2 @@
+delay	f.day_of_week	f.airline	al.airline
+-14.222222222222221	1	VX	Virgin America

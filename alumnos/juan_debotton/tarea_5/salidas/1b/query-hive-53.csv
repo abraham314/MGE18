@@ -1,0 +1,3 @@
+b.employeeid,a.num_orders,b.firstname,b.lastname,b.title,b.hiredate
+4,156,Margaret,Peacock,Sales Representative,5/3/93
+3,127,Janet,Leverling,Sales Representative,4/1/92

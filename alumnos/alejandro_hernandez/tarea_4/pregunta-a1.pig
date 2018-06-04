@@ -1,0 +1,11 @@
+products = load 's3://aws-alex-03032018-metodos-gran-escala/datos/products.csv' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+order_details = load 's3://aws-alex-03032018-metodos-gran-escala/datos/order_details.csv' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+group_orders = group order_details by productid;
+count_products = FOREACH group_orders GENERATE group as productid, COUNT($1) as n;
+ranked = rank count_products by n DESC;
+limited_rank = limit ranked 10;
+join_order_products = JOIN limited_rank by productid, products by productid;
+resultado = FOREACH join_order_products generate rank_count_products,productname,n;
+resultado_ordenado = ORDER resultado by $0;
+resultado_final = limit resultado_ordenado 1;
+STORE resultado_final INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_a' USING PigStorage(';');

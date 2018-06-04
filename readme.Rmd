@@ -1,0 +1,116 @@
+---
+title: "Readme"
+author: "Liliana Millán"
+date: "December 27, 2017"
+output: html_document
+---
+
+![](images/itam_logo.png)
+
+
+
+### Reglas del juego
+
++ Clase: Martes de 19 a 22 RH105
++ Calificación 
+    + Tareas 30%:
+        + Las tareas se entregan en el repositorio de la clase -con solicitud vía pull request-
+        + -0.5 por cada día de retraso
+        + Equipos de mínimo 3 personas
+    + Proyecto 1: 35% 
+        + Equipos de mínimo 3 personas
+    + Proyecto 2: 35% 
+        + Equipos de mínimo 3 personas
++ Canales de comunicación: 
+    + Principalmente slack -trato de contestar lo más pronto posible-, nuestro workspace es: **metodos-gran-escala**
+    + Correo -me tardaré más tiempo en contestar :(- liliana.millan@gmail.com 
+
+### Temario 
+
+|Sesión|Fecha|Tema|
+|:----:|:----:|:-------------|
+|1|16 enero 2017|Introducción arquitectura Lambda|
+|2|23 enero 2017|Batch layer - Hadoop - HDFS|
+|3|30 enero 2017|Batch layer - Hadoop - HDFS, MapReduce|
+|4|6 febrero 2017|Batch layer - Hadoop - MapReduce|
+|5|13 febrero 2017|Batch layer - Sqoop, Pig, Hive|
+|6|20 febrero 2017|PaaS - AWS|
+|7|27 febrero 2017|Batch layer - AWS, Pig|
+|8|6 marzo 2017|Batch layer - Hive|
+|9|13 marzo 2017|Batch layer - Spark SQL 1\*|
+|10|20 marzo 2017|Batch layer - Spark SQL, Zeppelin|
+|11|27 marzo 2017|ASUETO|
+|12|3 abril 2017|Spark ML|
+|13|10 abril 2017|Spark ML, Spark Streaming|
+|14|17 abril 2017|Spark Streaming|
+|15|24 abril 2017|Luigi|
+|16|1 mayo 2017|ASUETO|
+|17|8 mayo 2017|Dask|
+|18|15 mayo 2017|Proyecto 2\*|
+
+\* La fecha no es definitiva es solo una referencia, depende de cómo avancemos en los temas
+
+
+### Requerimientos 
+
++ Todo el material del curso está desarrollado para ser ejecutado en **Ubuntu 16.4** nativo utilizando **python 3.5.2**
++ Se recomienda **ampliamente** utilizar [pyenv](https://github.com/pyenv/pyenv) o [docker](https://www.docker.com/) para tener en el ambiente/imagen todas las tecnologías que vayamos ocupando sin tener que romper tu ambiente 
++ Cuentas con un glosario de términos en el archivo `glosario.Rmd` para conocer el significado y pequeña explicación de acrónimos o conceptos ocupados durante la clase
+
+### Bibliografía 
+
+Todo el contenido de este curso está basado en estos 3 libros que aconsejo los tengan como parte de su biblioteca de referencia:
+
++ *[Big Data: principles and best practices](https://www.amazon.com.mx/Big-Data-Principles-Practices-Real-Time/dp/1617290343/ref=sr_1_1?s=books&ie=UTF8&qid=1514430912&sr=1-1&keywords=big+data+principles+and+best+practices)* by Nathan Marz and James Warren, O'Reilly 
++ *[Hadoop Application Architectures](https://www.amazon.com.mx/Hadoop-Application-Architectures-Mark-Grover/dp/1491900083/ref=sr_1_1?ie=UTF8&qid=1514430775&sr=8-1&keywords=hadoop+application+architectures)* by Mark Grover, Ted Malaska, Jonathan Seidman and Gwen Shapira, O'Reilly 
++ *[Advanced Analytics with Spark](https://www.amazon.com.mx/Advanced-Analytics-Spark-Sandy-Ryza/dp/1491912766/ref=pd_sim_14_5?_encoding=UTF8&psc=1&refRID=SZS6V8W2MCE5E3KJ0C2X)* by Sandy Ryza, Uri Laserson, Sean Owen and Josh Wills, O'Reilly 
+
+![](images/big_data_book.png)
+
+<br>
+
+![](images/hadoop_book.png)
+
+<br>
+
+![](images/spark_book.png)
+
+<br>
+
+### Presentaciones
+
++ Nombre
++ Maestría que estas estudiando
++ Semestre en el que estas
++ ¿Tiempo completo o tiempo parcial?
++ ¿Último semestre?
+
+
+### Tarea 1 
+
+**Fecha de entrega:** Lunes 22 enero 2018 máximo 23:59:59 CST
+
++ Enviar correo a liliana.millan@gmail.com con tu usuario de git para agregarte al repo 
++ Una vez que aceptas ser colaborador del repo crea tu carpeta debajo de la carepta `alumnos` con el siguiente formato: `nombre_apellido` todo en minúsculas
++ Agrega un archivo `equipo.txt` que contenga: 
+    + Nombre, apellidos y matrícula de cada miembro de tu equipo
++ Agrega un archivo `me.txt` que contenga: 
+    + Nombre y apellidos
+    + Carrera, universidad donde la estudiaste, fecha de titulación
+    + ¿Estudiante de tiempo completo? 
+        + si eres de tiempo parcial agrega el nombre de la empresa en la que trabajas y una pequeña descripción de lo que haces en tu día a día
++ Agregaré la cuenta de donde me envies tu correo al workspace de slack
+    + una vez que estes en el slack porfavor cambia la imagen asociada a tu cuenta a una en la que aparezcas tu -en particular tu cara- **no haré uso de esta imagen**, la ocupo para aprenderme los nombres de cada uno...
++ Genera un pull request para que pueda subir tus cambios 
+
+
+¿Qué se califica? 
+
++ Se agrega carpeta con el nombre en el formato correcto: 1
++ Se agrega el archivo `equipo.txt` con los requerimientos solictiados: 1
++ Se agrega el archivo `me.txt` con los requerimientos solicitados: 1 
++ Se envia usuario de git para enviar invitación de colaboración: 1
+
+**Total: 4**
+
+

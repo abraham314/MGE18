@@ -1,0 +1,19 @@
+%pyspark
+
+# 2e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana? 
+
+vuelos = vuelos.withColumnRenamed('AIRLINE', 'IATA_CODE')
+
+vuelosaerolinea = vuelos.join(aerolineas, vuelos.IATA_CODE == aerolineas.IATA_CODE, 'left_outer').select(vuelos.DAY_OF_WEEK, vuelos.DEPARTURE_DELAY, aerolineas.AIRLINE)
+
+retrasosprom = vuelosaerolinea.groupBy("AIRLINE", "DAY_OF_WEEK").avg("DEPARTURE_DELAY").orderBy('avg(DEPARTURE_DELAY)', ascending = False)
+
+resultado = retrasosprom.groupBy("DAY_OF_WEEK", "AIRLINE").max("avg(DEPARTURE_DELAY)").orderBy('max(avg(DEPARTURE_DELAY))', ascending = False)
+
+resultado1 = resultado.groupBy("DAY_OF_WEEK").max("max(avg(DEPARTURE_DELAY))")
+
+resultado1 = resultado1.withColumnRenamed('max(max(avg(DEPARTURE_DELAY)))', 'retraso_prom_max')
+
+retrasosprom = retrasosprom.withColumnRenamed('avg(DEPARTURE_DELAY)', 'retraso_prom')
+
+resultado_final = resultado1.join(retrasosprom, resultado1.retraso_prom_max == retrasosprom.retraso_prom, 'left_outer').select(resultado1.DAY_OF_WEEK, resultado1.retraso_prom_max, retrasosprom.AIRLINE).orderBy("DAY_OF_WEEK", ascending = True).show()

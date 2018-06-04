@@ -1,0 +1,791 @@
+---
+title: "Hadoop"
+author: "Liliana Millán, liliana.millan@gmail.com"
+date: "Enero 2018"
+output: 
+  html_document:
+    df_print: paged
+    highlight: tango
+    theme: lumen
+---
+
+![](images/itam_logo.png)
+
+## Agenda {.tabset .tabset-pills .tabset-fade}
+
++ Teorema CAP 
++ Hadoop
+    + Arquitectura
++ HDFS
+    + Arquitectura
+    + Diseño de esquema
+    + Estrategia de almacenado
+    + Shell commands
+    + Tarea 2
++ Yarn
++ MapReduce
+    + Arquitectura
+    + Ejemplo
+    + Tarea 3
++ Referencias
+
+### Teorema CAP
+
++ **C**onsistency:
++ **A**vailability:
++ **P**artition tolerance:
+
+Normalmente se asocia con esta imagen
+
+![](images/cap_theorem.png)
+<br>
+
+Pero en palabras del autor del teorema esta imagen y la interpretación de la misma está equivocada. En realidad este teorema se refiere a que en las bases de datos distribuidas NoSQL se tiene el dilema **temporal** de escoger entre la A y la C. 
+
+En los sistemas distribuidos la A se logra replicando los datos entre todas las máquinas que forman parte del clúster, la C se logra actualizando varios nodos antes de permitir más lecturas y la P se refiere a que si hay una falla en alguna parte del sistema el sistema sigue procesando correctamente. Si hay un *delay* entonces es cuando tenemos que escoger entre la A y la C temporlamente:
+
++ En sistemas en donde durante el *temporary partitioning* se permite leer datos de los nodos antes de actualizarlos se privilegia la A
++ En sistemas en donde durante el *temporary partitioning* se actualiza los nodos antes de permitir la lectura se privilegia la C
+
+
+### Hadoop 
+
+![](images/hadoop_logo.png)
+<br>
+
+Hadoop es un *framework* de Apache -no un producto- que forma parte del [Apache Software Foundation](https://www.apache.org/) que permite hacer procesamiento distribuido de datos de gran escala. En ese contexto distribuido se refiere a que el procesamiento se realiza en un clúster de computadoras. 
+
+La ventaja de este framework es que su diseño es por naturaleza distribuido lo que significa que no depende del *hardware* para ser de alta-disponibilidad, más bien está diseñado para detectar y manejar fallas en las máquinas del clúster. 
+
+**Caracterísicas:**
+
++ Está hecho en Java
++ Esta diseñado para correr en ambientes distribuidos, no hace falta que el desarrollador implemente funciones de bajo nivel para administrar la distribución, el framework ya lo hace por nosotros
++ Es tolerante a fallas de hardware
+
+#### Arquitectura 
+
++ **Hadoop common:** Utilerías comunes a todos los módulos de Hadoop
++ **Hadoop Distributed File System (HDFS):** Sistema de archivos distribuido que provee alto flujo -*high-throughput*- de acceso a los datos de una aplicación/dataset 
++ **Hadoop Yarn:** Framework para *job scheduling* y administración de los recursos del clúster -orquestador-
++ **Hadoop MapReduce:** Sistema basado en YARN que permite el procesamiento en paralelo de dataset de gran escala
+
+
+### HDFS
+
+Se utiliza como punto de entrada a Hadoop pues es donde almacenamos los datos que queremos procesar en múltiples archivos. Cuando se carga a HDFS un set de datos éste es dividido en múltiples bloques que serán almacenados de forma distribuida replicándose al menos en 3 nodos que forman parte del clúster.
+
+**Objetivos:** 
+
++ Tolerancia a fallas de hardware: Una instancia de HDFS puede estar conformada por cientos o miles de máquinas cada una guardando una parte de  los archivo. Como tenemos muchas máquinas es muy probable que algunas de ellas fallen por lo que HDFS está diseñado para detectar fallas y tener una recuperacinó automtáica y rápida
++ HDFS está diseñado para procesamiento en *batch* **no** para el uso interactivo de usuarios $\rightarrow$ no está diseñado para *streaming*!
++ Datasets de gran escala: El tamaño de un archivo típico en HDFS es de gigabytes o terabytes. HDFS, está tuneado para trabajar con datasets de gran escala, puede tener decenas de millones de archivos en una sola instancia ╭(◔ ◡ ◔)/
++ Modelo de coherencia simple: HDFS requiere un modelo de acceso a archivos de escribir una vez y leer múltiples veces. Esta propiedad implica que no se puede agregar datos a un archivo una vez que es creado, escrito y cerrado
++ Mover el cómputo es mejor que mejor los datos: Cuando una aplicacinó solicita hacer algún procesamiento este es más eficiente si sucede "cerca" de donde están los datos a los que se tienen que procesar-sobretoo si los datos son de gran escala!-. HDFS provee interfaces para que la aplicación se muevan cerca de donde están los datos que se requieren procesar O.o o.O
++ Portabilidad: HDFS está diseñado para ser portado entre plataformas diferentes de manera sencilla, lo que facilita el uso de este framework.
+
+#### Arquitectura
+
+HDFS tiene una arquitectura maestro/esclavo con los siguientes elementos:
+
+1. **Name Node:** El server maestro que administra el sistema de archivos y regula el acceso de los clientes a los archivos.
+  + Tiene la metadata, la información de cómo los datos fueron divididos -en qué *data nodes* se encuentran- por lo que puede recrear todo el set de datos
+  + Realiza operaciones de apertura, cierre y renombramiento de archivos y directorios
+  + Determina el mapeo de los bloques a los *data nodes* -*JobTracker*-
+2. **Data Nodes:** Normalmente 1 por cada nodo, administran lo que está guardado en ellos
+  + Responsables de atender las peticiones de escritura y lectura de los clientes del sistema de archivos
+  + Llevan a cabo la creación de bloques, borrado y replicación bajo instrucción del *Name Node*
+
+![](images/hdfs_architecture.png)
+
+Fuente: [http://blog.raremile.com/hadoop-demystified/](http://blog.raremile.com/hadoop-demystified/)
+
+Ambos tipos de nodo están diseñados para correr en máquinas que normalmene tienen Linux como sistema operativo, y debido a que Hadoop está hecho en Java las máquinas que forman parte del clúster con Hadoop requieren de tener Java.
+
+Un despliegue típico de una arquitectura de Hadoop ocupa un nodo para el *Name Node* mientras que el resto de las máquinas -nodos- en el clúster corren 1 instancia del programa *Data Node*.
+
+**File system namespace**
+
++ HDFS puede trabajar con una organización de archivos jerárquica tradicional -aunque físicamente no se guardan de esta manera- 
++ Como en los sistemas de archivos tradicionales en HDFS se pueden crear, borrar, renombrar y mover archivos
++ Se puede utiliar *user quotas* y permisos de acceso
++ No soporta los *soft* o *hard* links
+
+El *Name Node* es el responsable de mantener este *file system namespace*, cualquier cambio realizado en el sistema de archivos o en sus propiedades queda almacenado en el *Name Node*. El *Name node* también es responsable de administrar el número de réplicas que se generar por archivo -*replication factor*-.
+
+**Data Replication**
+
++ HDFS alamcena cada archivo como una sequencia de bloques, estos bloques son replicados en el clúster para tener tolerancia a fallas -físicas-. El tamaño de los bloques y el número de réplicas son configurables por archivo -aunque se puede establecer una configuración de ambos por default-
+
+![](images/hdfs_blocks_1.png)
+
+<br>
+
++ **Todos** los bloques de un archivo excepto el último son del mismo tamaño ... ¿por qué?. El tamaño por default es de 64MB por bloque, pero el tamaño 'óptimo' depende de la naturaleza del data set y de cómo se utilizarán los datos en la aplicación
++ Se puede especificar el número de réplicas de un archivo -normalmente se pone mínimo 3- ... ¿por qué?
++ El factor de replicación se puede especificar en el momento de la creación del archivo y se puede cambiar después. Los archivos en HDFS se escriben **una vez** (excepto por *appends* y *truncates*) y tienen estrictamente un solo *writer* por vez
++ El *Name Node* es el que toma las decisiones relacionadas a la replicación de los bloques y periódicamente recibe un *heartbeat* y un reporte de los bloques -*Blockreport*- de cada *Data Node* en el clúster. Al recibir el *heartbeat* el *Name Node* se asegura que ese nodo está "vivo" y que está funcionando correctamente, y el *Blockreport* contiene la lista de todos los bloques contenidos por *Data Node* 
+
+![](images/block_replication.png)
+Fuente: [https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html#Data_Replication](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html#Data_Replication)
+
+**Anatomía de la replicación** 
+
++ *Replica placement*
+
+Dónde se ponen las réplicas de cada bloque es un tema muy importante porque afecta el desempeño y confiabilidad -*reliability*- de HDFS. Optimizar el lugar en donde poner cada réplica requiere de mucho *tuneo* y experiencia! ... $\rightarrow$ acérquense a su ingeniero de datos de cabecera :P.
+
+Si el clúster de Hadoop es tan grande que se requiere de ocupar *racks*, el protocolo de replicación más simple consiste en poner cada réplica en diferentes *racks* esto evitará que perdamos datos si un *rack* completo se cae. Este protocolo balancea la distribución de las réplicas en el clúster pero incrementa el costo de escritura ya que se requieren transferir bloques a varios racks. 
+
+Cuándo se deja la réplica de 3 -con *racks*- se deja 1 réplica en la máquina local -si el *writer* está en el *Data Node*- o en cualquier nodo en otro caso, otra réplica en un nodo en otro *rack*, y la última en un nodo diferente en el mismo *rack* del anterior.
+
+![](images/replication_racks.png)
+
+Si el factor de replicación es mayor a 3, el *placement* de cada réplica a partir de la 4 se determina de forma aleatoria cuidando que el número de réplicas por *rack* se encuentre por debajo de su límite máximo: $(replicas -1)/(racks + 2)$ **NOTA:** Debido a que el *Name Node* no permite que haya más de una réplica de un mismo bloque en un mismo *Data Node* el máximo número de réplicas corresponde al número de *Data Nodes* en el clúster de hadoop.
+
++ *Replica selection* 
+
+Con el propósito de minimizar la latencia de lectura y el ancho de banda de red ocupado, HDFS siempre busca satisfacer una petición de lectura con la réplica del bloque que contenga los datos más cercana al que solicitó la petición. Si existe una réplica en el mismo *rack* donde se encuentra el nodo *reader* entonces se escogerá esta réplica de entre las demás disponibles. Si el cluster incluye múltiples *data centers* entonces escogerá la réplica que se encuentre en el *data center* local antes que el remoto pues es más cercano al nodo lector.
+
++ *Safemode*
+
+Cuando se levanta el cluster de Hadoop el *Name Node* entra en un estado especial llamado *Safemode*, en este estado el *Name Node* no genera réplicas de los datos, solo puede recibir *heartbeats* y *blockreports* de los *Data Node* del clúster. 
+
+El *Blockreport* contiene la lista de los *data blocks* que contiene, cada bloque tiene especificado el número mínimo de réplicas que requiere. Se considera que un bloque está replicado correctamente cuando su mínimo número de réplicas ha sido notificado al *Name Node*. Después de que se cumple un \% -configurable- de notificaciónes de réplica de un bloque al *Name Node* y después de 30 segundos el *Name Node* sale de este estado *Safemode*, luego determina cuáles bloques no cumplen con el mínimo % de replicación para iniciar su replicación a otros *Data Node*.
+
+[Socrative Room: LILIANA4084](http://www.socrative.com/login/student)
+
+#### Schema design
+
+Una de las primeras cosas que hay que definir para ocupar HDFS es el diseño del esquema -la jerarquía y grupos que ocuparemos en el sistema de archivos-. Un diseño simple de directorios puede ser:
+
+
+```
+|- user
+|- etl
+|- tmp
+|- data
+|- app
+|- metadata
+```
+
++ `/user/<username>` 
+
+En este directorio se encuentran los archivos, datos de configuración específicos a un usuario. Los archivos que están aquí **no** son ocupados como parte del proceso de negocio y son solo ocupados por el dueño de los mismos -por eso el username-. Por ejemplo: Archivos con los que se está jugando en un pequeño proceso y con los que queremos primero experimentar, o salidas específicas a este usuario.
+
++ `/etl`
+
+En este directorio se encuentran los datos que están en alguno de los procesos de algún *etl*. Se recomienda tener una organización dentro de esta carpeta por grupo de la empresa que tenga algún proceso de *etl*, la aplicación asociada y el proceso que se realiza `etl/<group>/<application>/<process>`. 
+
+```
+|- etl
+|--- group
+|----- application 
+|------- process
+```
+
+También se recomienda agregar al final un subdirectorio `bad` para dejar en este directorio aquellas observaciones que no pudieron ser procesadas correctamente -recuerda que no queremos perderlas...-
+
+Por ejemplo: 
+
+```
+|- etl
+|--- bi
+|----- clickstream
+|------- deduplication
+```
+
++ `/tmp`
+
+En este directorio se guardan **temporalmente** archivos que pueden ser salidas/entradas de otros procesos. Se recomienda que esta carpeta se borre automáticamente por algún *script* después de terminar el(los) proceso(s) adecuados para no tener basura acumulada que quita espacio.
+
++ `/data`
+
+En este directorio se guardan los datasets que ya han sido procesados y que se comparten en toda la organización. Debido a que estos datasets ya están limpios y varios tienen acceso se recomienda solo dar permisos de lectura -no faltará el que la cajetee y borre/actualice los datos sin querer-. La única forma de escribir a este directorio debe ser a través de algún proceso automatizado -después del etl(s) normalmente- **auditado**.
+
+Se debe agregar un directorio por cada *dataset* para identificar de qué va ese *dataset*. Por ejemplo: Si tenemos el *dataset* de ecobici y de calidad del aire de cdmx -supongamos que somos una empresa de análisis de datos- tendríamos la siguiente estructura: 
+
+```
+|- data
+|--- ecobici
+|--- calidad_aire
+|----- cdmx
+```
+
++ `/app`
+
+En este directorio se guarda todo lo que requiere una aplicación de hadoop para correr: jars , *workflow definitions*, *UDF*s -User Defined Functions, Hive-, archivos HQL -Hive-, etc.
+
+Sigue la misma estructura propuesta que en la carpeta `etl` admás de agregarle versión/tag y/o artefacto: 
+
+```
+|- app
+|--- group
+|----- application 
+|------- version
+```
+
+Ocuparemos esta carpeta cuando hagamos UDFs con Hive.
+
++ `/metadata`
+
+Este directorio guarda la *metadata* generada por algún proceso -datos de los datos- ¿qué dato de los datos se te ocurre guardar? 
+
+Normalmente este directorio tendrá permisos de lectura para procesos del ETL y de escritura para los procesos que ingestan datos a Hadoop -Sqoop-
+
+Dentro de este directorio se debe guardar el nombre del dataset al que pertenece la metada, también se puede agregar el proceso que "genera" la metadata. Por ejemplo: 
+
+```
+|- metada
+|--- ecobici
+```
+
+#### Estrategias de almacenamiento
+
+El diseño del esquema resuelve el punto de la organización de archivos, pero no resuelve el cómo guardar eficientemente los archivos en HDFS -el formato con el que serán almacenados!-. 
+
+Hay 3 estrategias para almacenar los datos: 
+
+1. **Partitioning**
+
+En las bases de datos tradicionales SQL para hacer una búsqueda más rápida se generan índices sobre los datos, estos índices se crean -normalmente- al momento de ir "llenando" la tabla de los datos, esto hace que la inserción de los datos sea lenta pero el beneficio viene al momento de hacer queries pues el DBMS no necesita hacer un *full table scan* para encontrar los registros requeridos. Esto no sucede en HDFS pues no hay indexado de datos -parte del por qué la ingestión es mucho más rápida que en una BD tradicional para grandes sets de datos- ... ¿cómo resolvemos el problema de tener que hacer un *full table scan* para encontrar ciertos registros? 
+
+La estrategia de partición requiere de hacer unas modificaciones a la forma en la que organizamos los datos en HDFS. Para hacer una partición ocupamos el `=` dentro del nombre del directorio al que queremos particionar -piénsalo como hacer índices de forma manual-. Por ejemplo: con los datos de ecobici tenemos la intuición de que será mejor separarlos por día ya que es muy seguro que queramos hacer preguntas con respecto a comportamientos por día... para hacer esta partición agregaríamos al directorio donde guardemos los datos de Ecobici:  
+
+```
+|- data
+|-- ecobici
+|---- date=20170101
+|------ datos_1.csv
+|------ datos_2.csv
+```
+
+O mejor aún
+
+```
+|- data
+|-- ecobici
+|---- year=2017
+|------ month=01
+|-------- day=01
+|----------- datos_1.csv
+|----------- datos_2.csv
+```
+
+Puedes pensar que la segunda opción es demasiado específica, pero en mi experiencia funciona mucho mejor ser más específico -de nuevo es como tener un índice por año, uno para mes, uno para día- y es más eficiente para recuperar datos $\rightarrow$ recuerda que estamos trabajando con datos de gran escala, cada optimización por más pequeña que sea es un beneficio enorme en todo el proceso :) 
+
+Esta estrategia es "entendida" por las tecnologías que normalmente se ocupan en Hadoop para poder hacer *queries* sobre los datos: Pig, Hive, Impala, HCatalog. $\rightarrow$ nosotros jugaremos con Pig y Hive (ﾉ^_^)ﾉ
+
+2. **Bucketing**
+
+La estrategia de particionamiento funciona cuando es posible particionar el set de datos de manera que muchos archivos "caen" en la partición, esto casi siempre sucede cuando los datos se organizan por fechas, pero si los datos no son organizados por fechas... la estrategia de *partitioning* no es una buena opción. Por ejemplo: Supongamos que de los datos de Ecobici queremos organizarlos -porque eventualmente preguntaremos de esa manera- por usuario de ecobici... habrá usuarios que casi no ocupan Ecobici, mientras que hay otros muy comprometidos con el medio ambiente que lo ocupan todos los días... u otros que no les queda de otra :P ... en estos casos en los que es posible que haya **pocos archivos** por partición se ocupa la estrategía *bucketing*. 
+
+En esta estrategía se genera un número de buckets -normalmente potencias de 2- y un hash a la variable por la que queremos "particionar" para saber en qué cubeta debe quedar -un buen tamaño de cubeta puede ser de algunos múltiplos del tamaño del bloque en HDFS, esto hará que las cubetas estén bien distribuidas-.
+
+Esta estrategia también beneficia el uso de *joins* entre diferentes datos ... ya veremos más adelante que hacer un *join* en *MapReduce* no está tan sencillo, aunque esta operación la podemos hacer desde Pig, Hive, Spark sin necesidad de quebrarnos la cabeza con el MapReduce ;). Cuando los datos que se quieren unir a través de un *join* se encuentran en *buckets*, su llave es la columna por la que quieren hacer *join* y uno de los dos *buckets* es múltiplo del otro se tiene la ventaja de no necesitar juntar todo el set, sino solo cada *bucket* individual lo que reduce significativamente el tiempo de procesamiento.
+
+Se recomienda que las tablas que sean muy largas -en SQL tradicional- se guarden en *bucketing* utilizando como llave para hacer el *bucketing* la variable con la que normalmente se le hace *join* a otras tablas.
+
+
+3. **Denormalizing**
+
+Con la estrategia de *bucketing* identificamos que los *join* pueden ser un problema en una arquitectura de Hadoop, pues son muy caros computacionalmente -requieren muchos recursos del cluster- y corresponden al conjunto de operaciones más lentas en Hadoop. Una solución para esto es "no tener que hacer joins" y para evitar tener que hacer *joins* tenemos que denormalizar los datos. 
+
+En una BD tradicional los datos se guardan en tercera forma normal -3NF- asegurando que no haya redundancia en los datos y resguardando su integridad en las operaciones que se realizan sobre los mismos -actualizaciónes principalmente-. Esta forma de guardar los datos provoca tener que hacer *joins* entre diferentes tablas para encontrar más variables/atributos que necesitamos que formen parte de la respuesta de nuestro *query*. Para evitar hacer estos joins, esta estrategia plantea denormalizar los datos -unirlos a una sola tabla que contenga todos los atributos pertenecientes a diferentes tablas. Esto implica hacer el *join* antes de guardar los datos $\rightarrow$ en el ETL!!! :)
+
+
+El simil más parecido a lo que estamos haciendo con estas estrategias en BD tradicional operativa son las famosas vistas materializadas...
+
+![](images/pointer.png) Notarás que en Hadoop no nos importa el espacio que ocupen los datos, ni repetirlos para guardarlos en diferentes estrategias de alamacenamiento... nos importa la forma en la que los guardamos para optimizar su lectura y procesamiento en capas más arriba :). Denormalizar en una BD tradicional es un **pecado capital** además de que te tildan de ignorante :/ pero pues en ese mundo operativo tiene todo el sentido del mundo normalizar, en el nuestro NO!. 
+
+
+#### Tipos de archivos
+
++ **AVRO** 
+    + Proyecto de Apache
+    + Un lenguaje de serialización de datos neutral: los datos son descritos a través de un esquema independiente de lenguaje 
+    + Guarda el esquema de los los datos -tipos de datos: numérico, string, etc.- en el header de cada archivo para que siempre pueda ser leído al mismo tiempo que los datos. Este formato es de tipo *compressible* y *splittable*, características importantes en sistemas de archivos distribuidos ya que son más eficientes en tareas de *MapReduce*
+    + Permite guardar la evolución del esquema ya que el esquema al momento de leer los datos puede ser diferente al momento de escritura -alguna manipulación en los datos puede cambiar su esquema original-
+    + Los esquemas de avro normalmente se escriben en JSON o en Avro IDL (C-ish)
+    + Utiliza tipos de datos simples y complejos: enums, arrays, maps, unions [Avro Data Types](https://avro.apache.org/docs/1.8.1/spec.html)
+    + Una de las ventajas más grandes de avro, además de que guarda el esquema, es que se puede leer por otros formatos más adelante en el proceso. Por ejemplo: Es posible leer un avro en Spark y guardarlo como parquet ＼(＾O＾)／
+
+
++ **Parquet**
+    + Proyecto de Apache
+    + Al igual que avro, es *compressible* y *splittable* 
+    + **Formato columnar preferido para manejar set de datos de gran escala**:
+        + Funciona mejor para queries que solo requieren un pequeño subconjunto del total de columnas de una tabla -de no ser así es mejor ocupar el formato por renglón tradicional-
+        + No tiene que hacer la decompresión y I/O de columnas que no forman parte del query
+        + Es eficiente en compresión porque normalmente la entropía -0 homogéneo, 1 heterogéneo- en una columna es más baja que la entropía por renglón -diferentes atributos-
+    + Permite regresar solo los atributos requeridos
+    + Eficiencia en compresión -por naturalieza-, es posible definir el nivel de compresión por columna
+    + Diseñado para soportar estructuras de datos complejas: mapas, arreglos, etc.
+    + Guarda los metadatos del archivo al final del mismo
+    + Puede leer y escribir con los API de avro ＼(＾O＾)／
+    + Utiliza un encoding de esquema eficiente
+    + Soporta tipos de datos primitivos, lógicos y *nested*
+   
+
+![](images/db_ex.png)
+
+Fuente: [https://en.wikipedia.org/wiki/Column-oriented_DBMS](https://en.wikipedia.org/wiki/Column-oriented_DBMS)
+
+![](images/columnar_format.png)
+
+<br>
+
++ **Compresión**
+
+En hadoop es importante seleccionar correctamente el formato de archivo que mejor sirva al propósito de lo que queremos hacer, seleccionar el formato incorrecto nos llevará a tener un desempeño pobre en Hadoop. 
+
+Normalmente los archivos en hdfs son almacenados en formato comprimido -recordemos que ocupamos hdfs para guardar grandes cantidades de datos!- pero debemos tener cuidado con el formato de compresión ya que hay algunos que no son *splittable* o que son *splittable* pero no secuancial -esto le poría dar en la torre a algun set de datos-. 
+
+  + **Snappy:** Formato de compresión de Google optimizado para hacer compresiones rápidas con un nivel de compresión razonable, no es *splittable* por lo que requiere de ocuparse con algún formato que lo sea -avro, parquet-
+
+  + **LZO:** También está optimizado para hacer compresiones rápidas con un nivel de compresión razonable, a diferencia de snappy, este formato si es *splittable*. Su desventaja es que no viene como parte de la distribución de Hadoop por lo que hay que hacer otra instalación :(. Formato recomendado para archivos de texto plano. 
+
+  + **GZip:** Provee muy buen nivel de compresión a costa de la velocidad de compresión -2.5 veces lo que tarde Snappy, pero casi reduce a la mitad de lo de snappy-. Es igual de bueno en desempeño de lecturas sobre hadoop pero al igual que snappy no es *splittable* por lo que requiere de ocuparse con algún formato que lo sea -avro, parquet-
+
+  + **bzip2:** Provee un nivel de compresión excelente -9% mejor que GZip- pero es mucho más lento que cualquier otro formato, además de que en desempeño de lectura/escritura ya que en promedio puede tardar 10 veces más que Gzip. Este formato es *splittable* sin embargo no es recomendado para ocuparse en Hadoop por el performance mencionado, se recomienda ocupar solo si es necesario reducir el espacio ocupado en hadoop $\rightarrow$ eso solo ocurriría si se ocupa Hadoop como simple almacenador de datos.
+
+  + Si utilizamos avro y/o parquet haremos que cualquier formato de compresión se haga *splittable* ＼(＾O＾)／ 
+
+<div style="background-color:#ffcf40">
+
+Se recomienda tener un solo formato de archivo en el cluster, y la recomendación incluye ocupar uno que permita guardar esquema, eso solo nos deja avro o parquet. Pero como es posible leer y escribir parquet desde los API de avro, por lo que podemos dejar estos 2 formatos y tener el beneficio de guardar esquemas con avro y tener los beneficios de un formato columnar con parquet.
+
+</div>
+
+#### HDFS Commands
+
+Para interactuar con el sistema HDFS siempre neceistaremos oocupar el script `hdfs`  -depende de la versión de hadoop que estes ocupando puede ser `hadoop` en lugar de `hdfs`- que se encuentra en la carpeta `bin` $\rightarrow$ `/bin/hdfs [command]` 
+
+Comandos más ocupados: 
+
++ `getconf` Permite obtener información de la configuración de HDFS `hdfs getconof [-command]`
+    + `namenodes` Lista de los *NameNodes* en el clúster
+    + `secondaryNameNodes` Lista los *NameNode* secundarios
+
++ `version` Obtiene la versión de Hadoop que estamos ocupando
+
+![](images/hdfs_version.png)
+<br>
+
++ `dfsadmin` Permite obtener información del sistema `hdfs dfsadmin [-commnad]`
+    + `report` genera un reporte del estado actual de HDFS, incluye estadísticas básicas del uso de hdfs
+    + `printTopology` imprime los racks que hay en el cluster y los nodos que hay en ellos tal cual lo reporta el *NameNode* 
+
+![](images/hdfs_report.png)
+
+<br>
+
+![](images/hdfs_topology.png)
+<br>
+
++ `dfs`  Permite ejecutar comandos a archivos guardados en el HDFS `hdsf dfs [-command [-command options]]`. Los comandos ocupados en dfs son los mismos (casi) que los ocupados en bash (ﾉ^_^)ﾉ -tonz nada nuevo aquí ;)-
+    + `ls` listar los archivos que están cargados en hdfs
+    + `copyFromLocal` subir un archivo a hdfs
+    + `copyToLocal` bajar de hdfs un archivo
+    + `put` subir varios archivos de local a hdfs
+    + `get` baja varios archivos de hdfs a local
+    + `mkdir` crear un directorio en hdfs
+    + `mv` mueve un archivo en algún lugar de hdfs a otro en hdfs 
+    + `cp` copia un archivo de algún lugar de hdfs a otro en hdfs
+    + `rm` borrar un archivos de hdfs
+    + `find` buscar los archivos que concuerden con el patrón de búsqueda en hdfs
+    
+$\rightarrow$ Lista completa de comandos de `hdfs` [HDFS Commands](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSCommands.html)
+
+$\rightarrow$ Lista completa de comandos de `hdfs dfs` [hdfs dfs commands](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html) 
+
+#### Alternativas a HDFS 
+
+##### Administración local
+
++ [Quantcast File System](http://quantcast.github.io/qfs/)
++ [OpenAFS](https://www.openafs.org/)
++ [XtreemFS](http://www.xtreemfs.org/)
+
+##### Acceso remoto
+
++ [Amazon S3](https://aws.amazon.com/s3/), la opción más ocupada por su fácilidad de uso y aprovechamos que esta en la infrastructura disponible en la nube de aws -muy barata-
++ [Google Cloud Storage](https://cloud.google.com/storage/?hl=es), si tienes tus aplicaciones/infraestructura de analítica con datos de gran escala con Google
++ [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/?v=16.50), si tienes tus aplicaciones/infraestructura de analítica con datos de gran escala con Microsoft
+
+#### Ejercicio Hadoop
+
+#### Tarea 2
+
+A entregar el **5 de febrero del 2018** máximo a las 23:59:59 CST en tu carpeta dentro de la carpeta `alumnos`
+
++ En la siguiente [carpeta de dropbox](https://www.dropbox.com/sh/u0g3g378xfdyxot/AACN77EAFN1rjNkPemkX-PWZa?dl=0) están los datos del primer semestre de Ecobici 2017 -datos de Valeria Perez Cong estudiante del ITAM-  
++ Puedes ocupar una imágen de Docker que ocupe Ubuntu 16.04 y Hadoop mínimo versión 2.7.x o puedes instalar en tu máquina hadoop :)
++ Habrá que cargar en tu hdfs el archivo de datos en la carpeta `/metodos_gran_escala/tarea_2//ecobici/year=2017/sem_1/`
+
+A entregar: 
+
++ Rmd con los pasos que seguiste, cada paso acompáñalo de una imagen de evidencia  
+    + Crear el directorio `/metodos_gran_escala/tarea_2/ecobici/year=2017/sem_1/` con `mkdir` verifica la opción `-p`
+    + Muestra que el directorio está vacío -no hay datos cargados- con `ls`
+    + Carga los datos a este directorio que creaste ocupando `copyFromLocal`
+    + Muestra que los datos están cargados haciendo un `ls`
+    + Muestra que el *NameNode*, *DataNode*, *ResourceManager* y el *NodeManager* están activos en tu clúster de Hadoop con `jps`
+    + Muestra la salida del reporte generado con `dfsadmin report`
+    + ¿Cuál es el % de DFS utilizado una vez que ya subiste los datos?
+    
+¿Qué se califica? 
+
++ Entregó Rmd **y** html: -2
++ Agregó las imágenes de la evidencia: -2
++ Si utilizaste una imágen de docker, la url de la imagen, dockerfile, el comando que ocupaste para iniciar la imagen -recuerda que necesitas ocupar un volúmen!-: -2
++ Creó el directorio correctamente (nombre y comando): 1.5
++ Mostró que está vacío el directorio creado: 1
++ Cargó los datos correctamente (comando): 1.5
++ Mostró que los datos se cargaron (comando): 1.5
++ Mostró la salida del jps: 1.5
++ Generó el reporte de dfs: 1.5
++ Indicó el % de DFS utilizado una vez que ha cargado los datos: 1.5
+
+**Total: 10** 
+
+
+### Yarn 
+
+**Y**et **a**nother **r**esource **n**egotiator. Yarn es el sistema encargado de la administración de recursos computacionales del clúster: cpu, memoria, hilos, etc. Expone una serie de APIs de bajo nivel para solicitar recursos y trabajar con ellos, el acceso a estos API no es directo al usuario, se realiza a través de aplicaciones/frameworks de cómputo distribuido que están construidos sobre YARN: MapReduce, Spark, etc. 
+
+![](images/yarn_architecture.png)
+Fuente: [Hadoop: the definitive guide](https://www.amazon.com.mx/Hadoop-Definitive-Guide-Tom-White/dp/1491901632/ref=sr_1_1?ie=UTF8&qid=1517197795&sr=8-1&keywords=hadoop+the+definitive+guide)
+<br>
+
+$\rightarrow$ Cuando ocupemos Pig y Hive nos montaremos sobre los API de MapReduce para comunicarnos con YARN ... 
+
+YARN tiene 2 elementos en su arquitectura: 
+
+1. **Resource manager**
+
++ Hay un **resource manager** por cluster, es el maestro
++ Es el que decide cómo administrar los recursos del clúster entre las aplicaciones que los solicitan
++ Sabe dónde están los esclavos -*rack awareness*- y cuántos recursos tiene cada uno
++ Tiene 2 componentes: 
+    + *Scheduler* Es el responsable de asignar los recursos a las aplicaciones que están corriendo
+    + *ApplicationsMaster* 
+        + Son responsables de aceptar solicitudes de procesamiento -*job-submissions*-, 1 sola aplicación. Negocía contenedores con el *scheduler* para correr las aplicaciones
+        + Conoce la lógica de la aplicación por lo que es específico por framework. Por ejemplo: al ocupar MapReduce como aplicación para procesar datos, el frameword de *MapReduce* provee su propia implementación de *ApplicationMaster*
+
+![](images/yarn_resource_manager.png)
+
+Fuente: [http://ercoppa.github.io/HadoopInternals/HadoopArchitectureOverview.html](http://ercoppa.github.io/HadoopInternals/HadoopArchitectureOverview.html)
+<br>
+
+2. **Node manager** 
+
++ Hay uno por nodo, son los esclavos
++ En cuanto se inicializa avisa al *Resource manager* de su existencia
++ Manda periódicamente un *heartbeat* al *Resource manager* -cómo lo hace el DataNode al NameNode-
++ Los recursos disponibles de cada *node manager* son la memoria y el número de *vcores*, el *resource manager* ocupará una fracción de lo disponible en cada *node manager* para correr aplicaciones
+
+![](images/yarn_node_manager.png)
+
+Fuente: [http://ercoppa.github.io/HadoopInternals/HadoopArchitectureOverview.html](http://ercoppa.github.io/HadoopInternals/HadoopArchitectureOverview.html)
+<br>
+
+#### Anatomía de una petición a YARN 
+
+![](images/yarn_anatomy.png)
+Fuente: [Hadoop: the definitive guide](https://www.amazon.com.mx/Hadoop-Definitive-Guide-Tom-White/dp/1491901632/ref=sr_1_1?ie=UTF8&qid=1517197795&sr=8-1&keywords=hadoop+the+definitive+guide)
+<br>
+
+![](images/yarn_process.png)
+
+Fuente: [http://ercoppa.github.io/HadoopInternals/HadoopArchitectureOverview.html](http://ercoppa.github.io/HadoopInternals/HadoopArchitectureOverview.html)
+<br>
+
+Es posible hace una reserva de recursos -*resource reservation*- para asegurar que se van a tener los recursos que se requieren una vez ejecutado un primero proceso que ocupa menos recursos. 
+
+Es posible escalar YARN a ocupar miles de nodos utilizando federación, una característica que permite juntar varios clusters de YARNs para que aparezca como si fuera uno solo -muy grande-.
+
+En la página [Powered by Apache Hadoop](https://wiki.apache.org/hadoop/PoweredBy) puedes encontrar diferentes empresas que ocupan clusters de Hadoop para su operación, Yahoo sigue siendo la que tienen el mayor clúster con ~40,000 nodos
+
+#### Alternativas a YARN
+
++ [Apache Mesos](http://mesos.apache.org/)
+
+### Hadoop browser
+
++ Puedes ver información del clúster de Hadoop en `http://localhost:50070`
+
+![](images/hadoop_50070.png)
+<br>
+
++ Puedes administrar el clúster desde `http://localhost:8088`
+
+![](images/hadoop_8088.png)
+<br>
+
+### MapReduce 
+
+#### Framework MapReduce
+
+El concepto de MapReduce fue introducido en un *white paper* de Google en 2004 [MapReduce: Simplified Data Procesing on Large Clusters ](http://static.googleusercontent.com/media/research.google.com/en/us/archive/mapreduce-osdi04.pdf). MapReduce es un paradigma de programación -un modelo de programación- creado para el procesamiento de grandes cantidades de datos a través de su procesamiento en paralelo en un clúster. El algoritmo de procesamiento está compuesto por dos fases: la fase *map* y la fase *reduce*, para ambas fases la entrada y la salida son pares `<llave, valor>`. 
+
+1. Fase *Map*
+
+A los procesos que ejecutan el *map* se les conoce como  *mappers* -proceso de Java-, normalmente hay 1 por nodo y se ejecutan en los nodos aquellos que tengan los datos sobre los que se quiere hacer el procesamiento -recordemos que en procesamiento distribuido se prefiere mover el proceso a mover los datos por el cluster ya que es muy costoso en recursos- 
+
+**Características** 
+
++ Los *mappers* procesan entrada únicamente en la estructura `<llave, valor>`
++ Los *mappers* solo pueden procesar **un** par `<llave, valor>` a la vez
++ El número de *mappers* en el cluster es configurado por el framework no por el desarrollador -aunque es posible que el desarrollador ponga un \#-, el \# de *mappers* depende del tamaño del set de datos de entrada del *job* y del tamaño de los bloques, 1 bloque por *mapper* $\rightarrow$ el \# de *mappers* de un trabajo de MapReduce es igual al número de bloques en el set de datos a procesar. Por ejemplo: Si tenemos 10TB como entrada y un *block size* de 128MB ¿cuántos *mappers* tenemos?
+    + 1 TB =  1,099,511,627,776 bytes
+    + 1 MB = 1,048,576 bytes
++ La salida de los  *mappers* son pares `<llave, valor>` que son enviados únicamente a los *reducers*
++ Los *mappers* no se pueden comunicar entre ellos
++ Los *mappers* normalmente no ocupan mucha memoria y el tamaño del *heap* -*heap size*- de la JVM (Java Virtual Machine) es relativamente bajo
+
+2. Fase *Reduce*
+
+Una vez que el procesamiento de datos se ha hecho en los *mappers*, los datos se pasan a un proceso de *sort* y *shuffle* en donde los datos son ordenados y particionados, una vez que los datos son ordenados y particionados se mandan a los *reducers*. Los proceso de *sort* y *shuffle* forman parte de la fase *reduce*.
+
+Los *reducers* -también procesos de Java- reciben los datos ordenados y particionados, hacen alguna operación(es) sobre ellos -normalmente alguna agregación- y escriben la salida a HDFS o a la opción elegida como sistema de archivos distribuidos. 
+
+**Características** 
+
++ Los *reducers* no se pueden comunicar entre ellos, solo con los *mappers* 
++ La salida de los *reducers* como en los *mappers* son pares `<llave, valor>`
++ Normalmente cada *reducer* tiene una solo flujo de salida -aunque no siempre-
++ La salida por default es guardada en disco en archivos con un prefijo `part-r-0000` bajo un mismo directorio de HDFS
++ Los *reducers* normalmente no ocupan mucha memoria y el tamaño del *heap* de la JVM es relativamente bajo
++ Si la salida del *reducer* requiere procesamiento adicional el data set completo será escrito a disco y vuelto a leer de nuevo :/
++ El \# de *reducers* se establece a nivel del clúster, aunque se puede sobreescribir este valor para ciertos *jobs* cuando se tiene mucha experiencia con los datos a procesar -conocemos el tamaño de los datos y cómo se particionan-
++ El \# de particiones es igual al \# de *reducers* 
++ Para particionar el set se ocupa una función de *hash* 
+
+
+![](images/map_reduce.png)
+<br>
+Fuente: Libro *Hadoop Application Architectures*
+
+
+**Desventajas** 
+
+MapReduce no es una buena solución para algoritmos iterativos pues tiene las siguientes desventajas: 
+
++ Tiempo de "arranque": Aunque no estemos haciendo nada de procesamiento con MapReduce en el clúster, se pierden entre 10 y 30 segundos para iniciar MapReduce
++ MapReduce escribe constantemente a disco para facilitar el cumplir con la propiedad de tolerancia a fallos $\rightarrow$ la evolución fue Spark! y por eso se prefiere ocupar Spark ... lo veremos más adelante.
+
+
+**Recomendaciones** 
+
++ El \# de mapas depende del \# total de bloques de los archivos de entrada como lo vimos anteriormente, es posible poner más *mappers* configurando `Configuration.set(MRJobConfig.NUM_MAPS, int)` (en Java)
++ Se recomienda tener entre 10 y 100 *mappers* por nodo para tener el nivel óptimo de paralelismo para los procesos *map*, aunque se puede aumentare este número se prefiere esta configuración pues la configuración del task es tardada por lo que se prefiere que la ejecución de un *mapper* tome **al menos un minuto** para ejecutarse
++ Se recomienda establecer el \# de *reducers* con la fórmula $0.95 \cdot (\text{<# of nodes> * <# of max containers per node>})$ o bien cambiar el 0.95 por 1.75. 
+    + Multiplicando por 0.95 los *reducers* se levantan inmediatamente e inician el procesamiento de los *mappers* en cuanto terminan
+    + multiplicando por 1.75 los nodos más "rápidos" terminarán su primer ronda de *reducers* y podrán hacer una segunda ronda de procesamiento de *reducers* $\rightarrow$ esta opción es mejor para balancear carga
++ Incrementar el \# de *reducers* incrementa el balanceo de carga, baja los costos de fallas pero incrementa el uso de recursos del framework
++ Se puede poner el \# de *reducers* en 0 si no es necesario hacer un procesamiento *reduce* $\rightarrow$ la salida de los *mappers* **no** será ordenada ni particionada
+
+
+#### Modelo de programación MapReduce
+
+La inspiración de MapReduce viene de la programación funcional, bajo este modelo de progamación, la entrada es particionada en pequeñas partes, se ejecuta el código del *mapper* en cada parte, luego junta todos los resultados de los *mappers* en uno o más *reducers* que juntan/combinan los resultados para entregar uno final.
+
++ *Map* corresponde a una función que aplica una función a cada elemento en una lista -[lambda functions](https://docs.python.org/3/tutorial/controlflow.html#lambda-expressions) de python por ejemplo.
++ *Reduce* corresponde a una función que analiza una estructura de datos recursiva a la que aplica las operaciones definidas para combinarlas y devolver una sola respuesta.
+
+En `dplyr` cuando hacemos un `group_by() %>% summarise()` la parte del `group_by` corresponde al *mapper* y la parte del `summarise` al *reduce*  
+$\rightarrow$ La forma en la que corremos procesos de MapReduce es a través de un programa escrito en Java (╯°□°)╯︵ ┻━┻ con los siguientes parámetros de entrada: 
+
++ Un método `main` desde donde configuramos un *job* de MapReduce y lo "levantamos"
+    + Establecemos \# de *reducers* 
+    + Configuramos las clases de *mapper* y *reducer* 
+    + Configuramos el particionador (¿Qué tipo de particionador?)
+    + Configuramos otras cosas de Hadoop 
++ Una clase *Mapper* 
+    + Toma como entrada tuplas de `<llave, valor>` y escribe tuplas de `<llave, valor>`
+    
+Debido a que la librería de Hadoop de *streaming* implementa estas chivas mencionadas arriba sirve como API a escribir proceso de MapReduce en otros lenguajes, para ello solo hay que leer de `STDIN` y escribir a `STDOUT`  ＼(＾O＾)／. Solo debemos tener en cuenta que esta librería **asume que las tuplas `<llave,valor>` están separadas por un tab `\t`** 
+
+Para correr un job de *streaming* en Hadoop solo debemos indicarle a hadoop de dónde sacar el jar de streaming ... depende de la versión de Hadoop que hayamos instalado pero como nosotros estamos en la 2.7.x, el jar se encuentra en el siguiente directorio:  `/usr/local/hadoop/share/hadoop/tools/lib/`
+
+#### Ejercicio
+
+El *Hello world!* de MapReduce es hacer un conteo de palabras de algún texto... juguemos con el *Hello World* 
+
+**Objetivo:** Contar la frecuencia de operación de cada palabra en un texto
+
++ $\rightarrow$ ¿Cómo diseñamos el conteo de palabras para hacer en modelo de programación MapReduce? 
++ $\rightarrow$ ¿Qué harían los *mappers*? ¿Qué harían los *reducers*? (¿más de uno?) 
+
+![](images/word_count_map_reduce.png)
+
+<br>
+Fuente: [https://www.researchgate.net/figure/Word-count-program-flow-executed-with-MapReduce-5_270448794](https://www.researchgate.net/figure/Word-count-program-flow-executed-with-MapReduce-5_270448794)
+
+##### Python
+
+Haremos "trampa"" porque no queremos programar en Java ni en *Jython* para poder ejecutar proceso de MapReduce, en lugar de esto ocuparemos la librería de *Hadoop streaming* para poder escribir el código en Python y poder ejecutar el código en Hadoop :P 
+
+En el mi máquina bajé "La Ilíada" de Homero en un txt plano que bajé del proyecto [Gutenberg](http://www.gutenberg.org/cache/epub/6130/pg6130.txt) 
+
+Empezaremos con algo sencillo, sin pensar en MapReduce cómo contaríamos la frecuencia de aparación por palabra en *plain vanilla* python?
+
+```
+#!/usr/bin/python
+
+import sys
+import re
+ 
+sums = {} 
+ 
+for line in sys.stdin:
+  line = re.sub('^\W+|\W+$', '', line) #elimina lo que no sean alfanumérico al inicio y fin de la línea
+  words = re.split('\W+', line)
+  
+  for word in words:
+    word = word.lower()
+    sums[word] = sums.get(word, 0) + 1
+
+print(sums)
+```
+
+
+**Mapper** 
+```
+#!/usr/bin/python
+
+import sys
+import re
+ 
+for line in sys.stdin:
+  line = re.sub('^\W+|\W+$', '', line) #elimina lo que no sean alfanumérico al inicio y fin de la línea
+  words = re.split('\W+', line)
+  
+  for word in words:
+    print(word.lower() + "\t1") #mandamos a la salida la palabra separada por un tab y un 1 
+```
+
+**Reducer** $\rightarrow$ Recuerda que al *reducer* le llegan los pares de `<llave,valor>` **ordenados!**
+```
+#!/usr/bin/python
+
+import sys
+
+previous = None
+sum = 0
+
+for line in sys.stdin:
+  key, value = line.split('\t')
+  if key != previous:
+      if previous is not None:
+        print(previous + '\t' + str(sum))
+      previous = key
+      sum = 0
+
+  sum += int(value)
+
+print(previous + '\t' + str(sum))
+```
+
+Probemos esto en python sin MapReduce para ver cómo demonios funciona esto
+
+Ahora probemos con MapReduce! ๏◡๏
+
+```
+$hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.4.jar \
+-input /iliada/input.txt \
+-output /iliada/output \
+-file /home/lmillan/Documents/itam/metodos_gran_escala/datasets/mapper.py \
+-mapper mapper.py \
+-file /home/lmillan/Documents/itam/metodos_gran_escala/datasets/reducer.py \
+-reducer reducer.py
+```
+
+#### ¿Cuándo usar MapReduce? 
+
+Realmente solo se recomienda usar MapReduce -as is- para desarrolladores de Java experimentados :( pues hay muchos pequeños detalles que cubrir, demasiada configuración, demasiados puntos de fallo. 
+
+Para Data scientists se recomienda mejor ocupar Pig/Hive/Spark (preferentemente el último!) que tienen una abstracción sobre la capa de bajo nivel que tiene MapReduce. Todas esas tecnologías están montadas sobre MapReduce, pero hacen que el implementador no se preocupe por la implementación a bajo nivel y se concentre en el análisis de datos que quiere hacer :). 
+
+#### Tarea 3
+
+A entregar el **12 de febrero 2018** máximo 23:59:59 CST en tu carpeta `alumnos`
+
+**Parte 1:** 
+
+En tu carpeta `alumnos/` crea una carpeta `tarea_3/parte_1` **¡en minúsculas!** 
+
++ Hacer una clúster de Hadoop **multi nodo** con los miembros de tu equipo 
++ Tendrás que utilizar una imágen de Docker construida por ustedes que tenga Ubuntu 16.4, Hadoop 2.7.4, python 3.5.2
+    + el `etc/hosts/` debe ser el mismo en todos los nodos
+    + en tu docker pon el network mode como `host` y no como `bridge`
++ Cada *host* del equipo será nombrado con la inicial de tu nombre y apellido seguido de un guión bajo y la matrícula correspondiente. Por ejemplo: mi hostname sería `lm_54903`
+
+¿Qué se entrega? 
+
++ Subir tu dockerfile $\rightarrow$ se requiere que ustedes creen su propia imágen...
++ En un Rmd poner la imagen que obtengan de `jps` una vez que todos los miembros del equipo se han podido conectar al clúster de hadoop
++ En el mismo Rmd poner la imagen de `localhost:8088` seleccionando la opción Nodes
+
+¿Qué se califica? 
+
++ Se entrega el dockerfile: 2
++ Se entrega el RMD y html: 1
++ Se entregan las imágenes solicitadas: 2
+
+Total: 5
+
+**Parte 2:**
+
+Los siguientes ejercicios son utilizando su cluster multinodo creado con su imagen de docker: 
+
+En tu carpeta `alumnos/` crea la carpeta `tarea_3/parte_2` **¡en minúsculas!**
+
++ Ejercicio 1: Utilizando los datos de [ecobici_2010_2017](https://www.dropbox.com/sh/u0g3g378xfdyxot/AACN77EAFN1rjNkPemkX-PWZa?dl=0) y MapReduce averigua ¿Cuántos registros hay por cicloestación? 
++ Ejercicio 2: Con los datos de [vuelos retrasados en USA](https://www.dropbox.com/sh/rdd78b7nofjb5vy/AAAwUm97baTusv5l8QY2ZAi2a?dl=0) hacer un join del lado del *mapper* con flights, airports y airlines. Primero intenta una sola llave o flights o airports
++ Ejercicio 3: Con los datos de [vuelos retrasados en USA](https://www.dropbox.com/sh/rdd78b7nofjb5vy/AAAwUm97baTusv5l8QY2ZAi2a?dl=0) hacer un join del lado del *reducer* con flights, airports y airlines. Primero intenta una sola llave o flights o airports
+
+¿Qué se entrega?
+
++ ejericio 1: El `mapper.py`, `reducer.py` y `output.txt` del conteo del \# de registros por cicloestación
+    + Imágen del jps del clúster
+    + Imágen de `localhost:8088` seleccionando la opción Nodes
+    + Imágen de `localhost:8088` seleccionando la opción FINISHED para ver que los jobs corrieron existosamente
++ Ejercicio 2: El `mapper.py`, `reducer.py` y `output.txt` del join del lado del *mapper* 
+    + Imágen del jps del clúster
+    + Imágen de `localhost:8088` seleccionando la opción Nodes
+    + Imágen de `localhost:8088` seleccionando la opción FINISHED para ver que los jobs corrieron existosamente
++ Ejercicio 3: El `mapper.py`, `reducer.py` y `output.txt` del join del lado del *reducer* 
+    + Imágen del jps del clúster
+    + Imágen de `localhost:8088` seleccionando la opción Nodes
+    + Imágen de `localhost:8088` seleccionando la opción FINISHED para ver que los jobs corrieron existosamente
++ El rmd y html con el reporte que contiene el código del `mapper.py`, `reducer.py`, **head** del `output.txt` y las imágenes solicitadas de cada ejercicio
++ El dockerfile de su imágen
+
+¿Qué se califica? 
+
++ Se entregó el Rmd y html: -2
++ Se entregó el dockerfile: -2
++ Se incluyó el `mapper.py`, `reducer.py`, `output.txt`, y las 3 imágenes solicitadas para ejercicio 1: 2
++ Se incluyó el `mapper.py`, `reducer.py`, `output.txt`, y las 3 imágenes solicitadas para ejercicio 2: 2 
++ Se incluyó el `mapper.py`, `reducer.py`, `output.txt`, y las 3 imágenes solicitadas para ejercicio 3: 2
+
+Total: 6
+
+**Total:** 11
+
+### Referencias 
+
++ [Apache Software Foundation](https://www.apache.org/)
++ [Hadoop](http://hadoop.apache.org/)
++ [Cloud Native Computing Foundation](https://www.cncf.io/)
++ [HDFS architecture](http://hadoop.apache.org/docs/r2.9.0/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html)
++ [HDFS Command Guide](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html)
++ [Best practices for block size HDFS](https://community.hortonworks.com/questions/16278/best-practises-beetwen-size-block-size-file-and-re.html)
++ [S3](https://aws.amazon.com/s3/)
++ [AVRO](https://avro.apache.org/docs/current/)
++ [Parquet](https://parquet.apache.org/)
++ [Hadoop wiki](https://wiki.apache.org/hadoop/)
++ [MapReduce articulo](http://static.googleusercontent.com/media/research.google.com/en/us/archive/mapreduce-osdi04.pdf)
++ []()

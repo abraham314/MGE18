@@ -1,0 +1,2 @@
+f.origin_airport,ae.airport,cuantas
+ATL,Hartsfield-Jackson Atlanta International Airport,169

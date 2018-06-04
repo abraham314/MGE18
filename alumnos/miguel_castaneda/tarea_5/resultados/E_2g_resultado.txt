@@ -1,0 +1,4 @@
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Hartsfield-Jackson Atlanta International Airport        169
+Time taken: 51.115 seconds, Fetched: 1 row(s)

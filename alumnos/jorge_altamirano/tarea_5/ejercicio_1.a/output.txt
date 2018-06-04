@@ -1,0 +1,73 @@
+employeeid	firstname	lastname	title	birthdate	hiredate	city	country	reportees
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Michael Suyama
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Robert King
+5	Steven	Buchanan	Sales Manager	1955-03-04	1993-10-17	London	UK	Anne Dodsworth
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Nancy Davolio
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Janet Leverling
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Margaret Peacock
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Steven Buchanan
+2	Andrew	Fuller	"Vice President	 Sales"	1952-02-19	1992-08-14	Tacoma	USA	Laura Callahan

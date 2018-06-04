@@ -1,0 +1,254 @@
+---
+title: "Tarea 4"
+author: "Alejandro Hernández Farías 87806"
+output: html_document
+---
+
+### Detalles del cluster
+
+__Fotos del cluster `alejandro_hernandez`:__
+
+Foto General:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_4/cluster1.png)
+
+Foto del summary:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_4/cluster2.png)
+
+Foto Hardware:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_4/cluster3.png)
+
+
+### Ejercicio A
+
+__Modifica el ejercicio de Rank para que en lugar de obtener el id del producto con mejor rank obtengamos el nombre del producto -requieres un join- con el mejor rank.__
+
+El nombre del producto con el mejor rank es: Raclette Courdavault.
+
+Se utilizó el siguiente script de pig:
+
+```{R,eval=FALSE}
+products = load 's3://aws-alex-03032018-metodos-gran-escala/datos/products.csv' using PigStorage(',') as (productid:chararray, productname:chararray, supplierid:chararray, categoryid:chararray, quantityperunit:int, unitprice:float, unitsinstock:int, unitsonorder:int, reorderlevel:int, discounted:int);
+order_details = load 's3://aws-alex-03032018-metodos-gran-escala/datos/order_details.csv' using PigStorage(',') as (orderid:chararray, productid:chararray, unitprice:float, quantity:int, discount:float);
+group_orders = group order_details by productid;
+count_products = FOREACH group_orders GENERATE group as productid, COUNT($1) as n;
+ranked = rank count_products by n DESC;
+limited_rank = limit ranked 10;
+join_order_products = JOIN limited_rank by productid, products by productid;
+resultado = FOREACH join_order_products generate rank_count_products,productname,n;
+resultado_ordenado = ORDER resultado by $0;
+resultado_final = limit resultado_ordenado 1;
+STORE resultado_final INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_a' USING PigStorage(';');
+
+```
+
+
+Se anexa output `ejercicio_a1` y archivo .pig.
+
+
+### Ejercicio B
+
+__1. ¿Cuántos vuelos existen en el dataset cuyo aeropuerto destino sea el "Honolulu International Airport"?__
+
+Existen 43157 vuelos que tienen como aeropuerto destino el Honolulu International Airport.
+
+Se utilizó el siguiente script de pig:
+
+```{R,eval=FALSE}
+
+flights = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/flights.csv' using PigStorage(',') as (year:float, month:int, day:int, day_of_week:int, airline:chararray, flight_number:float, tail_numer:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time: chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:float, elapsed_time:float, air_time:float, distance:float, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:int, cancelled:int, cancelation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+airports = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/airports.csv' using PigStorage(',') as (iata_code:chararray, airport:chararray, city:chararray, state:chararray, country:chararray, latitud:float, longitude:float);
+group_aero_dest = GROUP flights by destination_airport;
+order_aero_dest = FOREACH group_aero_dest generate group as destination_airport,COUNT($1) as n;
+join_order_aero_dest = JOIN order_aero_dest by destination_airport, airports by iata_code;
+honolulu = filter join_order_aero_dest by (airport == 'Honolulu International Airport');
+honolulu_final = FOREACH honolulu generate airport,n;
+STORE honolulu_final INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_b1' USING PigStorage(';');
+
+
+```
+
+
+Se anexa output `ejercicio_b1` y archivo .pig.
+
+
+__2. ¿Cuál es el vuelo con más retraso? ¿De qué aerolínea es?__
+
+El vuelo con más retraso, considerando el `arrival_delay` es el vuelo 1322 y es de American Airlines Inc.
+
+Se utilizó el siguiente script de pig:
+
+```{R,eval=FALSE}
+flights = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/flights.csv' using PigStorage(',') as (year:float, month:int, day:int, day_of_week:int, airline:chararray, flight_number:float, tail_numer:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time: chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:float, elapsed_time:float, air_time:float, distance:float, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:int, cancelled:int, cancelation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+airlines = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/airlines.csv' using PigStorage(',') as (iata_code:chararray, airline:chararray);
+join_flights_airlines = JOIN flights by airline, airlines by iata_code;
+rank_retraso = ORDER join_flights_airlines by departure_delay DESC;
+max_retraso = limit rank_retraso 1;
+retraso = FOREACH max_retraso GENERATE flight_number,airlines::airline,departure_delay;
+STORE retraso INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_b2' USING PigStorage(';');
+
+```
+
+
+Se anexa output `ejercicio_b2` y archivo .pig.
+
+
+__3. ¿Qué día es en el que más vuelos cancelados hay?__
+
+Es el día de la semana 1 con 21073 cancelaciones.
+
+Se utilizó el siguiente script de pig:
+
+```{R,eval=FALSE}
+flights = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/flights.csv' using PigStorage(',') as (year:float, month:int, day:int, day_of_week:int, airline:chararray, flight_number:float, tail_numer:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time: chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:float, elapsed_time:float, air_time:float, distance:float, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:int, cancelled:int, cancelation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+vuelos_cancelados = filter flights by (cancelled==1);
+group_cancel = GROUP vuelos_cancelados by day_of_week;
+count_cancel = FOREACH group_cancel generate group as day_of_week, COUNT ($1) as n;
+order_cancel = ORDER count_cancel by n DESC;
+final_cancel = limit order_cancel 1;
+STORE final_cancel INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_b3' USING PigStorage(';');
+
+```
+
+
+Se anexa output `ejercicio_b3` y archivo .pig.
+
+
+__4. ¿Cuáles son los aeropuertos orígen con 17 cancelaciones?__
+
+Los aeropuertos origen con 17 cancelaciones son:
+
+- Dothan Regional Airport;Dothan;AL;USA
+
+- Dickinson Theodore Roosevelt Regional Airport;Dickinson;ND;USA
+
+- Delta County Airport;Escanaba;MI;USA
+
+Se utilizó el siguiente script de pig:
+
+```{R,eval=FALSE}
+
+flights = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/flights.csv' using PigStorage(',') as (year:float, month:int, day:int, day_of_week:int, airline:chararray, flight_number:float, tail_numer:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time: chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:float, elapsed_time:float, air_time:float, distance:float, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:int, cancelled:int, cancelation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+airports = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/airports.csv' using PigStorage(',') as (iata_code:chararray, airport:chararray, city:chararray, state:chararray, country:chararray, latitud:float, longitude:float);
+vuelos_cancelados = filter flights by (cancelled==1);
+group_cancel = GROUP vuelos_cancelados by origin_airport;
+count_cancel = FOREACH group_cancel generate group as origin_airport, COUNT ($1) as n;
+aeropuerto_17 = filter count_cancel by (n == 17);
+join_aeropuerto_17 = JOIN aeropuerto_17 by origin_airport, airports by iata_code;
+STORE join_aeropuerto_17 INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_b4' USING PigStorage(';');
+
+
+```
+
+
+Se anexa output `ejercicio_b4` y archivo .pig.
+
+
+__5. ¿Cuál es el aeropuerto origen con más vuelos cancelados?__
+
+El aeropuerto origen con más vuelos cancelados es: Chicago O'Hare International Airport;Chicago;IL;USA
+
+Se utilizó el siguiente script de pig:
+
+```{R,eval=FALSE}
+flights = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/flights.csv' using PigStorage(',') as (year:float, month:int, day:int, day_of_week:int, airline:chararray, flight_number:float, tail_numer:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time: chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:float, elapsed_time:float, air_time:float, distance:float, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:int, cancelled:int, cancelation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+airports = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/airports.csv' using PigStorage(',') as (iata_code:chararray, airport:chararray, city:chararray, state:chararray, country:chararray, latitud:float, longitude:float);
+vuelos_cancelados = filter flights by (cancelled==1);
+group_cancel = GROUP vuelos_cancelados by origin_airport;
+count_cancel = FOREACH group_cancel generate group as origin_airport, COUNT ($1) as n;
+order_aeropuertos = ORDER count_cancel by n DESC;
+max_cancel_aero = limit order_aeropuertos 1;
+join_max_cancel_aero = JOIN max_cancel_aero by origin_airport, airports by iata_code;
+STORE join_max_cancel_aero INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_b5' USING PigStorage(';');
+
+```
+
+
+Se anexa output `ejercicio_b5` y archivo .pig.
+
+
+__6. ¿Cuál es el vuelo (flight number) con mayor diversidad de aeropuertos destino, cuáles son estos destinos? (ocupar bag te ayudará en esta pregunta)__
+
+El vuelo con mayor diversidad de aeropuertos destino es el 202.
+
+Los destinos son:
+```{R,eval=FALSE}
+202.0;68;202.0;LAX;LAX;Los Angeles International Airport;Los Angeles;CA;USA;33.94254;-118.40807
+202.0;68;202.0;CLE;CLE;Cleveland Hopkins International Airport;Cleveland;OH;USA;41.41089;-81.8494
+202.0;68;202.0;SFO;SFO;San Francisco International Airport;San Francisco;CA;USA;37.619;-122.37484
+202.0;68;202.0;RNO;RNO;Reno/Tahoe International Airport;Reno;NV;USA;39.49858;-119.76806
+202.0;68;202.0;OGG;OGG;Kahului Airport;Kahului;HI;USA;20.89865;-156.43047
+202.0;68;202.0;TPA;TPA;Tampa International Airport;Tampa;FL;USA;27.97547;-82.53325
+202.0;68;202.0;ATL;ATL;Hartsfield-Jackson Atlanta International Airport;Atlanta;GA;USA;33.64044;-84.42694
+202.0;68;202.0;IAD;IAD;Washington Dulles International Airport;Chantilly;VA;USA;38.94453;-77.45581
+202.0;68;202.0;BWI;BWI;Baltimore-Washington International Airport;Baltimore;MD;USA;39.1754;-76.6682
+202.0;68;202.0;LGA;LGA;LaGuardia Airport (Marine Air Terminal);New York;NY;USA;40.77724;-73.87261
+202.0;68;202.0;DTW;DTW;Detroit Metropolitan Airport;Detroit;MI;USA;42.21206;-83.34884
+202.0;68;202.0;BOS;BOS;Gen. Edward Lawrence Logan International Airport;Boston;MA;USA;42.36435;-71.00518
+202.0;68;202.0;RSW;RSW;Southwest Florida International Airport;Ft. Myers;FL;USA;26.53617;-81.75517
+202.0;68;202.0;AUS;AUS;Austin-Bergstrom International Airport;Austin;TX;USA;30.19453;-97.66987
+202.0;68;202.0;BNA;BNA;Nashville International Airport;Nashville;TN;USA;36.12448;-86.67818
+202.0;68;202.0;SAN;SAN;San Diego International Airport (Lindbergh Field);San Diego;CA;USA;32.73356;-117.18966
+202.0;68;202.0;FLL;FLL;Fort Lauderdale-Hollywood International Airport;Ft. Lauderdale;FL;USA;26.07258;-80.15275
+202.0;68;202.0;SMF;SMF;Sacramento International Airport;Sacramento;CA;USA;38.69542;-121.59077
+202.0;68;202.0;RDU;RDU;Raleigh-Durham International Airport;Raleigh;NC;USA;35.87764;-78.78747
+202.0;68;202.0;MDW;MDW;Chicago Midway International Airport;Chicago;IL;USA;41.78598;-87.75242
+202.0;68;202.0;MSN;MSN;Dane County Regional Airport;Madison;WI;USA;43.13986;-89.33751
+202.0;68;202.0;PDX;PDX;Portland International Airport;Portland;OR;USA;45.58872;-122.5975
+202.0;68;202.0;OKC;OKC;Will Rogers World Airport;Oklahoma City;OK;USA;35.39309;-97.60073
+202.0;68;202.0;SLC;SLC;Salt Lake City International Airport;Salt Lake City;UT;USA;40.78839;-111.97777
+202.0;68;202.0;JFK;JFK;John F. Kennedy International Airport (New York International Airport);New York;NY;USA;40.63975;-73.77893
+202.0;68;202.0;FNT;FNT;Bishop International Airport;Flint;MI;USA;42.9655;-83.74346
+202.0;68;202.0;MCO;MCO;Orlando International Airport;Orlando;FL;USA;28.42889;-81.31603
+202.0;68;202.0;LAS;LAS;McCarran International Airport;Las Vegas;NV;USA;36.08036;-115.15233
+202.0;68;202.0;PHL;PHL;Philadelphia International Airport;Philadelphia;PA;USA;39.87195;-75.24114
+202.0;68;202.0;OAK;OAK;Oakland International Airport;Oakland;CA;USA;37.72129;-122.22072
+202.0;68;202.0;MSP;MSP;Minneapolis-Saint Paul International Airport;Minneapolis;MN;USA;44.88055;-93.21692
+202.0;68;202.0;PHX;PHX;Phoenix Sky Harbor International Airport;Phoenix;AZ;USA;33.43417;-112.00806
+202.0;68;202.0;IAH;IAH;George Bush Intercontinental Airport;Houston;TX;USA;29.98047;-95.33972
+202.0;68;202.0;MKE;MKE;General Mitchell International Airport;Milwaukee;WI;USA;42.94722;-87.89658
+202.0;68;202.0;CAK;CAK;Akron-Canton Regional Airport;Akron;OH;USA;40.91631;-81.44247
+202.0;68;202.0;IND;IND;Indianapolis International Airport;Indianapolis;IN;USA;39.71733;-86.29438
+202.0;68;202.0;SAT;SAT;San Antonio International Airport;San Antonio;TX;USA;29.53369;-98.46978
+202.0;68;202.0;BDL;BDL;Bradley International Airport;Windsor Locks;CT;USA;41.93887;-72.68323
+202.0;68;202.0;ITO;ITO;Hilo International Airport;Hilo;HI;USA;19.72026;-155.04848
+202.0;68;202.0;SEA;SEA;Seattle-Tacoma International Airport;Seattle;WA;USA;47.44898;-122.30931
+202.0;68;202.0;EWR;EWR;Newark Liberty International Airport;Newark;NJ;USA;40.6925;-74.16866
+202.0;68;202.0;DEN;DEN;Denver International Airport;Denver;CO;USA;39.85841;-104.667
+202.0;68;202.0;ORD;ORD;Chicago O'Hare International Airport;Chicago;IL;USA;41.9796;-87.90446
+202.0;68;202.0;DCA;DCA;Ronald Reagan Washington National Airport;Arlington;VA;USA;38.85208;-77.03772
+202.0;68;202.0;PIT;PIT;Pittsburgh International Airport;Pittsburgh;PA;USA;40.49147;-80.23287
+
+
+```
+
+Se utilizó el siguiente script de pig:
+
+```{R,eval=FALSE}
+flights = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/flights.csv' using PigStorage(',') as (year:float, month:int, day:int, day_of_week:int, airline:chararray, flight_number:float, tail_numer:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:chararray, departure_time: chararray, departure_delay:int, taxi_out:int, wheels_off:chararray, scheduled_time:float, elapsed_time:float, air_time:float, distance:float, wheels_on:chararray, taxi_in:int, scheduled_arrival:chararray, arrival_time:chararray, arrival_delay:int, diverted:int, cancelled:int, cancelation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+airports = LOAD 's3://aws-alex-03032018-metodos-gran-escala/datos/airports.csv' using PigStorage(',') as (iata_code:chararray, airport:chararray, city:chararray, state:chararray, country:chararray, latitud:float, longitude:float);
+
+unicos_aero =
+    FOREACH (GROUP flights BY flight_number) {
+        dest=flights.destination_airport;
+        dist_dest=distinct dest;
+        GENERATE group as flight_number, COUNT(dist_dest) as n;
+    };
+
+ord_unicos_aero = ORDER unicos_aero by n DESC;
+max_aero= limit ord_unicos_aero 1;
+
+destinos = FOREACH flights generate flight_number,destination_airport;
+destinos_dist = distinct destinos;
+destinos_dist_aero = JOIN destinos_dist by destination_airport, airports by iata_code;
+
+tabla_dest = JOIN max_aero by flight_number LEFT OUTER, destinos_dist_aero by flight_number;
+STORE tabla_dest INTO 's3://aws-alex-03032018-metodos-gran-escala/output/pregunta_b6' USING PigStorage(';');
+
+```
+
+Se anexa output `ejercicio_b6` y archivo .pig.
+

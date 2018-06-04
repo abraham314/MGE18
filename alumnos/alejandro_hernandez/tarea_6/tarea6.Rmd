@@ -1,0 +1,276 @@
+---
+title: "Tarea 6"
+author: "Alejandro Hernández Farías 87806"
+output: html_document
+---
+
+### Detalles del cluster Spark
+
+__Fotos del cluster `alejandro_hernandez`:__
+
+Imagen del summary:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/cluster.png)
+
+
+### Ejercicio 1
+
+__a. ¿Cuántos "jefes" hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? (atributo reportsto, ocupa explode en tu respuesta)__
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{r,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+emp=employees.select("employeeid","firstname","lastname","title","birthdate","hiredate","address","city","country")
+aux=employees.select("reportsto").distinct()
+join_emp=emp.join(aux,emp.employeeid==aux.reportsto)
+join_emp.show()
+
+join_emp.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_1a", sep='|')
+
+
+```
+
+Hay 2 jefes y los datos específicos de cada uno de ellos se pueden ver en la siguiente imagen:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_1a.png)
+
+
+
+
+__b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1)) __
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+e=employees.alias("a")
+o=orders.alias("o")
+tabla=o.groupBy("employeeid").count()
+tabla_o=tabla.orderBy("count",ascending=False)
+info=e.select("employeeid","firstname","lastname","title","birthdate","hiredate")
+preg_a2=tabla_o.join(info,tabla_o.employeeid==info.employeeid,"inner")
+preg_a2=preg_a2.select("firstname","lastname","title","birthdate","hiredate","count").limit(2)
+preg_a2=preg_a2.orderBy("count")
+preg_a2=preg_a2.limit(1)
+preg_a2.show()
+
+preg_a2.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_1b", sep='|')
+```
+
+
+La segunda mejor empleada es Janet Leverling y el detalle de los datos solicitados se pueden ver en la siguiente imagen:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_1b.png)
+
+__c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?__
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+from pyspark.sql.window import Window
+o=orders.alias("o")
+my_window = Window.partitionBy().orderBy("orderdate")
+aux = o.withColumn("prev_value", lag(o.orderdate).over(my_window))
+aux= aux.withColumn("diff", datediff(aux.orderdate,aux.prev_value))
+aux=aux.orderBy("diff",ascending=False)
+preg_a3=aux.select("diff")
+preg_a3=preg_a3.limit(1)
+preg_a3.show()
+
+preg_a3.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_1c", sep='|')
+```
+
+
+La diferencia máxima es de 3 como se puede constatar en la siguiente imagen:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_1c.png)
+
+### Ejercicio 2
+
+__a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"?__
+
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+a=airlines.alias("a")
+f=flights.alias("f")
+ae=airports.alias("ae")
+join_af=a.join(f,col("a.iata_code")==col("f.airline"))
+join_afa=join_af.join(ae,col("f.destination_airport")==col("ae.iata_code"))
+preg_b1=join_afa.select("a.airline").filter(col("ae.airport")=="Honolulu International Airport").distinct()
+preg_b1.show()
+
+preg_b1.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_2a", sep='|')
+```
+
+
+Se incluye imagen con el nombre de las aerolineas que llegan a Honolulu:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_2a.png)
+
+__b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"? __
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+a=airlines.alias("a")
+f=flights.alias("f")
+ae=airports.alias("ae")
+join_af=a.join(f,col("a.iata_code")==col("f.airline"))
+join_afa=join_af.join(ae,col("f.destination_airport")==col("ae.iata_code"))
+preg_b2=join_afa.select("origin_airport","destination_airport","SCHEDULED_DEPARTURE").orderBy("SCHEDULED_DEPARTURE",ascending=False).where((col("origin_airport")=="SFO") & (col("destination_airport")=="HNL") )
+preg_b2=preg_b2.withColumn("hora", preg_b2.SCHEDULED_DEPARTURE.substr(1,2))
+preg_b2=preg_b2.select("hora").distinct()
+preg_b2.show()
+
+preg_b2.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_2b", sep='|')
+
+```
+
+
+Se incluye imagen del horario:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_2b.png)
+
+
+__c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible?__
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+a=airlines.alias("a")
+f=flights.alias("f")
+ae=airports.alias("ae")
+join_af=a.join(f,col("a.iata_code")==col("f.airline"))
+join_afa=join_af.join(ae,col("f.destination_airport")==col("ae.iata_code"))
+preg_2c=join_afa.filter(col("ae.airport")=="Honolulu International Airport")
+preg_2c=preg_2c.groupBy("f.airline","f.day_of_week").agg(mean("arrival_delay").alias("retraso"))
+preg_2c=preg_2c.orderBy("retraso").limit(1)
+preg_2c=preg_2c.join(a,preg_2c.airline==a.IATA_CODE)
+preg_2c=preg_2c.select("IATA_CODE","a.AIRLINE","day_of_week","retraso")
+preg_2c.show()
+
+preg_2c.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_2c", sep='|')
+
+```
+
+
+Se incluye imagen de la aerolinea y día de la semana en que conviene viajar a Honolulu para tener el menor retraso posible:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_2c.png)
+
+
+__d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? __
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+f=flights.alias("f")
+ae=airports.alias("ae")
+preg_2d=f.join(ae,f.DESTINATION_AIRPORT==ae.IATA_CODE)
+preg_2d=preg_2d.groupBy("DESTINATION_AIRPORT").count()
+preg_2d=preg_2d.orderBy("count",ascending=False)
+preg_2d=preg_2d.join(ae,preg_2d.DESTINATION_AIRPORT==ae.IATA_CODE)
+preg_2d=preg_2d.select("AIRPORT","count").limit(1)
+preg_2d.show()
+
+preg_2d.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_2d", sep='|')
+```
+
+
+El aeropuerto con mayor trafico de entrada es Hartsfield-Jackson Atlanta International Airport, como se muestra a continuación:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_2d.png)
+
+
+__e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana?__
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+a=airlines.alias("a")
+f=flights.alias("f")
+join_af=a.join(f,col("a.iata_code")==col("f.airline"))
+preg_2e=join_af.groupBy("f.day_of_week","a.airline")
+preg_2e=preg_2e.agg(mean("DEPARTURE_DELAY").alias("retraso"))
+preg_2e_1=preg_2e.groupBy("day_of_week").agg(max("retraso").alias("max_retraso"))
+preg_2e=preg_2e.join(preg_2e_1,["day_of_week"])
+preg_2e=preg_2e.filter(preg_2e.retraso==preg_2e.max_retraso).orderBy("day_of_week")
+preg_2e=preg_2e.select("day_of_week","airline")
+preg_2e.show()
+
+preg_2e.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_2e", sep='|')
+```
+
+
+Las aerolineas con mayor retraso por día de la semana son las que se muestran a continuación:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_2e.png)
+
+
+__f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)?__
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+a=airlines.alias("a")
+f=flights.alias("f")
+join_af=a.join(f,col("a.iata_code")==col("f.airline"))
+preg_2f=join_af.groupBy("f.day_of_week","a.airline")
+preg_2f=preg_2f.agg(mean("DEPARTURE_DELAY").alias("retraso"))
+preg_2f=preg_2f.filter(preg_2f.day_of_week==2).orderBy("retraso").limit(3)
+preg_2f=preg_2f.orderBy("retraso",ascending=False).limit(1)
+preg_2f.show()
+
+preg_2f.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_2f", sep='|')
+
+```
+
+La aerolinea con menor retraso de salida los lunes es US Airways Inc. como se muestra a continuación:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_2f.png)
+
+
+__g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?__
+
+Se utilizó el siguiente script en Zeppelin:
+
+```{R,eval=FALSE}
+%pyspark
+from pyspark.sql.functions import *
+f=flights.alias("f")
+ae=airports.alias("ae")
+preg_2g=f.join(ae,f.DESTINATION_AIRPORT==ae.IATA_CODE)
+preg_2g=preg_2g.groupBy("f.origin_airport").agg(countDistinct("DESTINATION_AIRPORT"))
+preg_2g=preg_2g.orderBy("count(DISTINCT DESTINATION_AIRPORT)",ascending=False)
+preg_2g=preg_2g.join(ae,preg_2g.origin_airport==ae.IATA_CODE)
+preg_2g=preg_2g.select("origin_airport","AIRPORT","count(DISTINCT DESTINATION_AIRPORT)").limit(1)
+preg_2g.show()
+
+preg_2g.repartition(1).write.csv("s3a://aws-alex-03032018-metodos-gran-escala/output/pregunta_2g", sep='|')
+```
+
+
+El aeropuerto origen que llega a la mayor cantidad de aeropuertos destino es Hartsfield-Jackson Atlanta International Airport.
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_6/pregunta_2g.png)
+
+NOTA IMPORTANTE: Aunque los archivos se "escribieron" en s3 y se descargaron de allí en formato .csv, localmente les cambié la extensión a .txt para que no hubiera problemas al subirlos al repositorio. 

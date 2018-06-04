@@ -1,0 +1,69 @@
+---
+title: "Tarea 9 : Luigi"
+author: 
+- Victor Augusto Samayoa Donado 175750
+- Oliab Herrera Coria 107863
+- Allan Eduardo Rosas Garcia 160630
+- Carlos Castro Correa 103531
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: yes
+    df_print: paged
+    highlight: tango
+    theme: lumen
+---
+
+## Resultados Generales
+
+En esta entrega se adjuntan los archivos pipe.py, parquet.py y agg.py los cuales son usados en pipe.py para hacer la transformación de formato csv a parquet y para hacer un conteo por producto de la base de datos de profeco. 
+
+En el bucket de s3 tenemos alojados los archivos parquet.py y agg.py y son los que se usan a la hora de ejecutar el archivo.
+
+Para correr el pipe se usó el siguiente comando:
+
+![correr](/Users/usuario/Documents/MaestriaCD/MetodosGE/prueba_luigi/imagenes/correr_pipe.png)
+
+Al correr esto y completarse los tasks nos da este mensaje
+
+
+![output](/Users/usuario/Documents/MaestriaCD/MetodosGE/prueba_luigi/imagenes/output_pipe.png)
+
+El cuál nos indica que todo salió bien.
+
+Del lado de la consola de AWS podemos ver como:
+
+1.- Se crea el cluster:
+![cluster](/Users/usuario/Documents/MaestriaCD/MetodosGE/prueba_luigi/imagenes/cluster.png)
+
+2.- Se hacen steps:
+
+![steps](/Users/usuario/Documents/MaestriaCD/MetodosGE/prueba_luigi/imagenes/steps.png)
+
+3.- Se arrojan los archivos de resulados a S3:
+
+![resultados](/Users/usuario/Documents/MaestriaCD/MetodosGE/prueba_luigi/imagenes/resultados.png)
+
+Los resultados que arroja son de este tipo (conteo por producto):
+
+CAJA 510 GR.,20384
+FRASCO 200 GR. MEZCLADO CON AZUCAR,4729
+UN 32C4000PD. COLOR 32 PLGS. PANTALLA CRISTAL LIQUIDO LED. C/RECUADRO,1064
+CJ 631. EXPRIMIDOR,8039
+
+## Detalle de los tasks
+
+En total hay 9 Tasks en nuestro pipe.
+
+En orden de ejecución son:
+- CreateCluster.- Crea el cluster    
+- StatusCreateCluster.- Monitorea la creación del cluster  
+- CSVtoParquet.- Transforma de Csv a parquet    
+- StatusParquet.- Cuida el status del step de CSV a parquet    
+- ParquetCount.- Conteo de número de productos  
+- StatusCount.- Cuida el status del conteo de número de productos    
+- TerminateCluster.- Termina el clúster     
+- StatusTerminateCluster.- Cuida el status de terminación de clúster  
+- Descarga.- Descarga de archivos a local  
+

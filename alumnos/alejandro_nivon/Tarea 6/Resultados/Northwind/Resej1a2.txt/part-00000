@@ -1,0 +1,3 @@
+Row(employeeid=u'2', firstname=u'Andrew', lastname=u'Fuller', title=u'Vice President, Sales', birthdate=u'1952-02-19', hiredate=u'1992-08-14', city=u'Tacoma', country=u'USA')
+Row(employeeid=u'5', firstname=u'Steven', lastname=u'Buchanan', title=u'Sales Manager', birthdate=u'1955-03-04', hiredate=u'1993-10-17', city=u'London', country=u'UK')
+Row(employeeid=u'8', firstname=u'Laura', lastname=u'Callahan', title=u'Inside Sales Coordinator', birthdate=u'1958-01-09', hiredate=u'1994-03-05', city=u'Seattle', country=u'USA')

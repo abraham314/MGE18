@@ -1,0 +1,36 @@
+---
+title: "AWS"
+author: "Liliana Millán liliana.millan@gmail.com"
+date: "Febrero 2018"
+output: html_document
+---
+
+![](images/itam_logo.png)
+
+### AWS
+
+Servicio de Amazon para PaaS (Platform as a Service) que nos permite formar clusters que pueden crecer horizontalmente de manera dinámica -elástica- para escalar el número de computadoras cuando se requiere de más recursos para procesamiento o menos si así se requiere. Esto democratiza el poder de cómputo para que no solo grandes empresas puedan procesar grandes cantidades de datos... 
+
+AWS ofrece muchos servicios PaaS, el que nosotros estaremos ocupando para hacer nuestro cluster de procesamiento distribuido se llama EMR (Elastic Map Reduce) [EMR guía de administración](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-what-is-emr.html)
+
+Cualquier servicio de AWS requiere de tener un par de llaves ssh por lo que si tienes un par debes subirlo a AWS o bien si no tienes un par hay que crearlos y subirlas a AWS 
+
+EMR requiere de que tengamos un *bucket* de S3, el DFS que ocupamos normalmente en clústers de procesamiento distribuido. [Crear un bucket de S3](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/what-is-s3.html)
+
+Para subir, bajar y manipular datos en S3 puedes ocupar [AWS CLI](https://aws.amazon.com/cli/) que tiene comandos muy parecidos (más naturales) a los que vimos en HDFS. 
+
+$\rightarrow$ Siempre para y termina tu instancia una vez que haz terminado de ocuparla, de otra manera se sigue cobrando!!!! 
+
+$\rightarrow$ **NUNCA** subas tus llaves de AWS a git o algun repo! (ten cuidado con archivos de configuración que normalmente los ocupan en texto en claro)
+
+#### Pig 
+
+Para correr un script de Pig en el clúster de AWS [pig launch](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-pig-launch.html)
+
++ [EMR guía de administración](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-what-is-emr.html)
++ [Reset EMR environment](https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-gs-reset-environment.html)
++ [EMR console](https://us-west-2.console.aws.amazon.com/elasticmapreduce/home?region=us-west-2)
++ [Creación de bucket S3](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/what-is-s3.html)
++ [Guía de uso de instancias en AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html?icmpid=docs_ec2_console)
++ [Tipos de instancias](https://aws.amazon.com/ec2/instance-types/)
++ [Consola administración S3](https://s3.console.aws.amazon.com)

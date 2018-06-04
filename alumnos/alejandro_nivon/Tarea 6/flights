@@ -1,0 +1,46 @@
+import pyspark.sql.functions as psf
+from pyspark.sql import Row
+
+airlines=spark.read.csv('/Volume/flights/airlines.csv', header=True)
+airports=spark.read.csv('/Volume/flights/airports.csv', header=True)
+flights=spark.read.csv('/Volume/flights/flights.csv', header=True)
+
+ej2a=flights.select("AIRLINE", "DESTINATION_AIRPORT").join(airports.select("IATA_CODE", "AIRPORT"), flights.DESTINATION_AIRPORT == airports.IATA_CODE).join(airlines, flights.AIRLINE == airlines.IATA_CODE).select("AIRPORT", airlines.AIRLINE).filter("AIRPORT = 'Honolulu International Airport'").distinct()
+ej2a.show()
+spark.createDataFrame(ej2a).rdd.saveAsTextFile("/Volume/Resultados/Flights/Resej2a.txt")
+
+ej2b=flights.select("ORIGIN_AIRPORT", "SCHEDULED_DEPARTURE", "DESTINATION_AIRPORT").join(airports.select("IATA_CODE", "AIRPORT"), flights.DESTINATION_AIRPORT == airports.IATA_CODE).filter("AIRPORT='Honolulu International Airport' and ORIGIN_AIRPORT='SFO'").select("SCHEDULED_DEPARTURE").distinct().sort("SCHEDULED_DEPARTURE")
+hr=[Row(HORA=int(i[0])/100) for i in ej2b.select('SCHEDULED_DEPARTURE').collect()]
+ej2b = spark.createDataFrame(hr).distinct().sort('HORA', ascending=True)
+ej2b.show()
+spark.createDataFrame(ej2b).rdd.saveAsTextFile("/Volume/Resultados/Flights/Resej2b.txt")
+
+ej2c=flights.filter("DESTINATION_AIRPORT = 'HNL'").select('AIRLINE', 'DAY_OF_WEEK', col('ARRIVAL_DELAY').cast("double"), col('AIR_SYSTEM_DELAY').cast("double"), col('SECURITY_DELAY').cast("double"), col('AIRLINE_DELAY').cast("double"), col('WEATHER_DELAY').cast("double"))
+ej2c=ej2c.na.fill(0)
+ej2c=ej2c.withColumn('DELAY', ej2c['ARRIVAL_DELAY']+ej2c['AIR_SYSTEM_DELAY']+ej2c['SECURITY_DELAY']+ej2c['AIRLINE_DELAY']+ej2c['WEATHER_DELAY']).select('AIRLINE', 'DAY_OF_WEEK', 'DELAY').sort('DELAY', ascending=True).limit(1)
+ej2c = ej2c.join(airlines, ej2c.AIRLINE == airlines.IATA_CODE)
+ej2c.show()
+spark.createDataFrame(ej2c).rdd.saveAsTextFile("/Volume/Resultados/Flights/Resej2c.txt")
+
+ej2d=flights.select("DESTINATION_AIRPORT").groupBy("DESTINATION_AIRPORT").count().sort('count', ascending=False)
+ej2d=ej2d.limit(1).join(airports, ej2d.DESTINATION_AIRPORT == airports.IATA_CODE).select("AIRPORT", "count", "CITY", "STATE")
+ej2d.show()
+spark.createDataFrame(ej2d).rdd.saveAsTextFile("/Volume/Resultados/Flights/Resej2d.txt")
+
+ej2e=flights.filter("DESTINATION_AIRPORT = 'HNL'").select('AIRLINE', 'DAY_OF_WEEK', col('ARRIVAL_DELAY').cast("double"), col('AIR_SYSTEM_DELAY').cast("double"), col('SECURITY_DELAY').cast("double"), col('AIRLINE_DELAY').cast("double"), col('WEATHER_DELAY').cast("double"))
+ej2e=ej2e.na.fill(0)
+ej2e=ej2e.withColumn('DELAY', ej2e['ARRIVAL_DELAY']+ej2e['AIR_SYSTEM_DELAY']+ej2e['SECURITY_DELAY']+ej2e['AIRLINE_DELAY']+ej2e['WEATHER_DELAY']).select('AIRLINE', 'DAY_OF_WEEK', 'DELAY').sort('DELAY', ascending=True).sort(col('DELAY').desc(), col('DAY_OF_WEEK').asc()).limit(8)
+ej2e=ej2e.join(airlines, ej2e.AIRLINE == airlines.IATA_CODE)
+ej2e.show()
+spark.createDataFrame(ej2e).rdd.saveAsTextFile("/Volume/Resultados/Flights/Resej2e.txt")
+
+ej2f=flights.filter("DESTINATION_AIRPORT = 'HNL' AND DAY_OF_WEEK = '2'").select('AIRLINE', 'DAY_OF_WEEK', col('ARRIVAL_DELAY').cast("double"), col('AIR_SYSTEM_DELAY').cast("double"), col('SECURITY_DELAY').cast("double"), col('AIRLINE_DELAY').cast("double"), col('WEATHER_DELAY').cast("double"))
+ej2f=ej2f.na.fill(0)
+ej2f=ej2f.withColumn('DELAY', ej2f['ARRIVAL_DELAY']+ej2f['AIR_SYSTEM_DELAY']+ej2f['SECURITY_DELAY']+ej2f['AIRLINE_DELAY']+ej2f['WEATHER_DELAY']).select('AIRLINE', 'DAY_OF_WEEK', 'DELAY').sort('DELAY', ascending=True).sort(col('DAY_OF_WEEK').asc(), col('DELAY').desc()).limit(3).join(airlines, ej2f.AIRLINE == airlines.IATA_CODE)
+ej2f=ej2f.sort('DELAY', ascending=True).limit(1)
+ej2f.show()
+spark.createDataFrame(ej2f).rdd.saveAsTextFile("/Volume/Resultados/Flights/Resej2f.txt")
+
+ej2g=flights.select("ORIGIN_AIRPORT", "DESTINATION_AIRPORT").groupBy("ORIGIN_AIRPORT").count().sort("count", ascending=False).limit(1).join(airports, flights.ORIGIN_AIRPORT == airports.IATA_CODE)
+ej2g.show()
+spark.createDataFrame(ej2g).rdd.saveAsTextFile("/Volume/Resultados/Flights/Resej2g.txt")

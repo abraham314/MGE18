@@ -1,0 +1,13 @@
+flights = load 's3://cristian-challu/tarea4/flights.csv' using PigStorage(',') as (year:int, month:int, day:int, day_of_week:int, airline:chararray, flight_number:int, tail_number:chararray, origin_airport:chararray, destination_airport:chararray, scheduled_departure:int, departure_time:int, departure_delay:int, taxi_out:int, wheels_off:int, scheduled_time:int, elapsed_time:int, air_time:int, distance:int, wheels_on:int, taxi_in:int, scheduled_arrival:int, arrival_time:int, arrival_delay:int, diverted:int, cancelled:int, cancellation_reason:chararray, air_system_delay:chararray, security_delay:chararray, airline_delay:chararray, late_aircraft_delay:chararray, weather_delay:chararray);
+
+flights_2 = FOREACH flights GENERATE day_of_week AS day, cancelled;
+
+flights_cancelled = FILTER flights_2 BY cancelled == 1;
+
+flights_cancelled_grouped = GROUP flights_cancelled BY day;
+
+days = FOREACH flights_cancelled_grouped GENERATE group AS day, COUNT($1) as amount;
+
+result = RANK days BY amount DESC;
+
+STORE result INTO 's3://cristian-challu/tarea4/output/output_b_3/' using PigStorage(',');

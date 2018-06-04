@@ -1,0 +1,2 @@
+select distinct b.airline as nom_airline,c.airport as lleg_airport from flights.flights as a inner join flights.airlines as b on a.airline=b.iata_code inner join flights.airports as c on 
+a.destination_airport=c.iata_code where c.airport=="Honolulu International Airport";

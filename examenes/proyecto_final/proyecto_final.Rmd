@@ -1,0 +1,108 @@
+---
+title: "Proyecto Final"
+author: "Liliana Millán, liliana.millan@gmail.com"
+date: "Mayo, 2018"
+output: html_document
+---
+
+![](../../images/itam_logo.png)
+
+### Proyecto final
+
++ **17.5%** de la calificación final
++ Contamos con los datos de defunciones en México del 2016 en formato csv ([dropbox](https://www.dropbox.com/sh/0htylz82onlionc/AADyucRwWNYkkylZ57JjXxSga?dl=0)) obtenidas del INEGI archivo `defun_2016.csv`
++ Contamos con un diccionario de datos asociado al csv: `diccionario_datos_defun2016.csv`
++ Contamos con los siguientes catálogos: 
+    + Entidades del país `decateml.csv`
+    + Causa del deceso `decatcausa.csv`
+    + Edad `deedad.csv`
+    + Sexo `desexo.csv`
+
+
+***
+
+1. Map/Reduce
+
+  + a. ¿Cuántas defunciones tenemos por mes? campo `mes_ocurr`
+  + b. ¿Cuántas defunciones tenemos por violencia familiar? campo `vio_fami`
+
+
+2. Pig
+
+¿Cuál es el estado de México donde hay más muertes? campo `ent_ocurr`
+
+  + a. Indica el total de decesos en ese estado $\rightarrow$ No olivides poner la clave de la entidad y el nombre
+  + b. Indica por entidad donde residía ordenado descendentemente por número de decesos, campo `ent_resid` $\rightarrow$ No olvides poner la clave de cada entidad y el nombre
+  + c. Indica por entidad donde se registró el deceso ordenado descendentemente, campo `ent_regis` $\rightarrow$ No olvides poner la clave de cada entidad y el nombre
+  
+Por ejemplo: 
+
+a. Chiapas: 234,567
+
+b.
+
+|Clave|Entidad|Total|
+|:---|:------:|:---|
+|11|Guanajuato|20,345|
+|31|Quintana Roo|14,030|
+|01|Aguascalientes|3,222|
+
+c. 
+
+|Clave|Entidad|Total|
+|:---|:------:|:---|
+|11|Guanajuato|20,345|
+|31|Quintana Roo|14,030|
+|01|Aguascalientes|3,222|
+
+
+3. Hive
+
+Para esta sección deberás ocupar `row_number` o `rank` y `with`
+  
+  + a. ¿Cuál es la 34va causa de muerte en México? $\rightarrow$ no olvides poner el nombre de la causa
+  + b. ¿Cuál es la 7ma causa de muerte en mujeres en Chihuahua?  $\rightarrow$ no olvides poner el nombre de la causa
+
+
+4. SparkSQL
+
+  + a. ¿Cuántos casos de defunción por Hepatitis A hay por entidad? (B150, B159) ordena la salida de forma descendente por número de decesos
+  + b. ¿Cuál es la 6ta causa de defunción por entidad y sexo para las personas de 53 años?
+
+
+5. SparkML
+
+Genera un k-means para obtener clústers de los decesos en México del 2016
+
+a. ¿Cuántos grupos generaste? Justificación
+b. ¿Cuáles son las características de cada grupo? Resúmen estadístico, número de elementos, explicación de las características
+
+
+### ¿Qué se entrega? 
+
++ Entregar por correo electrónico a liliana.millan@gmail.com a más tardar el **martes 22 de mayo de 2018 a las 16:59:59** 
++ Html y Rmd con el código de cada script
++ Imágen del summary del clúster, el nombre del cluster lleva las iniciales y matrícula más pequeña del equipo
++ Archivo de salida de cada query
+
+### ¿Qué se califica? 
+
++ Cada pregunta-inciso vale 1 punto
++ No entregó Html y Rmd: -4
++ No entregó por correo electrónico: -4
++ No incluyó imágenes del summary de su cluster: -4
++ No incluyó salida de los scripts: -4
++ Entregó fuera de tiempo: -4
++ El correo no se envió con copia a todos los integrantes del equipo: -2
+
+
+*** 
+
+### Examen teórico
+
++ Fecha **martes 22 mayo 2018** de **18:00 a 20:45** salón: **RH111**
++ Es un socrative de 20 preguntas, muy parecido a los socratives que hemos realizado
++ Incluye código de sus tareas
++ Tienen que traer compu! es en Socrative
+
+

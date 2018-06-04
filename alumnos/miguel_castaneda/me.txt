@@ -1,0 +1,5 @@
+Miguel Rodrigo Castañeda Santiago 175840
+Ingeniería Civil, Facultad de Ingeniería UNAM, Fecha de Titulación 2006
+Tiempo completo.
+Trabajo en ROITSOFT en desarrollo de aplicaciones Web Java EE y aplicaciones Android.
+El trabajo que desarrollo de manera regular es la carga y extracción de datos capturados desde aplicativos móviles.  

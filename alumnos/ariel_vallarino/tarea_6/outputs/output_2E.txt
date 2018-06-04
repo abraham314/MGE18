@@ -1,0 +1,8 @@
+day_of_week,airline,airline_name,retrato_salida
+1,NK,Spirit Air Lines,18.8
+2,NK,Spirit Air Lines,15.71
+3,UA,United Air Lines Inc.,14.28
+4,UA,United Air Lines Inc.,14.89
+5,NK,Spirit Air Lines,15.79
+6,NK,Spirit Air Lines,15.78
+7,NK,Spirit Air Lines,17.15

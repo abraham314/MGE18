@@ -1,0 +1,8 @@
+f.airline	al.airline
+US	US Airways Inc.
+DL	Delta Air Lines Inc.
+HA	Hawaiian Airlines Inc.
+UA	United Air Lines Inc.
+VX	Virgin America
+AS	Alaska Airlines Inc.
+AA	American Airlines Inc.

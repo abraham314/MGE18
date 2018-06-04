@@ -1,0 +1,2 @@
+﻿day_of_week,airline,airline,minimo
+5,HA,Hawaiian Airlines Inc.,-27

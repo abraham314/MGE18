@@ -1,0 +1,71 @@
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados1a.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+title,
+COUNT(CASE WHEN title = '"Vice President' 
+OR title = 'Inside Sales Coordinator'
+OR title = 'Sales Manager' THEN 1 ELSE 0 END) AS conteo
+FROM employees
+WHERE title = '"Vice President' 
+OR title = 'Inside Sales Coordinator'
+OR title = 'Sales Manager'
+GROUP BY title;
+
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados1a.2'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT employeeid, firstname, lastname, title, birthdate, 
+hiredate, city, country
+FROM employees 
+WHERE title = 'Sales Manager'
+OR title = 'Inside Sales Coordinator'
+OR title = '"Vice President';
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados1.b.1'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT * FROM
+(SELECT firstname, title, hiredate, COUNT(*) as conteo
+FROM (
+ SELECT employees.employeeid as employee, employees.firstname as firstname,
+ employees.lastname as lastname, employees.title as title, 
+ employees.hiredate as hiredate, orders.orderid as ordernum
+FROM employees LEFT JOIN orders 
+ON employees.employeeid = orders.employeeid) as sub
+GROUP BY firstname, title, hiredate
+SORT BY conteo DESC
+LIMIT 2) as tab
+SORT BY conteo ASC
+LIMIT 1;
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados1.b.2'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT conteo FROM
+(SELECT firstname, title, hiredate, COUNT(*) as conteo
+FROM (
+ SELECT employees.employeeid as employee, employees.firstname as firstname,
+ employees.lastname as lastname, employees.title as title, 
+ employees.hiredate as hiredate, orders.orderid as ordernum
+FROM employees LEFT JOIN orders 
+ON employees.employeeid = orders.employeeid) as sub
+GROUP BY firstname, title, hiredate
+SORT BY conteo DESC
+LIMIT 2) as tab
+LIMIT 1;
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/Volume/Resultados1.c'
+    ROW FORMAT DELIMITED 
+    FIELDS TERMINATED BY '\t'
+SELECT
+MAX(DATEDIFF(or_date_prev, or_date))
+FROM(
+SELECT orderid, 
+to_date(LAG(orderdate, 1) over()) AS or_date_prev,
+to_date(orderdate) AS or_date
+FROM orders) as tab;

@@ -1,0 +1,116 @@
+---
+title: "Tarea 6: SPARK"
+output: html_notebook
+---
+
+Tarea 6 de Métodos de Gran Escala
+
+
+## Set up
+Para realizar esta tarea descargamos la imagen de Docker jupyter/pyspark-notebook que levanta un spark con python y te permite usar jupyter notebooks desde el browser de tu computadora local. Recomiendo esto para correr spark en un ambiente local sin tener que pelearse mucho con las configuraciones, más referencias en https://medium.com/@suci/running-pyspark-on-jupyter-notebook-with-docker-602b18ac4494
+
+En la terminal vemos esto:
+![Caption for the picture.](/Users/usuario/Documents/MaestriaCD/MetodosGE/metodos_gran_escala/alumnos/oliab_herrera/Tarea6/Docker.png)
+Mientras que en el browser vemos esto:
+![Caption for the picture.](/Users/usuario/Documents/MaestriaCD/MetodosGE/metodos_gran_escala/alumnos/oliab_herrera/Tarea6/Jupyternotebook.png)
+## Preguntas y queries utilizados
+
+
+Ejercicio 1. Con la base de datos de northwind que se encuentran en el dropbox:
+
+a. ¿Cuántos "jefes" hay en la tabla empleados? ¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país?
+
+```{r}
+employees.createOrReplaceTempView("employees")
+p_1 = spark.sql("SELECT employeeid,firstname,lastname,titleofcourtesy,birthdate,hiredate,city,country FROM employees where employeeid IN ( select distinct reportsto from employees where reportsto >0)")
+p1=p_1.collect()
+p1s = pd.DataFrame(p1)
+p1s.to_csv("salida1.csv", sep=',',index=False)
+```
+b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1))
+
+```{r}
+orders.createOrReplaceTempView("orders")
+p_2 = spark.sql("SELECT lastname, firstname, title, hiredate, count(*) as total_ordenes FROM orders JOIN employees ON orders.employeeid = employees.employeeid GROUP BY lastname, firstname, title, hiredate ORDER BY total_ordenes DESC LIMIT 2")
+p2=p_2.collect()
+p2s = pd.DataFrame(p2)
+p2s.to_csv("salida2.csv", sep=',',index=False)
+```
+
+ c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?
+
+```{r}
+p_3=spark.sql("SELECT orderid, from_utc_timestamp(date_format(orderdate,'yyyy-MM-dd HH:mm:ss.SSS'),'UTC') orderdate, datediff(orderdate,from_utc_timestamp(date_format(lag(orderdate) OVER(ORDER BY orderid),'yyyy-MM-dd HH:mm:ss.SSS'),'UTC')) delta FROM orders ORDER BY delta DESC LIMIT 5")
+p3=p_3.collect()
+p3s = pd.DataFrame(p3)
+p3s.to_csv("salida3.csv", sep=',',index=False)
+```
+
+Ejercicio 2. Con los archivos de vuelos, aeropuertos y aerolíneas que están en el dropbox
+
+a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"?
+
+```{r}
+p_4 = spark.sql("select distinct airlines.airline from flights join airlines on flights.airline = airlines.iata_code where flights.destination_airport = 'HNL'")
+p4=p_4.collect()
+import pandas as pd
+p4s = pd.DataFrame(p4)
+p4s.to_csv("salida4.csv", sep=',',index=False)
+```
+
+ b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco ("SFO") a "Honolulu International Airport"? 
+ 
+ 
+```{r}
+p_5 = spark.sql("select distinct SUBSTRING( scheduled_departure,1,2) as horario from flights where origin_airport == 'SFO' and destination_airport == 'HNL'")
+p5=p_5.collect()
+p5s = pd.DataFrame(p5)
+p5s.to_csv("salida5.csv", sep=',',index=False)
+```
+
+c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a "Honolulu International Airport" para tener el menor retraso posible?
+
+```{r}
+_6 = spark.sql("select day_of_week, airlines.airline, MIN(departure_delay) AS retraso from flights join airlines on flights.airline = airlines.iata_code where destination_airport == 'HNL' group by day_of_week, airlines.airline order by retraso asc limit 1")
+p6=p_6.collect()
+p6s = pd.DataFrame(p6)
+p6s.to_csv("salida6.csv", sep=',',index=False)
+
+```
+
+d. ¿Cuál es el aeropuerto con mayor tráfico de entrada? 
+
+```{r}
+p_7= spark.sql("select DESTINATION_AIRPORT, airlines.airline, count(*) as trafico from flights join airlines on flights.airline = airlines.iata_code group by DESTINATION_AIRPORT, airlines.airline order by trafico desc limit 1")
+p7=p_7.collect()
+p7s = pd.DataFrame(p7)
+p7s.to_csv("salida7.csv", sep=',',index=False)
+
+```
+e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana? 
+
+```{r}
+p_8= spark.sql("select f.day_of_week, f.airline, f.departure_delay from(select day_of_week, max(departure_delay) as retraso from flights group by day_of_week) as x inner join flights as f on f.day_of_week = x.day_of_week and f.departure_delay = x.retraso")
+p8=p_8.collect()
+p8s = pd.DataFrame(p8)
+p8s.to_csv("salida8.csv", sep=',',index=False)
+```
+
+f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)? 
+
+```{r}
+p_9=spark.sql("select airlines.airline, min(departure_delay) AS retraso from flights join airlines on flights.airline = airlines.iata_code where day_of_week == 2 group by airlines.airline order by retraso asc limit 2")
+p9=p_9.collect()
+p9s = pd.DataFrame(p9)
+p9s.to_csv("salida9.csv", sep=',',index=False)
+```
+
+g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+
+```{r}
+p_10 = spark.sql("select day_of_week, airlines.airline, MIN(departure_delay) AS retraso from flights join airlines on flights.airline = airlines.iata_code where destination_airport == 'HNL' group by day_of_week, airlines.airline order by retraso asc LIMIT 1")
+p10=p_10.collect()
+p10s = pd.DataFrame(p10)
+p10s.to_csv("salida10.csv", sep=',',index=False)
+```
+

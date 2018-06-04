@@ -1,0 +1,15 @@
+tb.airline,tb.day_of_week,tb.menor
+Alaska Airlines Inc.,2,1
+American Airlines Inc.,2,1
+American Eagle Airlines Inc.,2,1
+Atlantic Southeast Airlines,2,1
+Delta Air Lines Inc.,2,1
+Frontier Airlines Inc.,2,1
+Hawaiian Airlines Inc.,2,1
+JetBlue Airways,2,1
+Skywest Airlines Inc.,2,1
+Southwest Airlines Co.,2,1
+Spirit Air Lines,2,1
+US Airways Inc.,2,1
+United Air Lines Inc.,2,1
+Virgin America,2,1

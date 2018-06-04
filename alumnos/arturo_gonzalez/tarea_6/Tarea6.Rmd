@@ -1,0 +1,49 @@
+---
+title: "Tarea6"
+author: "Arturo González Bencomo -172906"
+date: "March 19, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![Cluster-Lista](./imagenes/cluster-list.png)
+
+![Cluster-Resumen](./imagenes/cluster-summary.png)
+
+![Cluster-Nodos](./imagenes/cluster-nodes.png)
+
+![Dashboard-zepellin](./imagenes/zepellin-dashboard.png)
+
+![](./imagenes/1.png)
+
+![](./imagenes/2.png)
+
+![](./imagenes/3.png)
+
+![](./imagenes/4.png)
+
+![](./imagenes/5.png)
+
+![](./imagenes/6.png)
+
+![](./imagenes/7.png)
+
+![](./imagenes/8.png)
+
+![](./imagenes/9.png)
+
+![](./imagenes/10.png)
+
+![](./imagenes/11.png)
+
+![](./imagenes/12.png)
+
+![](./imagenes/13.png)
+
+![](./imagenes/14.png)
+
+![](./imagenes/15.png)
+

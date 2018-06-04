@@ -1,0 +1,9 @@
+%pyspark
+
+# 2a. ¿Qué aerolíneas (nombres) llegan al aeropuerto "Honolulu International Airport"? 
+
+vuelos_aerolineas = vuelos.join(aerolineas, vuelos.AIRLINE == aerolineas.IATA_CODE, 'left_outer').select(vuelos.DESTINATION_AIRPORT, aerolineas.AIRLINE)
+
+vuelos_aerolineas_puertos = vuelos_aerolineas.join(aeropuertos, vuelos_aerolineas.DESTINATION_AIRPORT == aeropuertos.IATA_CODE, "left_outer").select(vuelos_aerolineas.DESTINATION_AIRPORT, vuelos_aerolineas.AIRLINE, aeropuertos.AIRPORT)
+
+vuelos_aerolineas_puertos.where(vuelos_aerolineas_puertos.AIRPORT == "Honolulu International Airport").select('AIRLINE').distinct().show()

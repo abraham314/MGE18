@@ -1,0 +1,205 @@
+---
+title: "Tarea 7: Spark "
+author: "Elizabeth Solis Díaz"
+date: "4/10/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+A entregar de manera **individual** máximo el **24 de abril de 2018 23:59:59 CST** (-0.5 por cada día de retraso) en tu carpeta `alumnos/nombre_apellido/tarea_7`
+
+Con los datos que tenemos de `flights` queremos predecir el tiempo de retraso de salida `DEPARTURE_DELAY`
+
+### Evidencia S3
+
+<br>
+
+![](images/1_s3_t7.png)
+<br>
+
+### Evidencia Cluster
+
+
+<br>
+
+![](images/2_creating_cluster.png)
+<br>
+
+![](images/3_cluster_t7.png)
+<br>
+
+![](images/cluster_2.png)
+
+
+<br> 
+
+### *La tarea fue realizada en Zeppelin y se adjunta el código comentado* 
+
+<br>
+
+### Incluimos librerias
+
+<br>
+
+![](images/4_lib.png)
+
+<br>
+
+<br>
+
+### Configuracion de Spark (para aseguranos de que todo este correcto)
+
+<br>
+
+![](images/5_spark_config.png)
+
+<br>
+
+### Cargamos datos de flights
+
+<br>
+
+![](images/6_load_data.png)
+
+<br>
+
+<br>
+
+### Preparamos datos
+
+<br>
+
++ Eliminamos `na`
+
++ La variable respuesta es renombrada como `label y seleccionamos variables de interés
+
+
+<br>
+
+![](images/7_prepare_data.png)
+
+<br>
+
+### Pipeline
+
+<br>
+
++ Transformación de los datos
+
++ Creación del pipeline
+
++ Declaración de los modelos a comparar
+
++ Se seleccionaron 3 algoritmos para realizar la predicción
+
++ Declaración del gridparams con hiperparámetros:
+
+    + Se generó un `gridParamMap` para modificar los parámetros de los algoritmos seleccionados, con 3 valores diferentes en 2 de los parámetros.
+
+
+<br>
+
+![](images/8_transf.png)
+
+
+<br>
+
+### Separación de datos (train, test)
+
+<br>
+
++ Dividir el set en entrenamiento y pruebas (70 y 30)
+
++ Deberás ocupar 10 como valor de k en *cross validation*
+
++ Asignamos semilla
+
+
+<br>
+
+![](images/9_train_test.png)
+
+<br>
+
+### Magic loop
+
+<br>
+
++ Declaramos el magic loop con cross validation
+
+<br>
+
+![](images/10_declar_magic.png)
+
+<br>
+
++ Ejecutamos magic loop para probar probar los dos diferentes algoritmos
+
+![](images/11_magic.png)
+
+<br>
+
+### Selección de mejores params por algoritmo
+
+
+<br>
+
++ Se selccionaron los mejores parámetros por algoritmo por medio de un evaluador (Regression Evaluator)
+
++ ¿Qué parametros resultaron mejor por algoritmo?
+
+
+![](images/12_best_params.png)
+
+<br>
+
+### Parámetros del mejor algoritmo
+
+<br>
+
++ ¿Qué algoritmo resultó el mejor, con qué parámetros? 
+
+Los modelos probados fueron: 
+
+- Linear Regression
+
+- Generalized Linear Regression (familia Gaussiana)
+
+- Generalized Linear Regression (familia Tweedie)
+
+Con base en las métricas generadas y que se muestran a continuación podemos decir que el mejor modelo fue el tercero:  **Generalized Linear Regression** con parámetro de regularización de 0.001 y un máximo de iteraciones de 2 y con la familia *Tweedie*. También pudimos notar que con los valores más bajos de regularización los errores disminuían y la $R^2$ mejoraba. Finalmente, cabe señalar la gran similitud en las métricas entre el modelo de Regresión Lineal y Regresión Lineal Generalizado con kernel Gaussiano.
+
+
+
+![](images/13_best_model.png)
+
+<br>
+
+
+### Tiempo de ejecución de la función de `magic loop`
+
+![](images/14_tmpo.png)
+
+<br>
+
+### Diagrama
+
+<br>
+
+![](images/diagrama.png)
+
+
+
+
+
+
+
+
+
+
+
+

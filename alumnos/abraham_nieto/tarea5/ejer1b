@@ -1,0 +1,3 @@
+select a.employeeid,b.firstname,b.lastname,b.title,b.hiredate,a.num,lag(num,1,0) over (order by num desc) as ord_emp1 from (select employeeid,count(*) as num 
+from orders2 group by employeeid order by num desc limit 2) as a join employees2 as b on a.employeeid=b.employeeid order by num limit 1;
+

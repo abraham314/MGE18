@@ -1,0 +1,20 @@
+Me llamo Francisco Bahena Galeana
+
+Estudié Ingeniería en Negocios en el ITAM y me titulo en marzo de 2018.
+
+Soy estudiante de tiempo completo 
+
+pero trabajo en Klustera como ingeniero de datos. 
+
+Crear pipelines de ETL, aplicarle modelos (MLib).
+
+Scripts en python.
+
+Shell Scripts.
+
+Desarrollo y deployment de REST apis. Principalmente con Flask.
+
+Uso de orquestadores (Luigi, Airflow), bases de datos relacionales(MySql,Postgresql)
+, base de datos columnares (MongoDB y Cassandra.)
+
+Actualmente estoy aprendiendo a usar bases de grafos, TitanDB y gremlin.

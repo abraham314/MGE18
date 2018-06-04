@@ -1,0 +1,26 @@
+---
+title: "Tarea 7"
+author: "Daniel Sharp"
+date: "April 24, 2018"
+output: 
+  html_document:
+    self_contained: no
+---
+
+### Diagrama de Elementos Spark  
+
+![Elements](diagrama.png)
+
+  
+### El mejor modelo para predecir flights fue:  
+![Mejor modelo](best_model.png)  
+  
+### Tiempo de ejecución del Magic Loop    
+![Tiempo de ejecución](exec_time.png)
+  
+### Cluster   
+![Tiempo de ejecución](cluster_info.png)
+
+  
+### Ejecución de tareas  
+![Tiempo de ejecución](task_execution.png)

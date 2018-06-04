@@ -1,0 +1,8 @@
+DAY_OF_WEEK,AIRLINE,max_delay
+5,American Airlines Inc.,1988
+7,American Airlines Inc.,1670
+4,American Airlines Inc.,1649
+6,American Airlines Inc.,1878
+1,American Airlines Inc.,1625
+2,American Airlines Inc.,1609
+3,American Airlines Inc.,1589

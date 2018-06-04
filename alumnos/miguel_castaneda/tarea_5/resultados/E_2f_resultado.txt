@@ -1,0 +1,4 @@
+Total MapReduce CPU Time Spent: 0 msec
+OK
+EV      Atlantic Southeast Airlines     -41
+Time taken: 51.337 seconds, Fetched: 1 row(s)

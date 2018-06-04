@@ -1,0 +1,252 @@
+# Clase luigi
+
+
+## Ejercicio en clase
+
+
+
+### Creacion de ambiente Docker
+```sh
+docker run --name qqp \
+-e POSTGRES_DB=QQP \
+-e POSTGRES_USER=QQP \
+-e POSTGRES_PASSWORD=q1q2p \
+-d -p 5433:5432 postgres
+```
+
+### Creacion de tabla Productos
+```sql
+CREATE TABLE PRODUCTO (
+    _id char(120) CONSTRAINT firstkey PRIMARY KEY,
+    producto varchar(100),
+    presentacion varchar(100),
+    marca char(20),
+    categoria varchar(100),
+    catalogo varchar(100),
+    precio decimal,
+    fechaRegistro date,
+    cadenaComercial varchar(100),
+    giro varchar(100),
+    rfc varchar(100),
+    razonSocial varchar(100),
+    nombreComercial varchar(100),
+    direccion varchar(500),
+    estado varchar(100),
+    municipio varchar(100),
+    latitud varchar,
+    longitud varchar
+);
+```
+
+### Requirements
+```sh
+luigi==2.7.5
+requests==2.18.4
+psycopg2==2.7.4
+```
+
+### Codigo Python
+
+```python
+import os
+import csv
+import json
+import luigi
+import time
+import random
+import requests
+from luigi.contrib.postgres import CopyToTable, PostgresTarget, PostgresQuery
+
+
+class DeleteTableProducto(PostgresQuery):
+    producto = luigi.Parameter()
+    host = os.environ.get('DB_HOST', '0.0.0.0:5433')
+    database = os.environ.get('DB_DATABASE', 'QQP')
+    user = os.environ.get('DB_USER', 'QQP')
+    password = os.environ.get('DB_PASSWORD', 'q1q2p')
+    port = os.environ.get('DB_PORT', 5433)
+    table = os.environ.get('DB_TABLE','PRODUCTO')
+    update_id = str(int(round(time.time() * 1000) * random.random()))
+
+    @property
+    def query(self):
+        return "DELETE FROM PRODUCTO;"
+
+
+class DownloadProduct(luigi.Task):
+    producto = luigi.Parameter()
+
+    def requires(self):
+        return DeleteTableProducto(self.producto)
+
+    def run(self):
+        page = 1
+        must_continue = True
+        list_product = []
+
+        while must_continue:
+            print("Peticion al API pagina: ", str(page))
+            self.set_status_message("Peticion al API QQP, producto: {} pagina: {}".format(self.producto, str(page)))
+
+            response = requests.get('https://api.datos.gob.mx/v1/profeco.precios', params={'producto': self.producto, 'page': str(page)})
+            print("Respuesta del servidor", response.status_code)
+            if response.status_code == 200:
+                json_response = response.json().get('results', [])
+                must_continue = len(json_response) > 0
+
+                if must_continue:
+                    list_product.extend(json_response)
+                    page += 1
+
+        if len(list_product) > 0:
+            with self.output().open('w') as json_file:
+                json.dump(list_product, json_file)
+
+    def output(self):
+        return luigi.LocalTarget('/tmp/qqp/{}/data.json'.format(self.producto))
+
+
+class ConvertJSONToCSV(luigi.Task):
+    producto = luigi.Parameter()
+
+    def requires(self):
+        return DownloadProduct(self.producto)
+
+    def run(self):
+        with self.input().open('r') as json_file:
+            json_product = json.load(json_file)
+
+        print(len(json_product))
+        headers = json_product[0].keys()
+
+        with open('/tmp/qqp/{0}/headers.csv'.format(self.producto), 'w+') as header_file:
+            json.dump(list(headers), header_file)
+
+        with self.output().open('w') as csv_file:
+            writer = csv.writer(csv_file, delimiter='|', quotechar='"')
+
+            for product in json_product:
+                writer.writerow(list(product.values()))
+
+    def output(self):
+        return luigi.LocalTarget('/tmp/qqp/{0}/data.csv'.format(self.producto))
+
+
+class InsertDataInDataBase(CopyToTable):
+    producto = luigi.Parameter()
+    host = os.environ.get('DB_HOST', '0.0.0.0:5433')
+    database = os.environ.get('DB_DATABASE', 'QQP')
+    user = os.environ.get('DB_USER', 'QQP')
+    password = os.environ.get('DB_PASSWORD', 'q1q2p')
+    port = os.environ.get('DB_PORT', 5433)
+    table = os.environ.get('DB_TABLE','PRODUCTO')
+    update_id = str(int(round(time.time() * 1000) * random.random()))
+    column_separator = "|"
+
+    @property
+    def columns(self):
+        with open('/tmp/qqp/{0}/headers.csv'.format(self.producto), 'r') as header_file:
+            return json.load(header_file)
+
+    def requires(self):
+        return ConvertJSONToCSV(self.producto)
+
+
+class DropAggTableIfExists(PostgresQuery):
+    producto = luigi.Parameter()
+    host = os.environ.get('DB_HOST', '0.0.0.0:5433')
+    database = os.environ.get('DB_DATABASE', 'QQP')
+    user = os.environ.get('DB_USER', 'QQP')
+    password = os.environ.get('DB_PASSWORD', 'q1q2p')
+    port = os.environ.get('DB_PORT', 5433)
+    table = os.environ.get('DB_TABLE','PRODUCTO')
+    update_id = str(int(round(time.time() * 1000) * random.random()))
+
+    @property
+    def query(self):
+        return "DROP TABLE IF EXISTS agg_{0};".format(self.producto.lower().replace(' ', '_'))
+
+    def requires(self):
+        return InsertDataInDataBase(self.producto)
+
+
+class AggretateByState(PostgresQuery):
+    producto = luigi.Parameter()
+    host = os.environ.get('DB_HOST', '0.0.0.0:5433')
+    database = os.environ.get('DB_DATABASE', 'QQP')
+    user = os.environ.get('DB_USER', 'QQP')
+    password = os.environ.get('DB_PASSWORD', 'q1q2p')
+    port = os.environ.get('DB_PORT', 5433)
+    table = os.environ.get('DB_TABLE','PRODUCTO')
+    update_id = str(int(round(time.time() * 1000) * random.random() ))
+
+    @property
+    def query(self):
+        return "SELECT AVG(precio), cadenaComercial INTO agg_{0} FROM PRODUCTO GROUP BY cadenaComercial;".format(self.producto.lower().replace(' ', '_'))
+
+    def requires(self):
+        return DropAggTableIfExists(self.producto)
+
+
+class StartPipeline(luigi.Task):
+    producto = luigi.Parameter()
+
+    def requires(self):
+        return AggretateByState(self.producto)
+
+```
+
+## Tarea
+Se requiere hacer procesamiento por lote de la base de datos de QQP. Esta base de datos se puede descargar por medio de este [link](https://drive.google.com/uc?export=download&id=0B-4W2dww7ELNazFfOFVhNG5vckE) que servirá como la fuente principal de datos. Se requiere armar un pipeline de procesamiento con 
+los siguientes elementos:
+
+1. Creación de EMR
+    - Parámetros:
+        - cluster_name: Nombre del equipo (equipo en clase).
+        - keyname
+        - subnet_id
+        - region_id
+        - s3_url_log
+    - Consideraciones
+        - Monitoreo del estado del cluster
+        - Si tarda más de 10 minutos en crear el cluster, detener el pipeline
+        - No avanzar hasta que el cluster esté listo para recibir tareas
+
+2. Parquet
+    - Consideraciones
+        - La salida debe terminar en s3
+        - Archivo con lógica de parqueteo (parquet.py) debe vivir en s3
+        - El archivo fuente csv (prfeco.csv) debe vivir en s3 en el mismo path que los anteriores
+
+3. Procesamiento en EMR
+    - Consideraciones
+        - Monitoreo del step
+        - Si el step falla dentro de EMR detener el pipeline
+        - Los cálculos deben terminar en un bucket de s3 definido
+        - El archivo con la lógica de procesamiento vive en s3 (agg.py) en el mismo path de los demás archivos
+
+4. Borrar EMR
+    - Consideraciones
+        - Monitoreo del estado del cluster
+        - Si tarda más de 10 minutos en destruir el cluster, detener el pipeline
+        - No avanzar hasta que el cluster esté eliminado
+
+5. Descarga Agregaciones de S3 a local
+
+
+### Requerimientos
+- Python(luigi) 3.5.2
+- Python(EMR) 3.4x
+
+### Estructura de proyecto
+- pipeline.py
+- parquet.py
+- agg.py
+- requirements.txt (con base en un ambiente pyenv virtualenv)
+- readme.MD (instrucciones de ejecución y detalle de status de las tareas)
+
+### Reglas del Juego
+- Equipos de 3 personas máximo (Si ya hay equipos, quedarse en los mismos)
+- La calificación de la tarea es booleana (0 - 10).
+- Se respetan las penalizaciones por retraso.
+

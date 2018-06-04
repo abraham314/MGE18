@@ -1,0 +1,13 @@
+%pyspark
+
+# 2g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+
+from pyspark.sql.functions import countDistinct
+
+resultado = vuelos.groupBy('ORIGIN_AIRPORT').agg(countDistinct('DESTINATION_AIRPORT'))
+
+resultado = resultado.withColumnRenamed('count(DISTINCT DESTINATION_AIRPORT)', 'DESTINOS')
+
+resultado = resultado.orderBy('DESTINOS', ascending = False).limit(1)
+
+resultado.join(aeropuertos, resultado.ORIGIN_AIRPORT == aeropuertos.IATA_CODE, 'left_outer').select(resultado.DESTINOS, aeropuertos.AIRPORT).show()

@@ -1,0 +1,12 @@
++----------+---------+--------+--------------------+-------------------+-------------------+------+-------+------------------+---------+
+|employeeid|firstname|lastname|               title|          birthdate|           hiredate|  city|country|employee_firstname|reportsto|
++----------+---------+--------+--------------------+-------------------+-------------------+------+-------+------------------+---------+
+|         2|   Andrew|  Fuller|Vice President; S...|1952-02-19 00:00:00|1992-08-14 00:00:00|Tacoma|    USA|             Laura|        2|
+|         2|   Andrew|  Fuller|Vice President; S...|1952-02-19 00:00:00|1992-08-14 00:00:00|Tacoma|    USA|            Steven|        2|
+|         2|   Andrew|  Fuller|Vice President; S...|1952-02-19 00:00:00|1992-08-14 00:00:00|Tacoma|    USA|          Margaret|        2|
+|         2|   Andrew|  Fuller|Vice President; S...|1952-02-19 00:00:00|1992-08-14 00:00:00|Tacoma|    USA|             Janet|        2|
+|         2|   Andrew|  Fuller|Vice President; S...|1952-02-19 00:00:00|1992-08-14 00:00:00|Tacoma|    USA|             Nancy|        2|
+|         5|   Steven|Buchanan|       Sales Manager|1955-03-04 00:00:00|1993-10-17 00:00:00|London|     UK|              Anne|        5|
+|         5|   Steven|Buchanan|       Sales Manager|1955-03-04 00:00:00|1993-10-17 00:00:00|London|     UK|            Robert|        5|
+|         5|   Steven|Buchanan|       Sales Manager|1955-03-04 00:00:00|1993-10-17 00:00:00|London|     UK|           Michael|        5|
++----------+---------+--------+--------------------+-------------------+-------------------+------+-------+------------------+---------+

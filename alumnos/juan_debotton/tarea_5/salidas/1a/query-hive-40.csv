@@ -1,0 +1,3 @@
+e.employeeid,e.firstname,e.lastname,e.title,e.birthdate,e.hiredate,e.city,e.country
+2,Andrew,Fuller,Vice President Sales,2/19/52,8/14/92,Tacoma,USA
+5,Steven,Buchanan,Sales Manager,3/4/55,10/17/93,London,UK

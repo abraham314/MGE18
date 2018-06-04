@@ -1,0 +1,94 @@
+---
+title: "Tarea 6 Spark"
+author: "Mariana Godina Abasolo"
+output: 
+  html_notebook:
+    toc: yes
+---
+
+<script>
+   $(document).ready(function() {
+     $head = $('#header');
+     $head.prepend('<img src=\"logo.png\" style=\"float: right;width: 150px;\"/>')
+   });
+</script>
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE, echo=FALSE}
+library(tidyverse)
+```
+
+### Foto de tu clúster de AWS 
+
++ management console
+
+![](summary_cluster.png)
+
++ Lectura de datos zeppelin
+
+![](setup.png)
+
+### Ejercicio 1
+
+a. ¿Cuántos “jefes” hay en la tabla empleados? 
+
+- Hay 2 "jefes"
+
+![](Ejercicio1/preg1a1.png)
+
+¿Cuáles son estos jefes: número de empleado, nombre, apellido, título, fecha de nacimiento, fecha en que iniciaron en la empresa, ciudad y país? (atributo reportsto, ocupa explode en tu respuesta)
+
+![](Ejercicio1/preg1a2.png)
+
+b. ¿Quién es el segundo “mejor” empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1))
+
+- La segunda "mejor" empleada es Janet con 127 ordenes generadas.
+
+![](Ejercicio1/preg1b.png)
+
+c. ¿Cuál es el delta de tiempo más grande entre una orden y otra?
+
+- 3 días es el tiempo más grande entre una orden y otra
+![](Ejercicio1/preg1c.png)
+
+### Ejercicio 2
+
+a. ¿Qué aerolíneas (nombres) llegan al aeropuerto “Honolulu International Airport”?
+
+![](Ejercicio2/preg2a.png)
+
+
+b. ¿En qué horario (hora del día, no importan los minutos) hay salidas del aeropuerto de San Francisco (“SFO”) a “Honolulu International Airport”?
+
+![](Ejercicio2/preg2b.png)
+
+
+c. ¿Qué día de la semana y en qué aerolínea nos conviene viajar a “Honolulu International Airport” para tener el menor retraso posible?
+
+- El día de la semana que nos conviene viajar a “Honolulu International Airport” es el Domingo por la aerolínea Virgin America.
+
+![](Ejercicio2/preg2c.png)
+
+d. ¿Cuál es el aeropuerto con mayor tráfico de entrada?
+
+- El aeropuerto con mayor tráfico es el de atlanta
+
+![](Ejercicio2/preg2d.png)
+
+e. ¿Cuál es la aerolínea con mayor retraso de salida por día de la semana?
+
+- Las aerolíneas con mayor retraso son Spirit Air Lines y United Air Lines
+
+![](Ejercicio2/preg2e.png)
+
+f. ¿Cuál es la tercer aerolínea con menor retraso de salida los lunes (day of week = 2)?
+
+- La tercer aerolínea con menor retraso es Southwest Airlines Co.
+
+![](Ejercicio2/preg2f.png)
+
+
+g. ¿Cuál es el aeropuerto origen que llega a la mayor cantidad de aeropuertos destino diferentes?
+
+- El aeropuerto origen que llega a la mayor cantidad de aeropuertos es 
+
+![](Ejercicio2/preg2g.png)

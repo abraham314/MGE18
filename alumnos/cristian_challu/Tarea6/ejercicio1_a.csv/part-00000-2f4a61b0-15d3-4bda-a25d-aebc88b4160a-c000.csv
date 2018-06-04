@@ -1,0 +1,9 @@
+employeeid,firstname,lastname,title,birthdate,hiredate,city,country,trabajadores_ids
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,3
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,1
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,5
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,8
+2,Andrew,Fuller,"Vice President, Sales",1952-02-19,1992-08-14,Tacoma,USA,4
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,9
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,7
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,6

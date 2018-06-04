@@ -1,0 +1,2 @@
+codigo,aeropuerto,cant_destinos
+ATL,Hartsfield-Jackson Atlanta International Airport,169

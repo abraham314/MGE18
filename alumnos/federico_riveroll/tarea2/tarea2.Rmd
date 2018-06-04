@@ -1,0 +1,53 @@
+---
+title: "Tarea 2"
+author: "Alejandro Hernández 87806, Federico Riveroll 105898 y Abraham Nieto 51556"
+output: html_document
+---
+
+__- URL de la imagen, dockerfile y comando para iniciar la imagen montando volumen__
+
+La imagen se tomó de: https://hub.docker.com/r/sequenceiq/hadoop-docker/
+
+El dockerfile es: https://hub.docker.com/r/sequenceiq/hadoop-docker/~/dockerfile/
+
+El comando pra inicializar la imagen montando el volumen `compartida` es: 
+`docker run -v /Users/alex/Documents/compartida/:/usr/local/hadoop/compartida `
+`-it sequenceiq/hadoop-docker:2.7.0 /etc/bootstrap.sh -bash`
+
+Revisamos la versión:
+
+![](/Users/alex/Documents/Maestría Ciencia de Datos/Metodos_gran_escala/Tarea2/0.png)
+
+__- Creamos el directorio y verificamos su existencia__
+
+
+Creamos directorio:
+
+![](/Users/alex/Documents/Maestría Ciencia de Datos/Metodos_gran_escala/Tarea2/1.png)
+
+
+
+__- Mostramos que el directorio esta vacío__
+
+![](/Users/alex/Documents/Maestría Ciencia de Datos/Metodos_gran_escala/Tarea2/2.png)
+
+
+__- Cargamos los datos__
+
+![](/Users/alex/Documents/Maestría Ciencia de Datos/Metodos_gran_escala/Tarea2/3.png)
+
+__- Mostramos que los datos estan cargados__
+
+![](/Users/alex/Documents/Maestría Ciencia de Datos/Metodos_gran_escala/Tarea2/4.png)
+
+__-Mostramos que el NameNode, DataNode, ResourceManager y el NodeManager están activos en el clúster__
+
+![](/Users/alex/Documents/Maestría Ciencia de Datos/Metodos_gran_escala/Tarea2/5.png)
+
+__-Mostramos la salida del reporte generado con `dfsadmin report`__
+
+![](/Users/alex/Documents/Maestría Ciencia de Datos/Metodos_gran_escala/Tarea2/6.png)
+
+__-¿Cuál es el % de DFS utilizado una vez que ya subiste los datos?__
+
+El porcentaje de DFS utilizado es el 2.85%.

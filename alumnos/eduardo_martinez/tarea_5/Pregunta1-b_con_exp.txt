@@ -1,0 +1,6 @@
+id,nombre,apellido,titulo,fecha_nac,fecha_ingreso,ciudad,pais,empleado
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Davolio
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Leverling
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Peacock
+2,Andrew,Fuller,"""Vice President",Dr.,1952-02-19,908 W. Capital Way,98401,Callahan
+5,Steven,Buchanan,Sales Manager,1955-03-04,1993-10-17,London,UK,Dodsworth

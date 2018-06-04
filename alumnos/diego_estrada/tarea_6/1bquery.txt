@@ -1,0 +1,16 @@
+%pyspark
+
+# 1b. ¿Quién es el segundo "mejor" empleado que más órdenes ha generado? (nombre, apellido, título, cuándo entró a la compañía, número de órdenes generadas, número de órdenes generadas por el mejor empleado (número 1))
+
+from pyspark.sql.functions import lag, col, lead, expr, lit
+from pyspark.sql.window import Window
+
+ordenes_empleado = ordenes.groupBy('employeeid').count().orderBy('count', ascending = False).limit(2)
+
+ordenes_empleado = ordenes_empleado.join(empleados, ordenes_empleado.employeeid == empleados.employeeid, 'left_outer').select('firstname','lastname','title','hiredate','count').orderBy('count', ascending = True)
+
+w = Window().partitionBy().orderBy(col("count"))
+resultado = ordenes_empleado.select("*", lead("count").over(w).alias("ordenes_del_mejor")).na.drop()
+
+resultado = resultado.withColumnRenamed('count', 'numero_de_ordenes')
+resultado.show()

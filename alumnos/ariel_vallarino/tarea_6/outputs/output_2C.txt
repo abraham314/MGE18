@@ -1,0 +1,2 @@
+day_of_week,airline,airline_name,retrato_arribo
+6,AS,Alaska Airlines Inc.,-2.73

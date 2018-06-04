@@ -1,0 +1,19 @@
+version: "3"
+services:
+  notebook:
+    build:
+      context: ./notebook_config
+    entrypoint: jupyter lab
+    ports:
+      - 8888:8888
+    volumes:
+      - ./notebooks:/home/jupyter/workspace/notebooks
+  graphdb:
+    image: neo4j:3.1
+    environment:
+      NEO4J_AUTH: neo4j/password
+      NEO4J_URI: http://neo4j:password@graphdb:7474
+    ports:
+      - 7474:7474
+      - 7687:7687
+

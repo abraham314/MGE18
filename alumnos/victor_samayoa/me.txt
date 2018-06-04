@@ -1,0 +1,14 @@
+Nombre, apellidos:
+Victor Augusto, Samayoa Donado.
+
+Carrera, Universidad donde la estudiaste, fecha de titulacion: 
+Matematicas, Facultad de Ciencias Universidad Nacional Autonoma de Mexico, marzo de 2013.
+Fisica, Facultad de Ciencias Universidad Nacional Autonoma de Mexico, febrero de 2017.
+
+Estudiante de tiempo completo?
+No.
+
+Empresa y descripcion del dia a dia:
+Estoy ingresando a Bancomer en el area de riesgos.
+Mi labor consiste en la extraccion, analisis de los datos y la generacion modelos predictivos y de clasificacion para la toma de decisiones.
+Una vez se valida y acepta un modelo es necesario implementar el proceso del analisis en un ambiente productivo para el uso del personal del banco.

@@ -1,0 +1,64 @@
+---
+title: "Tarea 7"
+author: "Alejandro Hernández Farías 87806"
+output: html_document
+---
+
+
+__Fotos del cluster `alejandro_hernandez`:__
+
+Imagen del summary:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_7/cluster1.png)
+
+
+Imágen del hardware:
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_7/cluster2.png)
+
+
+
+
+__- Se anexa en la carpeta el script de pyspark con comentarios que se corrió en zeppelin: `tarea7.py`__
+
+
+__- Diagrama de elementos de mi código:__
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_7/diagrama.png)
+
+__- Se incorporan 4 imágenes de Zeppelin para constatar que se corrió el script:__
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_7/zeppelin1.png)
+
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_7/zeppelin2.png)
+
+
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_7/zeppelin3.png)
+
+
+![](/Users/alex/Documents/Maestria_ciencia_datos/Metodos_gran_escala/tarea_7/zeppelin4.png)
+
+__- Se anexa en la carpeta el notebook de Zeppelin: `tarea7.json`__
+
+
+__- ¿Qué parámetros resultaron mejor por algoritmo?__
+
+- Para el DecisionTreeRegressionModel los mejores parámetros fueron maxBins = 10 y minInstancesPerNode = 10.
+
+- Para el RandomForestRegressionModel los mejores parámetros fueron maxDepth = 7 y numTrees = 5.
+
+
+__-Qué algoritmo resultó mejor, con qué parámetros?__
+
+El mejor algoritmo, pues obtuvo el menor rmse (36.8754) fue RandomForestRegressionModel con los parámetros maxDepth = 7 y numTrees = 5.
+
+
+__Indicar tiempo de ejecución del magicloop__
+
+El tiempo de ejecución utilizando la librería `timeit` fue de 3379.79 segundos; es decir, 56.32 minutos y el tiempo de ejecución que marcó Zeppelin fue de 56 minutos y 46 segundos.
+
+
+
+

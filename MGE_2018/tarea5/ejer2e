@@ -1,0 +1,3 @@
+select x.* from(select b.airline, a.day_of_week,max(a.departure_delay) as mayor from flights.flights as a join flights.airlines as b on a.airline=b.iata_code group by b.airline,
+a.day_of_week) as x inner join (select day_of_week,max(departure_delay) as mayord from flights.flights group by day_of_week) as y on x.day_of_week=y.day_of_week 
+and x.mayor=y.mayord order by x.day_of_week;

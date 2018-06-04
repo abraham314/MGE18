@@ -1,0 +1,2 @@
+select a.destination_airport,b.airport as name,count(*) as trafico from flights.flights as a join flights.airports as b on a.destination_airport=b.iata_code 
+group by a.destination_airport,b.airport order by trafico desc limit 1;

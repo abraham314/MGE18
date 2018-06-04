@@ -1,0 +1,9 @@
+employeeid,lastname,firstname,title,birthdate,hiredate,city,country,col
+2,Fuller,Andrew,"Vice President, Sales",1952-02-19T00:00:00.000Z,1992-08-14T00:00:00.000Z,Tacoma,USA,Janet
+2,Fuller,Andrew,"Vice President, Sales",1952-02-19T00:00:00.000Z,1992-08-14T00:00:00.000Z,Tacoma,USA,Laura
+2,Fuller,Andrew,"Vice President, Sales",1952-02-19T00:00:00.000Z,1992-08-14T00:00:00.000Z,Tacoma,USA,Nancy
+2,Fuller,Andrew,"Vice President, Sales",1952-02-19T00:00:00.000Z,1992-08-14T00:00:00.000Z,Tacoma,USA,Margaret
+2,Fuller,Andrew,"Vice President, Sales",1952-02-19T00:00:00.000Z,1992-08-14T00:00:00.000Z,Tacoma,USA,Steven
+5,Buchanan,Steven,Sales Manager,1955-03-04T00:00:00.000Z,1993-10-17T00:00:00.000Z,London,UK,Robert
+5,Buchanan,Steven,Sales Manager,1955-03-04T00:00:00.000Z,1993-10-17T00:00:00.000Z,London,UK,Anne
+5,Buchanan,Steven,Sales Manager,1955-03-04T00:00:00.000Z,1993-10-17T00:00:00.000Z,London,UK,Michael

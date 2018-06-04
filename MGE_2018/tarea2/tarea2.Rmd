@@ -1,0 +1,45 @@
+---
+title: "Tarea2" 
+author: "Alejandro Hernández 87806, Federico Riveroll 105898 y Abraham Nieto 51556"
+date: "2 de febrero de 2018" 
+output: html_document
+---
+
+**La Tarea se realizo en hadoop Local**
+
+**Version Hadoop**
+![](/home/abraham/MGE_2018/tarea2/version.png)
+
+
+**Creamos Directorio**
+
+![](/home/abraham/MGE_2018/tarea2/crea.png)
+
+**Mostramos que el directorio esta vacío**
+![](/home/abraham/MGE_2018/tarea2/vacio.png)
+
+
+**Cargamos los datos**
+![](/home/abraham/MGE_2018/tarea2/carga.png)
+
+
+**Mostramos que los datos estan cargados**
+![](/home/abraham/MGE_2018/tarea2/datos.png)
+
+
+**Mostramos que el NameNode, DataNode, ResourceManager y el NodeManager están activos en el clúster**
+![](/home/abraham/MGE_2018/tarea2/nodos.png)
+
+
+**Mostramos la salida del reporte generado con dfsadmin report**
+![](/home/abraham/MGE_2018/tarea2/dfs.png)
+
+
+
+**¿Cuál es el % de DFS utilizado una vez que ya subiste los datos?**
+
+El porcentaje es  0.20%
+
+
+
+

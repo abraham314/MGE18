@@ -1,0 +1,2 @@
+select b.airport as name_airport,a.origin_airport,count(distinct a.destination_airport) as distintos from flights.flights as a 
+join flights.airports as b on a.origin_airport=b.iata_code group by b.airport,a.origin_airport order by distintos desc limit 1;

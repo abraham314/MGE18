@@ -1,0 +1,33 @@
+estacion,nombre,num_dias,num_obs,promedio_mediciones
+ACO,Acolman,3437,402274,117
+AJM,Ajusco Medio,1076,217270,201
+AJU,Ajusco,969,35792,36
+ATI,Atizapán,8256,742320,89
+BJU,Benito Juarez,7143,632556,88
+CAM,Camarones,4914,500148,101
+CCA,Centro de Ciencias de la Atmósfera,1212,182193,150
+CHO,Chalco,3465,307018,88
+CUA,Cuajimalpa,8155,464084,56
+CUT,Cuautitlán,1995,253291,126
+FAC,FES Acatlán,10743,1294628,120
+GAM,Gustavo A. Madero,735,23477,31
+HGM,Hospital General de México,2116,409780,193
+INN,Investigaciones Nucleares,773,93932,121
+IZT,Iztacalco,3738,591241,158
+LLA,Los Laureles,8052,337647,41
+LPR,La Presa,9358,347666,37
+MER,Merced,11183,1657411,148
+MGH,Miguel Hidalgo,1061,218803,206
+MON,Montecillo,8241,381846,46
+MPA,Milpa Alta,687,88220,128
+NEZ,Nezahualcóyotl,2182,338819,155
+PED,Pedregal,11341,1599425,141
+SAG,San Agustín,9594,1349926,140
+SFE,Santa Fe,1861,341822,183
+TAH,Tláhuac,8539,690603,80
+TLA,Tlalnepantla,11178,1641310,146
+TLI,Tultitlán,8588,957095,111
+UAX,UAM Xochimilco,2129,333794,156
+UIZ,UAM Iztapalapa,9883,1278624,129
+VIF,Villa de las Flores,8262,952891,115
+XAL,Xalostoc,11082,1550022,139

@@ -1,0 +1,16 @@
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar  -files /home/abraham/MGE_2018/tarea3/ejer1/mapper1.py,/home/abraham/MGE_2018/tarea3/ejer1/reducer1.py  -input /home/abraham/MGE_2018/tarea3/ejer1/ecobici/year=2017/sem1/ecobici_2010_2017.csv  -output /home/abraham/MGE_2018/tarea3/ejer1/output1.txt  -mapper mapper1.py  -reducer reducer1.py 
+
+hdfs dfs -mkdir -p /home/abraham/MGE_2018/tarea3/ejer3/flights
+hdfs dfs -ls  /home/abraham/MGE_2018/tarea3/ejer3/flights
+hdfs dfs -copyFromLocal /home/abraham/MGE_2018/tarea3/ejer3/outaux3.csv /home/abraham/MGE_2018/tarea3/ejer3/flights/outaux3.csv
+hdfs dfs -copyFromLocal /home/abraham/MGE_2018/tarea3/airlines.csv /home/abraham/MGE_2018/tarea3/ejer2/flights/airlines.csv 
+hdfs dfs -copyFromLocal /home/abraham/MGE_2018/tarea3/ejer3/airports.csv /home/abraham/MGE_2018/tarea3/ejer3/flights/airports.csv 
+
+
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar  -files /home/abraham/MGE_2018/tarea3/ejer2/mapper2.py,/home/abraham/MGE_2018/tarea3/ejer2/reducer2.py  -input /home/abraham/MGE_2018/tarea3/ejer2/flights/flights.csv,/home/abraham/MGE_2018/tarea3/ejer2/flights/airlines.csv  -output /home/abraham/MGE_2018/tarea3/ejer2/aux.txt  -mapper mapper2.py  -reducer reducer2.py
+
+
+-Dmapred.reduce.tasks=1 -Dstream.num.map.output.key.fields=1 -input transactions_and_users_output -output transactions_and_users_output_final -file /path/to/joinMapperTU1.py -file /path/to/joinReducerTU1.py -mapper joinMapperTU1.py -reducer joinReducerTU1.py
+
+
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar -mapper mapper3_1.py -reducer reducer3_1.py -input /home/abraham/MGE_2018/tarea3/ejer3/flights/outaux3x2.csv -output /home/abraham/MGE_2018/tare3/ejer3/output3_15 -file /home/abraham/MGE_2018/tarea3/ejer3/mapper3_1.py -file /home/abraham/MGE_2018/tarea3/ejer3/reducer3_1.py

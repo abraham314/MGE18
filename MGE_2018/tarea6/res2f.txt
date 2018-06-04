@@ -1,0 +1,15 @@
+DAY_OF_WEEK,AIRLINE,min_delay
+2,American Eagle Airlines Inc.,1
+2,Spirit Air Lines,1
+2,Alaska Airlines Inc.,1
+2,JetBlue Airways,1
+2,Atlantic Southeast Airlines,1
+2,Virgin America,1
+2,American Airlines Inc.,1
+2,Skywest Airlines Inc.,1
+2,US Airways Inc.,1
+2,Hawaiian Airlines Inc.,1
+2,United Air Lines Inc.,1
+2,Delta Air Lines Inc.,1
+2,Frontier Airlines Inc.,1
+2,Southwest Airlines Co.,1

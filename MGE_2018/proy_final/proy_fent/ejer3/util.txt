@@ -1,0 +1,1 @@
+create table decateml2 as select `?cve_ent` as cve_ent,cve_mun,cve_loc,nom_loc from decateml 

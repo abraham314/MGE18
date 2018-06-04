@@ -1,0 +1,145 @@
+---
+title: "Examen 1"
+author: "Liliana Millán"
+date: "March 19, 2018"
+output: 
+  html_document:
+    df_print: paged
+    highlight: tango
+    theme: lumen
+---
+
+![](../images/itam_logo.png)
+
+## Examen 1 {.tabset .tabset-fade .tabset-pills}
+
++ 35% de la calificación total de la materia
+
+### Contexto: 
+
++ Cuentas con los datos de medición de calidad de aire de la CDMX del año 2017 a 1986 (~35 millones de observaciones, ~1.1G)
++ Las métricas son promedios diarios (1 medición cada hora) por estación meteorológica (si la estación no tuvo medición no se reporta medición) de los siguientes contaminantes:
+    + $CO$: Monóxido de carbono, que causa afectaciones al corazón y al cerebro (quita el oxígeno de la sangre)
+    + $NO$: Monóxido de nitrógeno, unido con vapor de agua produce lluvia ácida
+    + $NO_{2}$: Dióxido de nitrógeno, la exposición aguda provoca lesiones en las vías respiratorias y pulmones así como mayor sensibilidad a alergenos. Especialmente causa cambios irreversibles en la estructura y función de los pulmonnes en niños y personas asmáticas. 
+    + $NO_{x}$: Óxidos de nitrógeno $NO+NO_{2}$. Contaminante generado por tráfico rodado
+    + $O_{3}$: Ozono, ocasiona inflamación pulmonar, depresión del sistema inmunológico y efectos sistémicos en órganos blandos
+    + $PM_{10}$: Pequeñas partículas de 10 micrones ($\mu$) de diámetro que pueden causar cardiopatías, neumopatías y cáncer
+    + $PM_{2.5}$: Partículas finas de 2.5 micrones ($\mu$) de diámetro
+    + $SO_{2}$: Dióxido de azúfre, afecta a todas las mucosidades y pulmones.
+    
+De acuerdo a la CDMX la normatividad en vigencia tiene los siguientes límites por contaminante:
+
+![](../images/niveles_contaminantes.png)
+
+<br>
+
+Por otro lado:
+
++ El programa **Hoy no circula** inició en el segundo semestre del año 1989
++ El programa **Metrobus** inició en 2006
++ El programa **Ecobici** inició en febrero de 2010
++ La activación de contingencia ambiental Fase I sucede cuando la cantidad de alguno de los contaminantes supera los 190 puntos IMECA
++ La activación de contingencia ambiental Fase II sucede cuando la cantidad de alguno de los contaminantes supera los 240 puntos IMECA
++ El índice IMECA (Índice Metropolitano de la Calidad de Aire) tiene las siguientes escalas de medición por contaminante
+
+![](../images/indice_imeca.png)
+<br>
+
+![](../images/escala_imeca.png)
+<br>
+
+$\rightarrow$ La última revisión a la norma que define el IMECA sucedió en febrero de 2006
+
+Los datos se ven asi: 
+
+![](../images/datos_examen_1.png)
+
+<br>
+
+$\rightarrow$ También cuentas con el catálogo de estaciones meteorológicas, el catálogo de unidades de medición, la definición de la norma de IMECA y el historial de contigencias ambientales
+
+$\rightarrow$ Los datos los puedes encontrar [aquí](https://www.dropbox.com/sh/maciygwli5798n8/AAAMltgU0gDizCyOemg_0ujAa?dl=0)
+
+### ¿Qué hay que hacer? 
+
+#### MapReduce (A)
+
+Incluye el conteo total y el conteo de nulos o vacíos
+
++ A.1 ¿Cuántas estaciones meteorológicas diferentes tienes por año?
++ A.2 ¿Cuántos registros hay por contaminante y estación meteorológica?
++ A.3 ¿Cuántos registros hay por contaminante y año? 
++ A.4 ¿Cuántos registros hay por contaminante, año y estación meteorológica?
++ A.5 ¿Cuántos registros hay por estación meteorológica en el Estado de México?
+
+#### Pig (B)
+
++ B.1 ¿Cuál es la estación meteorológica más "nueva"? 
++ B.2 ¿Cuál es el contaminante con la medición más alta? -ten cuidado con las unidades de cada contaminante!-, ¿en qué fecha sucedió?, ¿qué estación metorológica la registró?
++ B.3 ¿Cuál es el contaminante con la medición más baja? -ten cuidado con las unidades de cada contaminante!-, ¿en qué fecha sucedió?, ¿qué estación metorológica la registró?
++ B.4 ¿Cuál es el promedio de mediciones (número de observaciones) de cada estación meteorológica por día (redondeado a enteros)? Por ejemplo: 
+
+|Estación meteorológica|Promedio de mediciones|
+|:-----------|:---------|
+|Corena|123,456|
+
++ B.5 ¿Cuántas veces por año hemos estado con $NO_{x}$ entre la Fase I y la Fase II de contingencia ambiental? (entre 191 y 239 -inclusive-) Promedia el contaminante por día
+
+#### Hive (C)
+
++ C.1 ¿En qué hora (solo hora, en formato 0-23) del día normalmente hay picos por contaminante/mes? ¡Incluir la unidad del contaminante! (catálogo de unidades) Por ejemplo: 
+
+|contaminante|mes|hora|valor|unidad|
+|:-----|:-----|:------|:----|
+|CO|enero|8|0.8|partes por millon|
+|NO|enero|10|1|pates por billon|
+
+
++ C.2 ¿Cuántas veces por año hemos estado con $O_{3}$ entre la Fase I y la Fase II de contingencia ambiental? (entre 191 y 239 -inclusive-) Promedia el contaminante por día
++ C.3 ¿Cuántas veces por año hemos estado con $SO_{2}$ entre la Fase I y la Fase II de contingencia ambiental? (entre 191 y 239 -inclusive-) Promedia el contaminante por día
++ C.4 De acuerdo a la definición del índice IMECA (pag 6 pdf) ¿Cuántas veces y cuáles veces hemos estado en un nivel IMECA malo para $PM_{2.5}$? Promedia el contaminante por día
++ C.5 De acuerdo a la definición del índice IMECA (pag 6 pdf) ¿Cuántas veces y cuáles veces hemos estado en un nivel IMECA malo para $PM_{10}$?
+Promedia el contaminante por día
+
+
+#### Spark (D)
+
+Esta parte realizala en el shell de *pyspark*
+
++ D.1 Realiza un pequeño *profiling* a los datos por métrica/año indicando: min, max, mean, approximateQuantiles, desviación estándar, número de datos sin registro (nulos, vacíos)
++ D.2 ¿Existe evidencia que sugiera que el metrobus ayudó a reducir contaminantes en ciertas estaciones meteorológicas? (No hace falta construir un modelo, qué nos dice la estadística descriptiva??)
++ D.3 ¿Cuál es el contaminante que ha tenido mayor descenso con el paso del tiempo? Obtén el promedio por métrica del día (todas las estaciones), luego genera un lag por día, luego saca el promedio del lag por contaminante, selecciona el que tenga mayor lag. $\rightarrow$ ordena de 1986 a 2017!
++ D.4 De acuerdo al histórico de PM2.5 ¿cuál es el mes del año en el que se pone peor?
++ D.5 ¿En qué horario/mes evitarías irte en Ecobici a cualquier lugar de acuerdo al histórico de mediciones de PM2.5?
+
+#### Reflexiones 
+
++ ¿Consideras que el programa "Hoy no circula" ha funcionado? Explica la evidencia que sustenta tu respuesta
++ ¿Agregarías restricciones más severas a la contingencia ambiental? ¿Los niveles de CDMX son adecuados de acuerdo a lo que sucede en otras partes del mundo para activación de contigencia ambiental? Explica la evidencia que sustenta tu respuesta
++ ¿Consideras que la calidad de aire no es un peligro para los habitantes de esta ciudad? sobre todo para niños y adultos mayores. Justifica tu respuesta con evidencia
+
+### ¿Qué hay que entregar?
+
++ El examen es por equipo 
++ Se envía por correo a liliana.millan@gmail.com **máximo el 2 de abril de 2018 a las 23:59:59 CST** con copia a todos los integrantes de tu equipo (un solo correo por equipo)
++ Entregar los `mapper.py`, `reducer.py`,  utilizando *Hadoop Streaming* imágenes de evidencia del commando de ejecución
++ Entregar las salidas del MapReduce de cada pregunta (`mr_a_1.csv`, `mr_a_2.csv`, etc)
++ Entregar los scripts `script_pig_n.pig`, imágenes de la corrida en el clúster de AWS, puede ser desde *Hue* o desde Zeppelin. El nombre del clúster debe tener el iniciales de nombre y apellido más la matrícula del que enviará el correo a nombre del equipo. Por ejemplo: `lm_59403`
++ Entregar las salidas de cada script de pig (`pig_b_1.csv`, `pig_b_2.csv`, etc.)
++ Entregar los scripts `script_hive_n.hql`, imágenes de la corrida en el clúster de AWS, puede ser desde *Hue* o desde Zeppelin
++ Entregar las salidas de cada script de hive (`hive_b_1.csv`, `hive_b_2.csv`, etc.)
++ Entregar los scripts `script_spark_n.py` de lo ejecutado en *Spark* con *pyspark* puede ser desde el *shell* o desde Zeppelin, imagen(es) de la corrida en el clúster de AWS
++ Entregar los parquet de cada script de spark (renombrar a `spark_d_1_part_1.parquet`, `spark_d_1_part_2.parquet`, etc)
++ Generar un Rmd y HTML que contenga las respuestas (sin código) de las preguntas que contestaron de cada sección, incluir una sección de Conclusiones 
+
+$\rightarrow$ El examen debe tener $n$ nodos en el clúster (configuración de AWS) donde $n$ es el número de integrantes del equipo. Solo es necesario que corra en una de las cuentas (chequen quién tiene más saldo en sus cuentas de AWS!!)
+
++ No se entregó el Rmd y HTML: -5
++ No se entregó el examen por correo: -5
++ No se entregó el examen a tiempo: -7
++ No entregó sección de Reflexiones: -2
++ No entregó sección de Conclusiones: -2
++ El correo no se envió con copia a todos los integrantes del equipo: -2
+
+$\rightarrow$ Escala 10

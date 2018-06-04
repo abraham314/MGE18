@@ -1,0 +1,5 @@
+select distinct substr(x.scheduled_departure,1,2) as hora_sal,x.origin_airport,
+y.airport as orig_airport,x.destination_airport,x.lleg_airport  from(select a.*,b.airline as nom_airline,c.airport as lleg_airport from flights.flights as a inner join flights.airlines as b 
+on a.airline=b.iata_code inner join flights.airports as c on 
+a.destination_airport=c.iata_code  where c.airport=="Honolulu International Airport") as x inner join flights.airports as y 
+on x.origin_airport=y.iata_code where y.airport=="San Francisco International Airport";

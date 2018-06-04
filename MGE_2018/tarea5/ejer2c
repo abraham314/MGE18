@@ -1,0 +1,11 @@
+select r.* from (
+/*tabla para saber el menor retraso posible de la base con destino honolulu*/
+select min(m.departure_delay) as retraso from flights.flights as m join flights.airports as n on m.destination_airport=n.iata_code where departure_delay>0 
+and n.airport=="Honolulu International Airport") as s inner join 
+/*tabla para saber menores retrasos por dia de la semana y aerolineas*/
+(select x.day_of_week,x.nom_airline,min(x.departure_delay) as retraso   
+from(select a.*,b.airline as nom_airline,c.airport as lleg_airport from flights.flights as a inner join flights.airlines as b 
+on a.airline=b.iata_code inner join flights.airports as c on 
+a.destination_airport=c.iata_code  where c.airport=="Honolulu International Airport") as x inner join flights.airports as y on 
+x.origin_airport=y.iata_code where x.departure_delay>0 group by x.day_of_week,x.nom_airline 
+order by retraso desc) as r on s.retraso=r.retraso order by day_of_week;

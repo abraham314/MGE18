@@ -1,0 +1,114 @@
+b.id_parameter,b.mes,b.hora,b.value,b.nombre_unidad
+CO,10,9,30.4,partes por millon
+CO,4,9,33.0,partes por millon
+CO,5,17,36.9,partes por millon
+NO,6,7,430.0,partes por billon
+NO,4,7,572.0,partes por billon
+NOX,8,8,496.0,partes por billon
+NOX,4,7,633.0,partes por billon
+NOX,12,4,716.0,partes por billon
+PM10,11,18,965.0,microgramos por metro cubico
+PM2.5,7,12,132.0,microgramos por metro cubico
+PM2.5,11,11,378.0,microgramos por metro cubico
+PMCO,10,8,154.0,microgramos por metro cubico
+PMCO,11,9,204.0,microgramos por metro cubico
+PMCO,2,20,282.0,microgramos por metro cubico
+PMCO,7,16,387.0,microgramos por metro cubico
+SO2,3,9,427.0,partes por billon
+SO2,5,16,444.0,partes por billon
+SO2,1,3,498.0,partes por billon
+CO,8,10,33.0,partes por millon
+CO,6,20,36.3,partes por millon
+CO,2,9,39.3,partes por millon
+NO,8,7,376.0,partes por billon
+NO,3,7,563.0,partes por billon
+NO,10,7,581.0,partes por billon
+NO2,9,10,260.0,partes por billon
+NO2,10,10,332.0,partes por billon
+NOX,6,8,494.0,partes por billon
+NOX,6,9,494.0,partes por billon
+NOX,3,7,611.0,partes por billon
+NOX,10,7,647.0,partes por billon
+O3,6,13,360.0,partes por billon
+O3,10,13,404.0,partes por billon
+PM10,9,17,961.0,microgramos por metro cubico
+PM10,5,19,998.0,microgramos por metro cubico
+PM2.5,9,23,159.0,microgramos por metro cubico
+PM2.5,5,11,281.0,microgramos por metro cubico
+PM2.5,3,11,345.0,microgramos por metro cubico
+PMCO,9,7,339.0,microgramos por metro cubico
+PMCO,3,20,545.0,microgramos por metro cubico
+PMCO,4,19,672.0,microgramos por metro cubico
+PMCO,1,1,816.0,microgramos por metro cubico
+SO2,4,10,476.0,partes por billon
+SO2,12,0,481.0,partes por billon
+SO2,11,17,491.0,partes por billon
+NO,7,7,378.0,partes por billon
+NO,11,7,469.0,partes por billon
+NO,2,8,688.0,partes por billon
+NO2,5,10,306.0,partes por billon
+NO2,3,9,324.0,partes por billon
+NOX,1,8,783.0,partes por billon
+O3,1,15,377.0,partes por billon
+O3,8,14,403.0,partes por billon
+O3,4,14,413.0,partes por billon
+PM10,10,15,930.0,microgramos por metro cubico
+PM10,4,17,1269.0,microgramos por metro cubico
+PM2.5,6,15,166.0,microgramos por metro cubico
+PM2.5,4,11,988.0,microgramos por metro cubico
+PMCO,6,18,376.0,microgramos por metro cubico
+PMCO,12,18,666.0,microgramos por metro cubico
+SO2,9,18,443.0,partes por billon
+CO,9,19,32.6,partes por millon
+CO,1,20,39.0,partes por millon
+NO2,6,12,251.0,partes por billon
+NO2,11,10,447.0,partes por billon
+PM2.5,12,9,690.0,microgramos por metro cubico
+PM2.5,2,5,698.0,microgramos por metro cubico
+SO2,6,21,409.0,partes por billon
+SO2,10,11,452.0,partes por billon
+CO,12,10,35.4,partes por millon
+NO,9,7,430.0,partes por billon
+NO,5,7,531.0,partes por billon
+NO,12,4,650.0,partes por billon
+NO2,7,10,234.0,partes por billon
+NO2,8,15,243.0,partes por billon
+NO2,4,10,292.0,partes por billon
+NOX,9,7,498.0,partes por billon
+NOX,5,7,577.0,partes por billon
+NOX,2,8,755.0,partes por billon
+O3,5,12,361.0,partes por billon
+O3,7,13,361.0,partes por billon
+O3,2,13,441.0,partes por billon
+O3,3,14,475.0,partes por billon
+PM10,7,14,817.0,microgramos por metro cubico
+PM10,6,16,959.0,microgramos por metro cubico
+PM10,8,11,994.0,microgramos por metro cubico
+PM10,2,19,998.0,microgramos por metro cubico
+PM10,12,17,1020.0,microgramos por metro cubico
+PM2.5,1,9,681.0,microgramos por metro cubico
+PM2.5,10,21,777.0,microgramos por metro cubico
+PMCO,8,6,201.0,microgramos por metro cubico
+PMCO,5,19,344.0,microgramos por metro cubico
+SO2,1,0,498.0,partes por billon
+SO2,1,10,498.0,partes por billon
+CO,7,11,33.2,partes por millon
+CO,11,19,36.6,partes por millon
+CO,3,9,36.8,partes por millon
+CO,5,20,36.9,partes por millon
+NO,1,8,702.0,partes por billon
+NO2,2,12,421.0,partes por billon
+NO2,12,11,444.0,partes por billon
+NO2,1,11,463.0,partes por billon
+NOX,9,22,498.0,partes por billon
+NOX,7,9,499.0,partes por billon
+NOX,11,7,511.0,partes por billon
+O3,11,13,359.0,partes por billon
+O3,12,16,402.0,partes por billon
+O3,9,14,405.0,partes por billon
+PM10,1,16,1319.0,microgramos por metro cubico
+PM10,3,19,1570.0,microgramos por metro cubico
+PM2.5,8,17,150.0,microgramos por metro cubico
+SO2,8,9,449.0,partes por billon
+SO2,7,19,479.0,partes por billon
+SO2,2,9,493.0,partes por billon

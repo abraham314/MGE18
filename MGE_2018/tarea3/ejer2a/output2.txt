@@ -1,0 +1,41 @@
+XNA,Northwest Arkansas Regional Airport,XNA,Northwest Arkansas Regional Airport,Fayetteville/Springdale/Rogers,AR,USA,-,OO,Skywest Airlines Inc.,-,2015,12,29,2,OO,6341,N945SW,XNA,DEN,0915,1312,237,28,1340,128,119,86,616,1406,5,1023,1411,228,0,0,,0,0,228,0,0
+XNA,Northwest Arkansas Regional Airport,XNA,Northwest Arkansas Regional Airport,Fayetteville/Springdale/Rogers,AR,USA,-,OO,Skywest Airlines Inc.,-,2015,12,30,3,OO,4515,N910EV,XNA,MSP,1648,1749,61,12,1801,117,105,83,596,1924,10,1845,1934,49,0,0,,0,0,0,49,0
+XNA,Northwest Arkansas Regional Airport,XNA,Northwest Arkansas Regional Airport,Fayetteville/Springdale/Rogers,AR,USA,-,OO,Skywest Airlines Inc.,-,2015,12,30,3,OO,4729,N8828D,XNA,ATL,1220,,,,,106,,,589,,,1506,,,0,1,A,,,,,
+XNA,Northwest Arkansas Regional Airport,XNA,Northwest Arkansas Regional Airport,Fayetteville/Springdale/Rogers,AR,USA,-,OO,Skywest Airlines Inc.,-,2015,12,30,3,OO,6341,N970SW,XNA,DEN,0915,0908,-7,27,0935,128,143,108,616,1023,8,1023,1031,8,0,0,,,,,,
+XNA,Northwest Arkansas Regional Airport,XNA,Northwest Arkansas Regional Airport,Fayetteville/Springdale/Rogers,AR,USA,-,OO,Skywest Airlines Inc.,-,2015,12,31,4,OO,6341,N471CA,XNA,DEN,0915,0913,-2,34,0947,128,146,108,616,1035,4,1023,1039,16,0,0,,16,0,0,0,0
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,2,5,AS,61,N794AS,YAK,CDV,1151,1306,75,3,1309,55,44,37,213,1346,4,1246,1350,64,0,0,,0,0,0,64,0
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,2,5,AS,66,N570AS,YAK,JNU,1830,1851,21,6,1857,49,49,39,199,1936,4,1919,1940,21,0,0,,0,0,0,21,0
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,3,6,AS,61,N799AS,YAK,CDV,1151,1130,-21,10,1140,55,45,31,213,1211,4,1246,1215,-31,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,3,6,AS,66,N708AS,YAK,JNU,1830,,,,,49,,,199,,,1919,,,0,1,B,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,4,7,AS,61,N764AS,YAK,CDV,1151,1136,-15,3,1139,55,42,35,213,1214,4,1246,1218,-28,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,4,7,AS,66,N796AS,YAK,JNU,1830,1811,-19,5,1816,49,45,36,199,1852,4,1919,1856,-23,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,5,1,AS,61,N765AS,YAK,CDV,1151,1144,-7,6,1150,55,46,36,213,1226,4,1246,1230,-16,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,5,1,AS,66,N797AS,YAK,JNU,1830,1807,-23,4,1811,49,41,34,199,1845,3,1919,1848,-31,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,6,2,AS,61,N764AS,YAK,CDV,1151,1134,-17,14,1148,55,56,37,213,1225,5,1246,1230,-16,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,6,2,AS,66,N613AS,YAK,JNU,1830,2046,136,7,2053,49,54,43,199,2136,4,1919,2140,141,0,0,,5,0,0,136,0
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,7,3,AS,61,N762AS,YAK,CDV,1151,1151,0,7,1158,55,48,37,213,1235,4,1246,1239,-7,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,7,3,AS,66,N762AS,YAK,JNU,1830,1812,-18,3,1815,49,,,199,,,1919,,,1,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,8,4,AS,61,N765AS,YAK,CDV,1151,1136,-15,6,1142,55,42,32,213,1214,4,1246,1218,-28,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,8,4,AS,66,N792AS,YAK,JNU,1830,1851,21,9,1900,49,48,34,199,1934,5,1919,1939,20,0,0,,0,0,0,20,0
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,9,5,AS,61,N763AS,YAK,CDV,1151,1130,-21,5,1135,55,42,34,213,1209,3,1246,1212,-34,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,9,5,AS,66,N705AS,YAK,JNU,1830,1748,-42,9,1757,49,51,36,199,1833,6,1919,1839,-40,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,10,6,AS,61,N762AS,YAK,CDV,1151,1140,-11,4,1144,55,44,36,213,1220,4,1246,1224,-22,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,10,6,AS,66,N791AS,YAK,JNU,1830,1800,-30,4,1804,49,43,35,199,1839,4,1919,1843,-36,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,11,7,AS,61,N764AS,YAK,CDV,1155,1144,-11,10,1154,48,48,34,213,1228,4,1243,1232,-11,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,11,7,AS,66,N779AS,YAK,JNU,1830,1753,-37,13,1806,55,50,34,199,1840,3,1925,1843,-42,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,12,1,AS,61,N762AS,YAK,CDV,1155,1149,-6,8,1157,48,48,37,213,1234,3,1243,1237,-6,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,12,1,AS,66,N796AS,YAK,JNU,1830,1810,-20,3,1813,55,39,33,199,1846,3,1925,1849,-36,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,13,2,AS,61,N764AS,YAK,CDV,1155,1129,-26,10,1139,48,53,39,213,1218,4,1243,1222,-21,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,13,2,AS,66,N756AS,YAK,JNU,1830,1758,-32,14,1812,55,50,31,199,1843,5,1925,1848,-37,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,14,3,AS,61,N768AS,YAK,CDV,1155,1243,48,4,1247,48,43,37,213,1324,2,1243,1326,43,0,0,,0,0,0,43,0
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,14,3,AS,66,N768AS,YAK,JNU,1830,1806,-24,5,1811,55,40,33,199,1844,2,1925,1846,-39,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,15,4,AS,61,N764AS,YAK,CDV,1155,1154,-1,4,1158,48,44,36,213,1234,4,1243,1238,-5,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,15,4,AS,66,N760AS,YAK,JNU,1830,1826,-4,13,1839,55,53,36,199,1915,4,1925,1919,-6,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,16,5,AS,61,N768AS,YAK,CDV,1155,1148,-7,12,1200,48,55,39,213,1239,4,1243,1243,0,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,16,5,AS,66,N627AS,YAK,JNU,1830,1804,-26,12,1816,55,54,38,199,1854,4,1925,1858,-27,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,17,6,AS,61,N768AS,YAK,CDV,1155,1147,-8,5,1152,48,46,37,213,1229,4,1243,1233,-10,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,17,6,AS,66,N796AS,YAK,JNU,1830,1806,-24,4,1810,55,45,36,199,1846,5,1925,1851,-34,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,18,7,AS,61,N763AS,YAK,CDV,1155,1154,-1,4,1158,48,44,38,213,1236,2,1243,1238,-5,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,18,7,AS,66,N788AS,YAK,JNU,1830,1743,-47,9,1752,55,51,38,199,1830,4,1925,1834,-51,0,0,,,,,,
+YAK,Yakutat Airport,YAK,Yakutat Airport,Yakutat,AK,USA,-,AS,Alaska Airlines Inc.,-,2015,1,19,1,AS,61,N763AS,YAK,CDV,1155,1148,-7,10,1158,48,50,37,213,1235,3,1243,1238,-5,0,0,,,,,,
+

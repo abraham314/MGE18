@@ -1,0 +1,134 @@
+---
+title: "Proyecto1_PIG"
+output: html_document
+---
+
+
+# PIG
+
+### Preambulo
+ - Para todos los ejercicios, se eliminaron los registros con mediciones nulas; lo anterior, en virtud de que al no tener valor, no se pueden utilizar ni interpretar adecuadamente.
+ 
+ - Para las preguntas B.2 y B.3 se eliminaron lo siguientes contaminantes pues no tienen una ecuación de transformación a IMECA asociada y por lo tanto no fue posible compararlos con los demás contaminantes: NO, NOX y PMCO. 
+
+### B.1
+__¿Cuál es la estación meteorológica más "nueva"?__
+
+La estación meteorológica más nueva es Milpa Alta (MPA) pues su primer registro es en enero 2016.
+
+
+
+### B.2
+
+__¿Cuál es el contaminante con la medición más alta? -ten cuidado con las unidades de cada contaminante!-, 
+¿en qué fecha sucedió?, ¿qué estación metorológica la registró?__
+
+El contaminante con la medicion más alta fue PM2.5 con un valor IMECA de 1319.52. La fecha en que sucedió fue el 16-04-2013 en al estación Xalostoc (XAL), en el Estado de México.
+
+Es importante destacar que aunque se obtuvo este valor de IMECA, probablemente exista algun problema con el "value" de el presente registro, pues en internet se indicaba que el valor máximo de IMECA es 500.
+
+
+
+### B.3
+__¿Cuál es el contaminante con la medición más baja? -ten cuidado con las unidades de cada contaminante!-, 
+¿en qué fecha sucedió?, ¿qué estación metorológica la registró?__
+
+No es posible determinar el contaminante con la medición más baja (tomando el IMECA como unidad para realizar la comparación entre variables); lo anterior, pues existen 328,277 mediciones con "value" cero y por lo tanto el valor IMECA que se calcula también es cero en dichas mediciones. En particular, lo anterior sucede con los siguientes contaminantes: CO, SO2, O3, PM2.5 y NO2.
+
+No obstante, se anexa base con todas las mediciones cero, pues son las que constituirian las mediciones más bajas.
+
+
+### B.4
+__¿Cuál es el promedio de mediciones (número de observaciones) de cada estación meteorológica por día 
+(redondeado a enteros)?__
+
+El promedio de las mediciones se muestra en la última columna:
+
+```{r,eval=FALSE}
+estacion,nombre,num_dias,num_obs,promedio_mediciones
+ACO,Acolman,3437,402274,117
+AJM,Ajusco Medio,1076,217270,201
+AJU,Ajusco,969,35792,36
+ATI,Atizapán,8256,742320,89
+BJU,Benito Juarez,7143,632556,88
+CAM,Camarones,4914,500148,101
+CCA,Centro de Ciencias de la Atmósfera,1212,182193,150
+CHO,Chalco,3465,307018,88
+CUA,Cuajimalpa,8155,464084,56
+CUT,Cuautitlán,1995,253291,126
+FAC,FES Acatlán,10743,1294628,120
+GAM,Gustavo A. Madero,735,23477,31
+HGM,Hospital General de México,2116,409780,193
+INN,Investigaciones Nucleares,773,93932,121
+IZT,Iztacalco,3738,591241,158
+LLA,Los Laureles,8052,337647,41
+LPR,La Presa,9358,347666,37
+MER,Merced,11183,1657411,148
+MGH,Miguel Hidalgo,1061,218803,206
+MON,Montecillo,8241,381846,46
+MPA,Milpa Alta,687,88220,128
+NEZ,Nezahualcóyotl,2182,338819,155
+PED,Pedregal,11341,1599425,141
+SAG,San Agustín,9594,1349926,140
+SFE,Santa Fe,1861,341822,183
+TAH,Tláhuac,8539,690603,80
+TLA,Tlalnepantla,11178,1641310,146
+TLI,Tultitlán,8588,957095,111
+UAX,UAM Xochimilco,2129,333794,156
+UIZ,UAM Iztapalapa,9883,1278624,129
+VIF,Villa de las Flores,8262,952891,115
+XAL,Xalostoc,11082,1550022,139
+
+```
+
+
+
+
+### B.5
+__¿Cuántas veces por año hemos estado con $NO_{x}$ entre la Fase I y la Fase II de contingencia ambiental? (entre 191 y 239 -inclusive-) Promedia el contaminante por día__
+
+Para este ejercicio se utilizó el contaminante $NO_X$ haciendo uso de la ecuación de transformación a IMECA de NO2, es decir; la ecuación simplificada: $0.001*C[NO_X]*100/0.21$, donde $C[NO_X]$ es la concentración de $NO_X$.
+
+Por otro lado, utilizando el promedio del contaminante por día se obtienen cero resultados, razón por la cual se utilizó el máximo por dia.
+
+Considerando lo anterior, se obtuvo que hemos estado entre la Fase I y Fase II el siguiente número de veces:
+
+```{r,eval=FALSE}
+year,fase1_fase2
+1986,26
+1987,28
+1988,13
+1989,23
+1990,26
+1991,16
+1992,28
+1993,79
+1994,81
+1995,89
+1996,152
+1997,145
+1998,101
+1999,69
+2000,102
+2001,45
+2002,38
+2003,35
+2004,36
+2005,46
+2006,42
+2007,28
+2008,32
+2009,26
+2010,24
+2011,29
+2012,33
+2013,39
+2014,20
+2015,14
+2016,22
+2017,26
+
+```
+
+
+

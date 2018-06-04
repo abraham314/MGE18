@@ -1,0 +1,116 @@
+---
+title: "tarea3"
+output: html_document
+---
+**Ejercicio 1: Utilizando los datos de ecobici_2010_2017 y MapReduce averigua ¿Cuántos registros hay por cicloestación?**
+
+**Imágen del jps del clúster y map reduce exitoso**
+![](ejer1/imagenes/nodos.png)
+
+![](ejer1/imagenes/mapred.png)
+
+**Imágen de localhost:8088 seleccionando la opción Nodes**
+
+![](ejer1/imagenes/nodecluster.png)
+
+**Imágen de localhost:8088 seleccionando la opción FINISHED para ver que los jobs corrieron existosamente**
+
+![](ejer1/imagenes/finished.png)
+
+
+**Se muestran resultados**
+
+![](ejer1/imagenes/output1.png)
+
+
+
+
+
+**Ejercicio 2: Con los datos de vuelos retrasados en USA hacer un join del lado del mapper con flights, airports y airlines. Primero intenta una sola llave o flights o airports**
+
+para este caso el Join se hzizo en 2 partes, la primera se unio flights con airlines utilizando los programas mapper2 y reducer2 que se agregan en la carpeta del ejercicio 2 y la segunda parte uso airports con el resultado del join anterior a través de mapper2_1 y reducer2_1:
+
+Mapper2 y reducer2 corre con la linea 
+cat /home/abraham/MGE_2018/tarea3/flights.csv /home/abraham/MGE_2018/tarea3/airlines.csv | python /home/abraham/MGE?2018/tarea3/mapper2.py | sort -r | python /home/abraham/MGE?2018/tarea3/reducer2.py>/home/abraham/MGE_2018/tarea3/ejer2/outaux.csv
+
+![](ejer2/imagenes/mapper2.png) 
+
+![](ejer2/imagenes/reducer2.png)
+
+mapper 2_1 y reducer 2_1 y corren correctamente con la linea 
+cat /home/abraham/MGE_2018/tarea3/ejer2/outaux.csv /home/abraham/MGE_2018/tarea3/airports.csv | python /home/abraham/MGE?2018/tarea3/ejer2/mapper2_1.py | sort --version-sort  | python /home/abraham/MGE?2018/tarea3/ejer2/reducer2_1.py
+
+
+![](ejer2/imagenes/mapper2_1.png)
+
+![](ejer2/imagenes/reducer2_1.png)
+
+con ambos obtenemos lo siguiente:
+
+**jps y map reduce exitoso**
+![](ejer2/imagenes/jps.png)
+
+![](ejer2/imagenes/mapred2.png)
+
+**localhost con nodes**
+
+![](ejer2/imagenes/node2.png)
+
+**localhost con finished**
+
+![](ejer2/imagenes/finish2.png)
+
+**se muestran resultados**
+
+![](ejer2/imagenes/output2.png)
+
+se anexa una muestra de la salida en el archivo output2.txt de la carpeta del ejercicio 2.
+
+**Ejercicio 3: Con los datos de vuelos retrasados en USA hacer un join del lado del reducer con flights, airports y airlines. Primero intenta una sola llave o flights o airports**
+
+al igual que en el ejemplo anterior se hace el join en 2 pasos primero airlines con flights usando los programas mapper3.py y reducer3.py y luego con ese resulado unido a airports y se usan los programas mapper3_1 y reducer3_1. 
+
+Mapper2 y reducer2 corre con la linea 
+cat /home/abraham/MGE_2018/tarea3/flights.csv /home/abraham/MGE_2018/tarea3/airlines.csv | python /home/abraham/MGE?2018/tarea3/ejer3/mapper3.py | python /home/abraham/MGE?2018/tarea3/ejer3/reducer3.py
+
+
+Mapper
+
+![](ejer3/imagenes/mapper3.png)
+
+Reducer
+
+![](ejer3/imagenes/reducer3.png)
+
+cat /home/abraham/MGE_2018/tarea3/ejer3/outaux3.csv /home/abraham/MGE_2018/tarea3/airports.csv | python /home/abraham/MGE?2018/tarea3/ejer3/mapper3_1.py | python /home/abraham/MGE?2018/tarea3/ejer3/reducer3_1.py
+
+Mapper3_1
+
+![](ejer3/imagenes/mapper3_1.png)
+
+Reducer3_1
+![](ejer3/imagenes/reducer3_1.png)
+
+**jps y map reduce exitoso**
+
+jps 
+![](ejer3/imagenes/jps.png)
+
+mapred 
+![](ejer3/imagenes/mapred.png)
+
+
+**localhost con nodes**
+
+![](ejer3/imagenes/nodes3.png)
+
+**locahost con finished**
+![](ejer3/imagenes/finished3.png)
+
+**Se muestran resultados del output3.txt, se utilizó una muestra dado el peso del archivo**
+
+![](ejer3/imagenes/output3.png)
+
+
+
+

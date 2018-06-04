@@ -1,0 +1,2 @@
+a.destination_airport,name,trafico
+ATL,Hartsfield-Jackson Atlanta International Airport,346904

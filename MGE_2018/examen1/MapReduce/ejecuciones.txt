@@ -1,0 +1,15 @@
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar -files /home/abraham/MGE_2018/examen1/MapReduce/mapper2.py,/home/abraham/MGE_2018/examen1/MapReduce/reducer2.py -input /home/abraham/MGE_2018/examen1/MapReduce/datos/contaminantes.csv -output /home/abraham/MGE_2018/examen1/MapReduce/mr_a_2.csv -mapper mapper2.py -reducer reducer2.py 
+
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar -files /home/abraham/MGE_2018/examen1/MapReduce/mapper1.py,/home/abraham/MGE_2018/examen1/MapReduce/reducer1.py -input /home/abraham/MGE_2018/examen1/MapReduce/datos/contaminantes.csv -output /home/abraham/MGE_2018/examen1/MapReduce/mr_a_1.csv -mapper mapper1.py -reducer reducer1.py
+
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar -files /home/abraham/MGE_2018/examen1/MapReduce/mapper3.py,/home/abraham/MGE_2018/examen1/MapReduce/reducer3.py -input /home/abraham/MGE_2018/examen1/MapReduce/datos/contaminantes.csv -output /home/abraham/MGE_2018/examen1/MapReduce/mr_a_3.csv -mapper mapper3.py -reducer reducer3.py
+
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar -files /home/abraham/MGE_2018/examen1/MapReduce/mapper4.py,/home/abraham/MGE_2018/examen1/MapReduce/reducer4.py -input /home/abraham/MGE_2018/examen1/MapReduce/datos/contaminantes.csv -output /home/abraham/MGE_2018/examen1/MapReduce/mr_a_4.csv -mapper mapper4.py -reducer reducer4.py
+
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar -files /home/abraham/MGE_2018/examen1/MapReduce/mapper5.py,/home/abraham/MGE_2018/examen1/MapReduce/reducer5.py -input /home/abraham/MGE_2018/examen1/MapReduce/datos/contaminantes.csv -output /home/abraham/MGE_2018/examen1/MapReduce/mr_aa_5.csv -mapper mapper5.py -reducer reducer5.py
+
+
+ssh -i newspark.pem -ND 8157 hadoop@ec2-52-36-0-19.us-west-2.compute.amazonaws.com
+
+
+hadoop jar /usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.7.3.jar -files /home/abraham/MGE_2018/examen1/MapReduce/mapper1.py,/home/abraham/MGE_2018/examen1/MapReduce/reducer1.py -input /home/abraham/MGE_2018/examen1/MapReduce/datos/contaminantes_2017.csv -output /home/abraham/Descargas/mr_a_1.csv -mapper mapper1.py -reducer reducer.py

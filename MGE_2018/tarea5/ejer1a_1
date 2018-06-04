@@ -1,0 +1,2 @@
+select b.*,a.sub from(select reportsto,collect_set(firstname) as sub from northwind.employees2 where reportsto is not null group by reportsto) as a join 
+(select employeeid,lastname,firstname,title,birthdate,hiredate,city,country from northwind.employees2) as b on a.reportsto=b.employeeid;

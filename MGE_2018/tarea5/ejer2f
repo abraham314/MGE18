@@ -1,0 +1,4 @@
+select*from(select b.airline, a.day_of_week,min(a.departure_delay) as menor from flights.flights as a join flights.airlines as b on a.airline=b.iata_code 
+where (a.day_of_week==2) and a.departure_delay>0 
+group by b.airline,a.day_of_week  order by menor /*limit 3*/) as tb /*order by menor desc limit 1*/;
+

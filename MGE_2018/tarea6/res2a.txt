@@ -1,0 +1,8 @@
+DESTINATION_AIRPORT,AIRLINE,AIRPORT
+HNL,Delta Air Lines Inc.,Honolulu International Airport
+HNL,Hawaiian Airlines Inc.,Honolulu International Airport
+HNL,United Air Lines Inc.,Honolulu International Airport
+HNL,American Airlines Inc.,Honolulu International Airport
+HNL,US Airways Inc.,Honolulu International Airport
+HNL,Alaska Airlines Inc.,Honolulu International Airport
+HNL,Virgin America,Honolulu International Airport

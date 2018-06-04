@@ -1,0 +1,28 @@
+version: "2.0"
+services:
+  scheduler:
+    image: arinarmo/dask-node:latest
+    entrypoint: dask-scheduler
+    ports:
+      - 8783:8783
+      - 8784:8784
+      - 8788:8788
+      - 8789:8789
+    volumes:
+      - ./data:/data
+
+  worker:
+    image: arinarmo/dask-node:latest
+    entrypoint: dask-worker scheduler:8786
+    volumes:
+      - ./data:/data
+
+  notebook:
+    build:
+      context: ./notebook_config
+    entrypoint: jupyter notebook
+    ports:
+      - 8888:8888
+    volumes:
+      - ./notebooks:/home/jupyter/workspace/notebooks
+      - ./data:/data

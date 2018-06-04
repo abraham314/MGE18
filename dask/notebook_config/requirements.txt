@@ -1,0 +1,11 @@
+jupyter
+jupyterlab
+dask[complete]
+dask-ml
+graphviz
+scikit-learn
+bokeh
+h5py
+matplotlib
+pyspark
+s3fs
